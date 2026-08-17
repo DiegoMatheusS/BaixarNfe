@@ -6,8 +6,16 @@ const categoryFilter = document.querySelector("#catalog-category-filter");
 const moreButton = document.querySelector("#catalog-more");
 const modelsModal = document.querySelector("#models-modal");
 const modelsModalTitle = document.querySelector("#models-modal-title");
+const modelsModalDescription = document.querySelector("#models-modal-description");
+const modelsModalEyebrow = document.querySelector("#models-modal-eyebrow");
+const modelsModalPreview = document.querySelector("#models-modal-preview");
+const modelsModalMeta = document.querySelector("#models-modal-meta");
+const modelsModalFeatures = document.querySelector("#models-modal-features");
 const modelsModalList = document.querySelector("#models-modal-list");
+const modelsModalPrice = document.querySelector("#models-modal-price");
+const modelsModalAction = document.querySelector("#models-modal-action");
 const scrollTopButton = document.querySelector("#scroll-top");
+let modalTrigger = null;
 
 const catalogTemplates = [
   {
@@ -666,11 +674,7 @@ function purchaseUrl(template) {
   return `https://mail.google.com/mail/?${params.toString()}`;
 }
 
-function cardAction(template) {
-  if (Array.isArray(template.modelos) && template.modelos.length) {
-    return `<button class="template-action models" type="button" data-models-id="${escapeHtml(template.id)}">Ver modelos</button>`;
-  }
-
+function finalAction(template) {
   const paid = template.tipo !== "gratuito";
   const available = template.status === "disponivel";
   const targetUrl = safeUrl(paid ? template.checkoutUrl : template.arquivoUrl);
@@ -678,16 +682,21 @@ function cardAction(template) {
   if (paid) {
     const emailUrl = safeUrl(purchaseUrl(template));
     if (emailUrl) {
-      return `<a class="template-action professional" href="${escapeHtml(emailUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Comprar ${escapeHtml(template.nome)} por e-mail">Comprar</a>`;
+      return `<a class="template-action professional detail-action" href="${escapeHtml(emailUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Comprar ${escapeHtml(template.nome)} por e-mail">Comprar</a>`;
     }
   }
 
   if (available && targetUrl) {
-    const label = paid ? "Comprar agora" : "Baixar grátis";
-    return `<a class="template-action ${paid ? "professional" : "free"}" href="${escapeHtml(targetUrl)}">${label}</a>`;
+    const label = paid ? "Comprar" : "Baixar";
+    const download = paid ? "" : " download";
+    return `<a class="template-action ${paid ? "professional" : "free"} detail-action" href="${escapeHtml(targetUrl)}"${download}>${label}</a>`;
   }
 
-  return `<button type="button" disabled aria-disabled="true">${paid ? "Compra indisponível" : "Download em breve"}</button>`;
+  return `<button class="template-action detail-action" type="button" disabled aria-disabled="true">${paid ? "Comprar" : "Baixar"}<small>Em breve</small></button>`;
+}
+
+function detailsButton(template) {
+  return `<button class="template-action details" type="button" data-details-id="${escapeHtml(template.id)}" aria-label="Ver detalhes de ${escapeHtml(template.nome)}">Ver mais</button>`;
 }
 
 function planInfo(type) {
@@ -716,7 +725,7 @@ function templateCard(template, index) {
       <p>${escapeHtml(template.descricao)}</p>
       <div class="template-card-footer">
         <strong class="template-price">${escapeHtml(formatPrice(template))}</strong>
-        ${cardAction(template)}
+        ${detailsButton(template)}
       </div>
     </div>
   `;
@@ -789,32 +798,98 @@ function closeModelsModal() {
   if (!modelsModal) return;
   modelsModal.hidden = true;
   document.body.classList.remove("models-modal-open");
+  modalTrigger?.focus();
+  modalTrigger = null;
 }
 
-function openModelsModal(template) {
-  if (!modelsModal || !modelsModalTitle || !modelsModalList) return;
+function templateFeatures(template) {
+  if (Array.isArray(template.recursos) && template.recursos.length) return template.recursos;
+  if (Array.isArray(template.modelos) && template.modelos.length) {
+    return [
+      `${template.modelos.length} modelos de painel`,
+      "Indicadores comerciais e financeiros",
+      "Filtros por plataforma e período",
+      "Estrutura compatível com Excel e JSON"
+    ];
+  }
+
+  const descriptionParts = String(template.descricao || "")
+    .replace(/[.]+$/g, "")
+    .split(/,| e /)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+  return [
+    template.destaque || "Visão geral",
+    ...descriptionParts,
+    "Filtros por período e categoria",
+    "Estrutura compatível com Excel e JSON"
+  ].filter((item, index, array) => array.indexOf(item) === index).slice(0, 6);
+}
+
+function modalDashboardPreview(template) {
+  const seed = catalogTemplates.findIndex((item) => item.id === template.id);
+  const plan = planInfo(template.tipo);
+  const imageUrl = safeUrl(template.previewUrl);
+  if (imageUrl) {
+    return `<img src="${escapeHtml(imageUrl)}" alt="Exemplo visual do dashboard ${escapeHtml(template.nome)}" loading="lazy" />`;
+  }
+
+  return `
+    <div class="detail-dashboard template-${escapeHtml(template.cor || "yellow")}" aria-hidden="true">
+      <div class="detail-dashboard-bar"><span>${escapeHtml(template.nome)}</span><b>${escapeHtml(plan.label)}</b></div>
+      <div class="detail-dashboard-content">
+        <div class="detail-dashboard-kpis"><article><small>INDICADOR PRINCIPAL</small><strong>R$ 128,4 mil</strong><i>+12,8%</i></article><article><small>RESULTADO</small><strong>R$ 43,7 mil</strong><i>+8,3%</i></article><article><small>VOLUME</small><strong>1.284</strong><i>Atualizado</i></article></div>
+        <div class="detail-dashboard-visuals">
+          <div class="detail-dashboard-chart"><span>${escapeHtml(template.destaque || "Evolução por período")}</span><div class="detail-dashboard-bars">${dashboardBars(Math.max(0, seed))}</div></div>
+          <div class="detail-dashboard-donut"><span>Distribuição</span><i></i></div>
+        </div>
+        <div class="detail-dashboard-table"><span></span><span></span><span></span><span></span></div>
+      </div>
+    </div>`;
+}
+
+function openModelsModal(template, trigger) {
+  if (!modelsModal || !modelsModalTitle || !modelsModalList || !modelsModalPreview || !modelsModalFeatures || !modelsModalAction) return;
+  modalTrigger = trigger || document.activeElement;
+  const plan = planInfo(template.tipo);
   modelsModalTitle.textContent = template.nome;
-  modelsModalList.replaceChildren(...template.modelos.map((model) => {
+  if (modelsModalDescription) modelsModalDescription.textContent = template.descricao;
+  if (modelsModalEyebrow) modelsModalEyebrow.textContent = `${template.categoria} • ${plan.label}`;
+  modelsModalPreview.innerHTML = modalDashboardPreview(template);
+  if (modelsModalMeta) {
+    modelsModalMeta.innerHTML = `<span>Power BI</span><span>Excel</span><span>JSON</span><span>${escapeHtml(template.categoria)}</span>`;
+  }
+  modelsModalFeatures.replaceChildren(...templateFeatures(template).map((feature) => {
+    const item = document.createElement("li");
+    item.textContent = feature;
+    return item;
+  }));
+
+  const models = Array.isArray(template.modelos) ? template.modelos : [];
+  modelsModalList.replaceChildren(...models.map((model) => {
     const article = document.createElement("article");
     const fields = Array.isArray(model.campos)
       ? `<div class="model-fields">${model.campos.map((field) => `<span>${escapeHtml(field)}</span>`).join("")}</div>`
       : "";
     article.innerHTML = `
       <div><strong>${escapeHtml(model.nome)}</strong><p>${escapeHtml(model.descricao)}</p>${fields}</div>
-      <button type="button" disabled aria-disabled="true">Em breve</button>
     `;
     return article;
   }));
+  modelsModalList.hidden = models.length === 0;
+  if (modelsModalPrice) modelsModalPrice.textContent = formatPrice(template);
+  modelsModalAction.innerHTML = finalAction(template);
   modelsModal.hidden = false;
   document.body.classList.add("models-modal-open");
   modelsModal.querySelector("[data-close-models]")?.focus();
 }
 
 grid?.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-models-id]");
+  const button = event.target.closest("[data-details-id]");
   if (!button) return;
-  const template = catalogTemplates.find((item) => item.id === button.dataset.modelsId);
-  if (template) openModelsModal(template);
+  const template = catalogTemplates.find((item) => item.id === button.dataset.detailsId);
+  if (template) openModelsModal(template, button);
 });
 
 modelsModal?.addEventListener("click", (event) => {

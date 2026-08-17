@@ -12,9 +12,9 @@
     <title>ProcurandoDashboardBI — Templates para Power BI</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5674140399014280" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/assets/index-Rj_DCHNM.css" />
-    <link rel="stylesheet" href="/procurandodashboard/styles.css?v=5" />
+    <link rel="stylesheet" href="/procurandodashboard/styles.css?v=6" />
     <script src="/procurandodashboard/config.js?v=3" defer></script>
-    <script src="/procurandodashboard/app.js?v=11" defer></script>
+    <script src="/procurandodashboard/app.js?v=12" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -150,7 +150,7 @@
         </div>
         <div class="templates-grid" id="templates-grid" aria-label="Modelos de dashboards"></div>
         <button class="catalog-more" id="catalog-more" type="button" hidden>Ver mais dashboards</button>
-        <p class="catalog-payment-note">Os gratuitos são modelos básicos para uso pessoal. Nos modelos pagos, o botão Comprar abre um e-mail com dashboard e preço preenchidos. Anexe o comprovante de transferência; a entrega será feita após a confirmação.</p>
+        <p class="catalog-payment-note">Clique em Ver mais para abrir a prévia completa. Nos modelos gratuitos, o download será liberado nessa tela. Nos pagos, o botão Comprar abre um e-mail com dashboard e preço preenchidos.</p>
       </section>
 
       <section class="dashboard-section package-section" id="pacotes">
@@ -191,12 +191,24 @@
       <button class="scroll-top" id="scroll-top" type="button" aria-label="Voltar ao topo" title="Voltar ao topo">↑</button>
 
       <div class="models-modal" id="models-modal" hidden>
-        <section class="models-modal-card" role="dialog" aria-modal="true" aria-labelledby="models-modal-title">
+        <section class="models-modal-card" role="dialog" aria-modal="true" aria-labelledby="models-modal-title" aria-describedby="models-modal-description">
           <button class="models-modal-close" type="button" data-close-models aria-label="Fechar">×</button>
-          <span class="models-modal-eyebrow">MODELOS DISPONÍVEIS</span>
+          <span class="models-modal-eyebrow" id="models-modal-eyebrow">PRÉVIA DO DASHBOARD</span>
           <h2 id="models-modal-title">Dashboard de Vendas</h2>
-          <p>Escolha o formato que melhor combina com sua operação. Cada modelo terá seu próprio exemplo de Excel e JSON.</p>
-          <div class="models-modal-list" id="models-modal-list"></div>
+          <p id="models-modal-description">Veja os indicadores, recursos e formatos incluídos neste dashboard.</p>
+          <div class="models-modal-layout">
+            <div class="models-modal-preview" id="models-modal-preview" aria-label="Imagem de exemplo do dashboard"></div>
+            <div class="models-modal-details">
+              <div class="models-modal-meta" id="models-modal-meta"></div>
+              <h3>O que você acompanha</h3>
+              <ul class="models-modal-features" id="models-modal-features"></ul>
+              <div class="models-modal-list" id="models-modal-list"></div>
+              <div class="models-modal-purchase">
+                <div><span>Valor do modelo</span><strong id="models-modal-price">Grátis</strong></div>
+                <div id="models-modal-action"></div>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </main>
