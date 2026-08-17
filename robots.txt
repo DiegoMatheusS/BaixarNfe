@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://procurandodanfe.com.br/sitemap.xml

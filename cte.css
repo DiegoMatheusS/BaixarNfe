@@ -1,0 +1,649 @@
+/* CT-e / DACTE — layout exclusivo, baseado no exemplo visual fornecido. */
+.cte-print,
+.cte-print * { box-sizing:border-box; }
+
+.cte-print {
+  background:#fff;
+  color:#111;
+  display:block;
+  font-family:Arial,Helvetica,sans-serif;
+  width:100%;
+}
+
+.cte-print .cte-sheet {
+  background:#fff;
+  border:0;
+  color:#111;
+  display:flex;
+  flex-direction:column;
+  height:277mm;
+  margin:0 auto;
+  overflow:hidden;
+  padding:2mm;
+  width:190mm;
+}
+
+.cte-print .cte-homolog {
+  border:0.14mm solid #555;
+  font-size:5.8pt;
+  font-weight:700;
+  margin-bottom:0.5mm;
+  padding:0.25mm;
+  text-align:center;
+}
+.cte-print .cte-homolog[hidden] { display:none !important; }
+
+/* Cabeçalho: Emitente 68 mm | DACTE 89 mm | QR 29 mm = 186 mm. */
+.cte-print .cte-header {
+  display:grid;
+  grid-template-columns:68mm 89mm 29mm;
+  height:31mm;
+  width:186mm;
+}
+
+.cte-print .cte-emitter-column,
+.cte-print .cte-center-column,
+.cte-print .cte-qr {
+  border:0.14mm solid #555;
+  border-radius:0;
+}
+.cte-print .cte-emitter-column,
+.cte-print .cte-center-column { border-right:0; }
+
+.cte-print .cte-emitter-column {
+  display:grid;
+  grid-template-rows:26mm 5mm;
+}
+.cte-print .cte-emitter {
+  align-items:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:0.4mm 0.7mm;
+  text-align:center;
+}
+.cte-print .cte-emitter strong { display:block; font-size:10.4pt; line-height:1; }
+.cte-print .cte-emitter b { display:block; font-size:6pt; line-height:1.03; margin-top:0.45mm; }
+.cte-print .cte-emitter p { font-size:4.6pt; line-height:1.05; margin:0.6mm 0 0.2mm; }
+.cte-print .cte-emitter small { display:block; font-size:4.4pt; line-height:1.04; }
+
+.cte-print .cte-types-row {
+  border-top:0.14mm solid #555;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+.cte-print .cte-inline {
+  align-items:center;
+  display:flex;
+  gap:0.6mm;
+  min-width:0;
+  padding:0.15mm 0.35mm;
+}
+.cte-print .cte-inline + .cte-inline { border-left:0.14mm solid #555; }
+.cte-print .cte-inline span { flex:0 0 auto; font-size:3.9pt; font-weight:700; line-height:1; }
+.cte-print .cte-inline b { font-size:4.9pt; line-height:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.cte-print .cte-center-column {
+  display:grid;
+  grid-template-rows:7mm 5.3mm 18.7mm;
+}
+.cte-print .cte-center-title-row {
+  border-bottom:0.14mm solid #555;
+  display:grid;
+  grid-template-columns:64mm 25mm;
+}
+.cte-print .cte-title {
+  align-items:center;
+  border-right:0.14mm solid #555;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+  overflow:hidden;
+  padding:0.25mm 0.5mm;
+  text-align:center;
+}
+.cte-print .cte-title strong { font-size:9pt; line-height:1; }
+.cte-print .cte-title span { display:block; font-size:3.35pt; line-height:1.04; margin-top:0.18mm; max-width:61mm; }
+.cte-print .cte-modal { align-items:center; display:flex; flex-direction:column; justify-content:center; text-align:center; }
+.cte-print .cte-modal span { font-size:3.7pt; font-weight:700; line-height:1; }
+.cte-print .cte-modal b { font-size:5.4pt; line-height:1.03; margin-top:0.35mm; }
+
+.cte-print .cte-meta-row {
+  border-bottom:0.14mm solid #555;
+  display:grid;
+  grid-template-columns:10mm 9mm 19mm 12mm 39mm;
+}
+.cte-print .cte-meta-row > div {
+  align-items:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+  text-align:center;
+}
+.cte-print .cte-meta-row > div + div { border-left:0.14mm solid #555; }
+.cte-print .cte-meta-row span { font-size:3.45pt; font-weight:700; line-height:1; }
+.cte-print .cte-meta-row b { font-size:5.5pt; line-height:1.02; margin-top:0.2mm; }
+.cte-print .cte-meta-issued b { font-size:4.6pt; }
+
+.cte-print .cte-access-area {
+  display:grid;
+  grid-template-rows:13mm 5.7mm;
+  padding:0.7mm 1.8mm 0.35mm;
+}
+.cte-print .cte-barcode { align-items:center; display:flex; justify-content:center; min-width:0; }
+.cte-print .cte-barcode svg { height:12mm !important; width:100% !important; }
+.cte-print .cte-key-line { align-items:center; display:flex; flex-direction:column; justify-content:center; text-align:center; }
+.cte-print .cte-key-line span { font-size:3.2pt; line-height:1; }
+.cte-print .cte-key-line strong { font-size:5.4pt; line-height:1.03; margin-top:0.18mm; white-space:nowrap; }
+
+.cte-print .cte-qr { align-items:center; display:flex; justify-content:center; padding:0.6mm; }
+.cte-print .cte-qr img { height:27mm; object-fit:contain; width:27mm; }
+
+/* Linhas imediatamente abaixo do cabeçalho. */
+.cte-print .cte-ident-row { display:grid; width:186mm; }
+.cte-print .cte-ident-first { grid-template-columns:36mm 54mm 96mm; }
+.cte-print .cte-ident-second { grid-template-columns:96mm 90mm; }
+.cte-print .cte-ident-third { grid-template-columns:93mm 93mm; }
+.cte-print .cte-box {
+  border:0.14mm solid #555;
+  border-top:0;
+  min-height:5.3mm;
+  padding:0.18mm 0.35mm;
+}
+.cte-print .cte-box + .cte-box { border-left:0; }
+.cte-print .cte-box > span { display:block; font-size:3.55pt; font-weight:700; line-height:1.02; }
+.cte-print .cte-box > b { display:block; font-size:4.8pt; line-height:1.05; margin-top:0.12mm; }
+.cte-print .cte-global-choice { padding-bottom:0.1mm; }
+.cte-print .cte-choice-row { align-items:center; display:flex; gap:0.55mm; margin-top:0.15mm; }
+.cte-print .cte-choice-row span { font-size:4pt; font-weight:700; }
+.cte-print .cte-choice-row i { align-items:center; border:0.14mm solid #555; display:inline-flex; font-size:5pt; font-style:normal; font-weight:900; height:2.4mm; justify-content:center; width:2.4mm; }
+
+/* Remetente, destinatário, expedidor, recebedor e tomador. */
+.cte-print .cte-parties { display:grid; grid-template-columns:93mm 93mm; width:186mm; }
+.cte-print .cte-party { border:0.14mm solid #555; border-top:0; min-height:18mm; padding:0.2mm 0.35mm; }
+.cte-print .cte-party:nth-child(even) { border-left:0; }
+.cte-print .cte-party-title { align-items:baseline; display:flex; gap:0.8mm; min-height:3.2mm; }
+.cte-print .cte-party-title span { font-size:3.8pt; font-weight:700; white-space:nowrap; }
+.cte-print .cte-party-title strong { font-size:5.2pt; line-height:1.04; }
+.cte-print .cte-party-address { display:grid; grid-template-columns:auto 1fr auto 1fr; gap:0.35mm; min-height:4mm; }
+.cte-print .cte-party-address span { font-size:3.35pt; font-weight:700; }
+.cte-print .cte-party-address b { font-size:4.25pt; line-height:1.04; }
+.cte-print .cte-party-meta { display:grid; grid-template-columns:1.1fr .78fr .38fr 1.15fr 1.12fr .72fr .66fr; gap:0.25mm; margin-top:0.2mm; }
+.cte-print .cte-party-meta > span { font-size:3.2pt; font-weight:700; min-width:0; }
+.cte-print .cte-party-meta > span b { display:block; font-size:4pt; font-weight:500; line-height:1.03; margin-top:0.08mm; overflow-wrap:anywhere; }
+
+.cte-print .cte-party-taker { grid-column:1 / span 2; min-height:10mm; padding:0.25mm 0.35mm; }
+.cte-print .cte-taker-line { align-items:baseline; display:grid; grid-template-columns:auto 1.45fr auto .6fr auto .28fr auto .55fr; gap:0.35mm; }
+.cte-print .cte-taker-bottom { grid-template-columns:auto 1.4fr auto .5fr auto .75fr auto .85fr auto .55fr; margin-top:0.55mm; }
+.cte-print .cte-taker-line span { font-size:3.35pt; font-weight:700; white-space:nowrap; }
+.cte-print .cte-taker-line strong { font-size:5pt; }
+.cte-print .cte-taker-line b { font-size:4.15pt; line-height:1.04; }
+
+/* Carga. */
+.cte-print .cte-cargo-top { display:grid; grid-template-columns:70mm 70mm 46mm; width:186mm; }
+.cte-print .cte-cargo-bottom { display:grid; grid-template-columns:16mm 30mm 35mm 35mm 70mm; width:186mm; }
+.cte-print .cte-cargo-top .cte-box,
+.cte-print .cte-cargo-bottom .cte-box { min-height:5mm; }
+.cte-print .cte-cargo-value b { text-align:right; }
+.cte-print .cte-empty-box { min-height:5mm; }
+
+/* Componentes do valor. */
+.cte-print .cte-section-title {
+  border:0.14mm solid #555;
+  border-top:0;
+  font-size:3.55pt;
+  font-weight:700;
+  line-height:1;
+  padding:0.12mm 0.3mm;
+  text-align:center;
+  text-transform:uppercase;
+  width:186mm;
+}
+.cte-print .cte-components-area { display:grid; grid-template-columns:50mm 50mm 50mm 36mm; min-height:14mm; width:186mm; }
+.cte-print .cte-component-group,
+.cte-print .cte-component-totals { border:0.14mm solid #555; border-top:0; }
+.cte-print .cte-component-group + .cte-component-group,
+.cte-print .cte-component-totals { border-left:0; }
+.cte-print .cte-component-head { display:grid; grid-template-columns:1fr 18mm; }
+.cte-print .cte-component-head span { font-size:3.35pt; font-weight:700; padding:0.15mm 0.25mm; }
+.cte-print .cte-component-head span + span { border-left:0.14mm solid #555; text-align:center; }
+.cte-print .cte-component-row { display:grid; grid-template-columns:1fr 18mm; min-height:3mm; }
+.cte-print .cte-component-row span,
+.cte-print .cte-component-row b { font-size:4.05pt; line-height:1.03; padding:0.12mm 0.25mm; }
+.cte-print .cte-component-row b { border-left:0.14mm solid #555; font-weight:500; text-align:right; }
+.cte-print .cte-component-totals { display:grid; grid-template-rows:1fr 1fr; }
+.cte-print .cte-component-totals .cte-box { border:0; min-height:7mm; }
+.cte-print .cte-component-totals .cte-box + .cte-box { border-top:0.14mm solid #555; }
+.cte-print .cte-component-totals .cte-box > b { font-size:5pt; text-align:right; }
+
+/* Impostos. */
+.cte-print .cte-taxes { display:grid; grid-template-columns:78mm 24mm 12mm 24mm 20mm 28mm; width:186mm; }
+.cte-print .cte-taxes .cte-box { min-height:7mm; }
+
+/* Documentos originários: duas metades como no exemplo. */
+.cte-print .cte-documents { border:0.14mm solid #555; border-top:0; height:41mm; width:186mm; }
+.cte-print .cte-doc-table { border-collapse:collapse; table-layout:fixed; width:100%; }
+.cte-print .cte-doc-table th,
+.cte-print .cte-doc-table td { border-right:0.14mm solid #555; font-size:3.45pt; line-height:1.03; padding:0.12mm 0.2mm; text-align:left; vertical-align:top; }
+.cte-print .cte-doc-table th { font-size:3.15pt; font-weight:700; }
+.cte-print .cte-doc-table th:nth-child(1), .cte-print .cte-doc-table th:nth-child(5) { width:10mm; }
+.cte-print .cte-doc-table th:nth-child(2), .cte-print .cte-doc-table th:nth-child(6) { width:31mm; }
+.cte-print .cte-doc-table th:nth-child(3), .cte-print .cte-doc-table th:nth-child(7) { width:37mm; }
+.cte-print .cte-doc-table th:nth-child(4), .cte-print .cte-doc-table th:nth-child(8) { width:15mm; }
+.cte-print .cte-doc-table th:nth-child(4), .cte-print .cte-doc-table td:nth-child(4) { border-right:0.14mm solid #555; }
+.cte-print .cte-doc-table th:last-child, .cte-print .cte-doc-table td:last-child { border-right:0; }
+
+/* Mantém os blocos inferiores perto do fim da folha, como o exemplo. */
+.cte-print .cte-flex-spacer { flex:1 1 auto; min-height:0; }
+.cte-print .cte-observations { border:0.14mm solid #555; border-top:0; font-size:3.8pt; line-height:1.05; min-height:19mm; padding:0.2mm 0.3mm; width:186mm; }
+.cte-print .cte-modal-details { display:grid; grid-template-columns:repeat(5,1fr); width:186mm; }
+.cte-print .cte-modal-details .cte-field { border:0.14mm solid #555; border-top:0; min-height:4.8mm; padding:0.18mm 0.3mm; }
+.cte-print .cte-modal-details .cte-field + .cte-field { border-left:0; }
+.cte-print .cte-modal-details .cte-field > span { display:block; font-size:3.2pt; font-weight:700; }
+.cte-print .cte-modal-details .cte-field > b { display:block; font-size:4.1pt; margin-top:0.08mm; }
+.cte-print .cte-use { display:grid; grid-template-columns:2fr 1fr; width:186mm; }
+.cte-print .cte-use .cte-box { min-height:6mm; }
+.cte-print .cte-cut { border-top:0.14mm dashed #666; margin:11mm 0 0.8mm; width:186mm; }
+
+/* Canhoto. */
+.cte-print .cte-receipt { border:0.14mm solid #555; display:grid; grid-template-columns:1fr 28mm; grid-template-rows:5.2mm 6mm 6mm; width:186mm; }
+.cte-print .cte-receipt > div { border-bottom:0.14mm solid #555; border-right:0.14mm solid #555; font-size:3.7pt; padding:0.18mm 0.3mm; }
+.cte-print .cte-receipt > div span { display:block; font-size:3.3pt; font-weight:700; }
+.cte-print .cte-receipt > div b { display:block; font-size:4.2pt; }
+.cte-print .cte-receipt-declaration { grid-column:1; }
+.cte-print .cte-receipt-number { grid-column:2; text-align:center; }
+.cte-print .cte-receipt-name { grid-column:1; grid-row:2; }
+.cte-print .cte-receipt-arrival { border-right:0 !important; grid-column:2; grid-row:2; }
+.cte-print .cte-receipt-doc { grid-column:1; grid-row:3; width:30mm; }
+.cte-print .cte-receipt-sign { border-left:0.14mm solid #555; grid-column:1; grid-row:3; margin-left:30mm; text-align:center; }
+.cte-print .cte-receipt-departure { border-right:0 !important; grid-column:2; grid-row:3; }
+.cte-print .cte-footer { font-size:3.4pt; padding-top:0.25mm; text-align:center; width:186mm; }
+
+@media print {
+  .cte-print { margin:0 !important; page:cte-page; width:190mm !important; }
+  .cte-print .cte-sheet { height:277mm !important; margin:0 !important; width:190mm !important; }
+}
+@page cte-page { margin:10mm; size:A4 portrait; }
+
+
+/* v2.04 - refinamentos: textos dentro dos retângulos e componentes do valor */
+.cte-print .cte-box,
+.cte-print .cte-party,
+.cte-print .cte-modal-details .cte-field,
+.cte-print .cte-meta-row > div,
+.cte-print .cte-inline,
+.cte-print .cte-taker-line > *,
+.cte-print .cte-party-address > *,
+.cte-print .cte-party-meta > span {
+  min-width:0;
+}
+
+.cte-print .cte-box > span,
+.cte-print .cte-box > b,
+.cte-print .cte-party-title strong,
+.cte-print .cte-party-address b,
+.cte-print .cte-taker-line b,
+.cte-print .cte-modal-details .cte-field > span,
+.cte-print .cte-modal-details .cte-field > b,
+.cte-print .cte-taxes .cte-box > span,
+.cte-print .cte-taxes .cte-box > b {
+  overflow-wrap:anywhere;
+}
+
+.cte-print .cte-box { min-height:5.7mm; }
+.cte-print .cte-ident-first .cte-box,
+.cte-print .cte-ident-second .cte-box,
+.cte-print .cte-ident-third .cte-box { min-height:5.8mm; }
+.cte-print .cte-taxes .cte-box { min-height:7.5mm; padding-top:0.24mm; padding-bottom:0.24mm; }
+.cte-print .cte-taxes .cte-box > span { font-size:3.35pt; line-height:1.04; }
+.cte-print .cte-taxes .cte-box > b { font-size:4.55pt; line-height:1.06; }
+
+/* Componentes: grade fixa e limpa como no exemplo. */
+.cte-print .cte-section-title {
+  font-size:3.8pt;
+  min-height:2.3mm;
+  padding:0.18mm 0.3mm 0.12mm;
+}
+.cte-print .cte-components-area {
+  grid-template-columns:50mm 50mm 50mm 36mm;
+  height:15.6mm;
+  min-height:15.6mm;
+}
+.cte-print .cte-component-group {
+  display:grid;
+  grid-template-rows:3.1mm 1fr;
+  min-width:0;
+}
+.cte-print .cte-component-head {
+  border-bottom:0.14mm solid #555;
+  grid-template-columns:1fr 18mm;
+  min-height:3.1mm;
+}
+.cte-print .cte-component-head span {
+  align-items:center;
+  display:flex;
+  font-size:3.45pt;
+  line-height:1;
+  padding:0.12mm 0.28mm;
+}
+.cte-print .cte-component-head span:last-child { justify-content:center; }
+.cte-print .cte-component-body {
+  display:grid;
+  grid-template-rows:repeat(3, 1fr);
+  min-height:0;
+}
+.cte-print .cte-component-row {
+  grid-template-columns:1fr 18mm;
+  min-height:0;
+}
+.cte-print .cte-component-row span,
+.cte-print .cte-component-row b {
+  align-items:center;
+  display:flex;
+  font-size:4.15pt;
+  line-height:1.05;
+  min-width:0;
+  overflow:hidden;
+  padding:0.1mm 0.28mm;
+}
+.cte-print .cte-component-row span {
+  overflow-wrap:anywhere;
+}
+.cte-print .cte-component-row b {
+  justify-content:flex-end;
+  white-space:nowrap;
+}
+.cte-print .cte-component-row-empty span,
+.cte-print .cte-component-row-empty b { min-height:100%; }
+.cte-print .cte-component-totals {
+  grid-template-rows:1fr 1fr;
+  height:15.6mm;
+}
+.cte-print .cte-component-totals .cte-box {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:0;
+  padding:0.28mm 0.45mm;
+}
+.cte-print .cte-component-totals .cte-box > span {
+  font-size:3.5pt;
+  line-height:1.03;
+}
+.cte-print .cte-component-totals .cte-box > b {
+  font-size:5.3pt;
+  line-height:1.05;
+  margin-top:0.25mm;
+}
+
+
+/* v2.05 - ajustes finos: campos do topo e bloco final */
+.cte-print .cte-ident-first .cte-box,
+.cte-print .cte-ident-second .cte-box,
+.cte-print .cte-ident-third .cte-box {
+  min-height:6.4mm;
+  padding:0.34mm 0.45mm 0.22mm;
+}
+.cte-print .cte-ident-first .cte-box > span,
+.cte-print .cte-ident-second .cte-box > span,
+.cte-print .cte-ident-third .cte-box > span {
+  font-size:3.25pt;
+  line-height:1.08;
+  margin-bottom:0.18mm;
+}
+.cte-print .cte-ident-first .cte-box > b,
+.cte-print .cte-ident-second .cte-box > b,
+.cte-print .cte-ident-third .cte-box > b {
+  font-size:4.6pt;
+  line-height:1.08;
+  margin-top:0.06mm;
+}
+.cte-print .cte-global-choice {
+  padding-bottom:0.26mm;
+}
+.cte-print .cte-global-choice .cte-choice-row {
+  margin-top:0.38mm;
+  gap:0.85mm;
+}
+.cte-print .cte-global-choice .cte-choice-row span {
+  font-size:5pt;
+  line-height:1;
+}
+.cte-print .cte-global-choice .cte-choice-row i {
+  width:2.8mm;
+  height:2.8mm;
+  font-size:5.3pt;
+}
+
+/* bloco final mais limpo e proporcional */
+.cte-print .cte-flex-spacer {
+  flex:0 0 2.6mm;
+}
+.cte-print .cte-observations {
+  min-height:12.5mm;
+  padding:0.32mm 0.4mm;
+  font-size:3.95pt;
+  line-height:1.07;
+}
+.cte-print .cte-modal-details .cte-field {
+  min-height:6.2mm;
+  padding:0.26mm 0.36mm;
+}
+.cte-print .cte-modal-details .cte-field > span {
+  font-size:3.3pt;
+  line-height:1.05;
+}
+.cte-print .cte-modal-details .cte-field > b {
+  font-size:4.25pt;
+  line-height:1.08;
+  margin-top:0.14mm;
+}
+.cte-print .cte-use .cte-box {
+  min-height:7.4mm;
+  padding-top:0.26mm;
+  padding-bottom:0.24mm;
+}
+.cte-print .cte-use .cte-box > span {
+  font-size:3.35pt;
+  line-height:1.05;
+}
+.cte-print .cte-use .cte-box > b {
+  font-size:4.15pt;
+  line-height:1.08;
+  margin-top:0.12mm;
+}
+.cte-print .cte-cut {
+  margin:2.4mm 0 0.8mm;
+}
+
+
+/* v2.06 - texto mais dentro dos retângulos e linha final completa */
+.cte-print .cte-ident-first .cte-box,
+.cte-print .cte-ident-second .cte-box,
+.cte-print .cte-ident-third .cte-box {
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+.cte-print .cte-ident-first .cte-box {
+  min-height:7.1mm;
+  padding:0.55mm 0.48mm 0.3mm;
+}
+.cte-print .cte-ident-second .cte-box,
+.cte-print .cte-ident-third .cte-box {
+  min-height:6.8mm;
+  padding:0.48mm 0.48mm 0.28mm;
+}
+.cte-print .cte-ident-first .cte-box > span,
+.cte-print .cte-ident-second .cte-box > span,
+.cte-print .cte-ident-third .cte-box > span {
+  line-height:1.08;
+  margin-bottom:0.18mm;
+}
+.cte-print .cte-ident-first .cte-box > b,
+.cte-print .cte-ident-second .cte-box > b,
+.cte-print .cte-ident-third .cte-box > b {
+  line-height:1.08;
+  margin-top:0;
+}
+.cte-print .cte-global-choice {
+  justify-content:flex-start;
+}
+.cte-print .cte-global-choice .cte-choice-row {
+  margin-top:0.5mm;
+  align-items:center;
+}
+.cte-print .cte-key-line {
+  padding-top:0.22mm;
+}
+
+.cte-print .cte-flex-spacer {
+  flex:0 0 1.2mm;
+}
+.cte-print .cte-observations {
+  min-height:11.8mm;
+}
+.cte-print .cte-modal-details {
+  margin-top:0;
+}
+.cte-print .cte-modal-details .cte-field {
+  min-height:6.6mm;
+}
+.cte-print .cte-modal-details .cte-field > span,
+.cte-print .cte-modal-details .cte-field > b {
+  overflow-wrap:anywhere;
+}
+.cte-print .cte-use {
+  margin-top:0;
+}
+
+
+/* v2.07 - títulos mais afastados da borda e linha final completa */
+.cte-print .cte-box > span,
+.cte-print .cte-modal-details .cte-field > span,
+.cte-print .cte-use .cte-box > span,
+.cte-print .cte-section-title {
+  padding-top:0.22mm;
+}
+.cte-print .cte-ident-first .cte-box {
+  min-height:7.6mm;
+  padding:0.75mm 0.5mm 0.32mm;
+}
+.cte-print .cte-ident-second .cte-box,
+.cte-print .cte-ident-third .cte-box {
+  min-height:7.2mm;
+  padding:0.62mm 0.5mm 0.3mm;
+}
+.cte-print .cte-ident-first .cte-box > span,
+.cte-print .cte-ident-second .cte-box > span,
+.cte-print .cte-ident-third .cte-box > span {
+  line-height:1.1;
+  margin-bottom:0.24mm;
+}
+.cte-print .cte-ident-first .cte-box > b,
+.cte-print .cte-ident-second .cte-box > b,
+.cte-print .cte-ident-third .cte-box > b {
+  line-height:1.1;
+}
+.cte-print .cte-choice-row {
+  margin-top:0.62mm;
+}
+.cte-print .cte-key-line {
+  padding-top:0.35mm;
+}
+.cte-print .cte-flex-spacer {
+  flex:0 0 0.45mm;
+}
+.cte-print .cte-section-title {
+  padding:0.3mm 0.32mm 0.16mm;
+  min-height:2.7mm;
+}
+.cte-print .cte-observations {
+  min-height:10.8mm;
+  padding:0.34mm 0.42mm;
+}
+.cte-print .cte-modal-details .cte-field {
+  min-height:7mm;
+  padding:0.38mm 0.4mm 0.28mm;
+}
+.cte-print .cte-modal-details .cte-field > span {
+  line-height:1.08;
+  margin-bottom:0.18mm;
+}
+.cte-print .cte-modal-details .cte-field > b {
+  line-height:1.08;
+}
+.cte-print .cte-modal-details .cte-field-empty > span,
+.cte-print .cte-modal-details .cte-field-empty > b {
+  color:transparent;
+}
+.cte-print .cte-use .cte-box {
+  min-height:7.8mm;
+  padding:0.4mm 0.42mm 0.28mm;
+}
+
+
+/* v2.09 - final da folha conforme o exemplo */
+.cte-print .cte-documents {
+  border:0.14mm solid #555;
+  border-top:0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  width:186mm;
+  height:33mm;
+}
+.cte-print .cte-doc-half {
+  display:grid;
+  grid-template-rows:4.2mm 1fr;
+}
+.cte-print .cte-doc-half + .cte-doc-half {
+  border-left:0.14mm solid #555;
+}
+.cte-print .cte-doc-head {
+  display:grid;
+  grid-template-columns:10mm 31mm 38mm 13mm;
+  align-items:center;
+  border-bottom:0.14mm solid #555;
+  padding:0 0.2mm;
+}
+.cte-print .cte-doc-head span {
+  font-size:3.15pt;
+  font-weight:700;
+  line-height:1.02;
+}
+.cte-print .cte-doc-body {
+  position:relative;
+  padding:0.22mm 0.18mm;
+  overflow:hidden;
+}
+.cte-print .cte-doc-item {
+  display:grid;
+  grid-template-columns:10mm 31mm 38mm 13mm;
+  align-items:start;
+  margin-bottom:0.18mm;
+}
+.cte-print .cte-doc-item span {
+  font-size:3.5pt;
+  line-height:1.04;
+}
+.cte-print .cte-observations {
+  min-height:9.2mm;
+  max-height:9.2mm;
+  overflow:hidden;
+}
+.cte-print .cte-modal-details .cte-field {
+  min-height:5.8mm;
+}
+.cte-print .cte-use .cte-box {
+  min-height:6mm;
+}
+.cte-print .cte-final-spacer {
+  flex:1 1 auto;
+  min-height:18mm;
+}
+.cte-print .cte-cut {
+  margin:0 0 0.8mm;
+  border-top:0.12mm dashed #666;
+}

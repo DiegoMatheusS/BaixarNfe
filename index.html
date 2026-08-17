@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Gere DANFE de NF-e e DACTE de CT-e pelo XML, processe vários arquivos em lote e baixe um PDF único. Consulte também pela chave de acesso." />
+    <meta name="google-adsense-account" content="ca-pub-5674140399014280" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://procurandodanfe.com.br/" />
+    <link rel="icon" href="/favicon.svg" />
+    <title>ProcurandoNFe</title>
+    <!-- print-fix v28: PDF único abre em aba própria; captura isolada evita oklab/oklch -->
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5674140399014280"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" crossorigin src="/assets/index-BDVXIsV1.js?v=2"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Rj_DCHNM.css">
+    <link rel="stylesheet" href="/chave-access.css?v=109">
+    <link rel="stylesheet" href="/cte.css?v=10">
+    <script type="module" src="/chave-access.js?v=112"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- CT-e: layout fixo baseado no exemplo visual. O JavaScript somente preenche os dados. -->
+    <template id="cte-layout-template">
+      <section class="cte-print" aria-label="DACTE para impressão">
+        <article class="cte-sheet">
+          <div class="cte-homolog" data-cte-show="homolog" hidden>EMITIDO EM AMBIENTE DE HOMOLOGAÇÃO — SEM VALOR FISCAL</div>
+
+          <header class="cte-header">
+            <section class="cte-emitter-column">
+              <div class="cte-emitter">
+                <strong data-cte="emitter-display-name"></strong>
+                <b data-cte="emitter-legal-name"></b>
+                <p data-cte="emitter-address"></p>
+                <small>CNPJ/CPF: <span data-cte="emitter-document"></span> · IE: <span data-cte="emitter-ie"></span></small>
+              </div>
+              <div class="cte-types-row">
+                <div class="cte-inline"><span>TIPO DO CT-e</span><b data-cte="cte-type"></b></div>
+                <div class="cte-inline"><span>TIPO DO SERVIÇO</span><b data-cte="service-type"></b></div>
+              </div>
+            </section>
+
+            <section class="cte-center-column">
+              <div class="cte-center-title-row">
+                <div class="cte-title"><strong>DACTE</strong><span>Documento Auxiliar do Conhecimento<br>de Transporte Eletrônico</span></div>
+                <div class="cte-modal"><span>MODAL</span><b data-cte="modal"></b></div>
+              </div>
+              <div class="cte-meta-row">
+                <div><span>MODELO</span><b data-cte="model"></b></div>
+                <div><span>SÉRIE</span><b data-cte="series"></b></div>
+                <div class="cte-meta-number"><span>NÚMERO</span><b data-cte="number"></b></div>
+                <div><span>PÁGINA</span><b>1/1</b></div>
+                <div class="cte-meta-issued"><span>DATA E HORA DE EMISSÃO</span><b data-cte="issued-at"></b></div>
+              </div>
+              <div class="cte-access-area">
+                <div class="cte-barcode" data-cte-slot="barcode"></div>
+                <div class="cte-key-line">
+                  <span>Chave de acesso para consulta de autenticidade no site www.cte.fazenda.gov.br</span>
+                  <strong data-cte="access-key"></strong>
+                </div>
+              </div>
+            </section>
+
+            <section class="cte-qr" data-cte-slot="qr"></section>
+          </header>
+
+          <section class="cte-ident-row cte-ident-first">
+            <div class="cte-box cte-global-choice">
+              <span>INDICADOR DO CT-e GLOBALIZADO</span>
+              <div class="cte-choice-row">
+                <span>SIM</span><i data-cte-check="global-yes"></i>
+                <span>NÃO</span><i data-cte-check="global-no"></i>
+              </div>
+            </div>
+            <div class="cte-box"><span>INFORMAÇÕES DO CT-e GLOBALIZADO</span><b data-cte="global-info"></b></div>
+            <div class="cte-box"><span>Nº PROTOCOLO</span><b data-cte="protocol"></b></div>
+          </section>
+          <section class="cte-ident-row cte-ident-second">
+            <div class="cte-box"><span>CFOP - NATUREZA DA PRESTAÇÃO</span><b data-cte="cfop-operation"></b></div>
+            <div class="cte-box"><span>INSC. SUFRAMA DO DESTINATÁRIO</span><b data-cte="recipient-suframa"></b></div>
+          </section>
+          <section class="cte-ident-row cte-ident-third">
+            <div class="cte-box"><span>ORIGEM DA PRESTAÇÃO</span><b data-cte="origin"></b></div>
+            <div class="cte-box"><span>DESTINO DA PRESTAÇÃO</span><b data-cte="destination"></b></div>
+          </section>
+
+          <section class="cte-parties">
+            <section class="cte-party" data-cte-party="sender">
+              <div class="cte-party-title"><span>REMETENTE</span><strong data-party="name"></strong></div>
+              <div class="cte-party-address"><span>ENDEREÇO</span><b data-party="street"></b><span>BAIRRO</span><b data-party="district"></b></div>
+              <div class="cte-party-meta"><span>MUNICÍPIO<b data-party="city"></b></span><span>CEP<b data-party="zip"></b></span><span>UF<b data-party="state"></b></span><span>CNPJ/CPF<b data-party="document"></b></span><span>INSCRIÇÃO ESTADUAL<b data-party="ie"></b></span><span>FONE<b data-party="phone"></b></span><span>PAÍS<b data-party="country"></b></span></div>
+            </section>
+            <section class="cte-party" data-cte-party="recipient">
+              <div class="cte-party-title"><span>DESTINATÁRIO</span><strong data-party="name"></strong></div>
+              <div class="cte-party-address"><span>ENDEREÇO</span><b data-party="street"></b><span>BAIRRO</span><b data-party="district"></b></div>
+              <div class="cte-party-meta"><span>MUNICÍPIO<b data-party="city"></b></span><span>CEP<b data-party="zip"></b></span><span>UF<b data-party="state"></b></span><span>CNPJ/CPF<b data-party="document"></b></span><span>INSCRIÇÃO ESTADUAL<b data-party="ie"></b></span><span>FONE<b data-party="phone"></b></span><span>PAÍS<b data-party="country"></b></span></div>
+            </section>
+            <section class="cte-party" data-cte-party="dispatcher">
+              <div class="cte-party-title"><span>EXPEDIDOR</span><strong data-party="name"></strong></div>
+              <div class="cte-party-address"><span>ENDEREÇO</span><b data-party="street"></b><span>BAIRRO</span><b data-party="district"></b></div>
+              <div class="cte-party-meta"><span>MUNICÍPIO<b data-party="city"></b></span><span>CEP<b data-party="zip"></b></span><span>UF<b data-party="state"></b></span><span>CNPJ/CPF<b data-party="document"></b></span><span>INSCRIÇÃO ESTADUAL<b data-party="ie"></b></span><span>FONE<b data-party="phone"></b></span><span>PAÍS<b data-party="country"></b></span></div>
+            </section>
+            <section class="cte-party" data-cte-party="receiver">
+              <div class="cte-party-title"><span>RECEBEDOR</span><strong data-party="name"></strong></div>
+              <div class="cte-party-address"><span>ENDEREÇO</span><b data-party="street"></b><span>BAIRRO</span><b data-party="district"></b></div>
+              <div class="cte-party-meta"><span>MUNICÍPIO<b data-party="city"></b></span><span>CEP<b data-party="zip"></b></span><span>UF<b data-party="state"></b></span><span>CNPJ/CPF<b data-party="document"></b></span><span>INSCRIÇÃO ESTADUAL<b data-party="ie"></b></span><span>FONE<b data-party="phone"></b></span><span>PAÍS<b data-party="country"></b></span></div>
+            </section>
+            <section class="cte-party cte-party-taker" data-cte-party="taker">
+              <div class="cte-taker-line"><span>TOMADOR DO SERVIÇO</span><strong data-party="name"></strong><span>MUNICÍPIO</span><b data-party="city"></b><span>UF</span><b data-party="state"></b><span>CEP</span><b data-party="zip"></b></div>
+              <div class="cte-taker-line cte-taker-bottom"><span>ENDEREÇO</span><b data-party="street"></b><span>PAÍS</span><b data-party="country"></b><span>CNPJ/CPF</span><b data-party="document"></b><span>INSCRIÇÃO ESTADUAL</span><b data-party="ie"></b><span>FONE</span><b data-party="phone"></b></div>
+            </section>
+          </section>
+
+          <section class="cte-cargo-top">
+            <div class="cte-box"><span>PRODUTO PREDOMINANTE</span><b data-cte="cargo-product"></b></div>
+            <div class="cte-box"><span>OUTRAS CARACTERÍSTICAS DA CARGA</span><b data-cte="cargo-other"></b></div>
+            <div class="cte-box cte-cargo-value"><span>VALOR TOTAL DA MERCADORIA</span><b data-cte="cargo-value"></b></div>
+          </section>
+          <section class="cte-cargo-bottom">
+            <div class="cte-box"><span>QTD</span><b data-cte="cargo-quantity"></b></div>
+            <div class="cte-box"><span>PESO BRUTO</span><b data-cte="cargo-gross-weight"></b></div>
+            <div class="cte-box cte-empty-box"></div><div class="cte-box cte-empty-box"></div><div class="cte-box cte-empty-box"></div>
+          </section>
+
+          <div class="cte-section-title">COMPONENTES DO VALOR DA PRESTAÇÃO DO SERVIÇO</div>
+          <section class="cte-components-area">
+            <div class="cte-component-group"><div class="cte-component-head"><span>NOME</span><span>VALOR</span></div><div class="cte-component-body" data-cte-slot="components-1"></div></div>
+            <div class="cte-component-group"><div class="cte-component-head"><span>NOME</span><span>VALOR</span></div><div class="cte-component-body" data-cte-slot="components-2"></div></div>
+            <div class="cte-component-group"><div class="cte-component-head"><span>NOME</span><span>VALOR</span></div><div class="cte-component-body" data-cte-slot="components-3"></div></div>
+            <div class="cte-component-totals"><div class="cte-box"><span>VALOR TOTAL DO SERVIÇO</span><b data-cte="total-service"></b></div><div class="cte-box"><span>VALOR A RECEBER</span><b data-cte="amount-receivable"></b></div></div>
+          </section>
+
+          <div class="cte-section-title">INFORMAÇÕES RELATIVAS AO IMPOSTO</div>
+          <section class="cte-taxes">
+            <div class="cte-box"><span>SITUAÇÃO TRIBUTÁRIA</span><b data-cte="tax-cst"></b></div>
+            <div class="cte-box"><span>BASE DE CÁLCULO</span><b data-cte="tax-base"></b></div>
+            <div class="cte-box"><span>ALIQ ICMS</span><b data-cte="tax-rate"></b></div>
+            <div class="cte-box"><span>VALOR ICMS</span><b data-cte="tax-value"></b></div>
+            <div class="cte-box"><span>% RED.BC.CÁLC.</span><b data-cte="tax-reduction"></b></div>
+            <div class="cte-box"><span>VALOR TOTAL TRIBUTOS</span><b data-cte="tax-total"></b></div>
+          </section>
+
+          <div class="cte-section-title">DOCUMENTOS ORIGINÁRIOS</div>
+          <section class="cte-documents">
+            <div class="cte-doc-half">
+              <div class="cte-doc-head"><span>TP DOC.</span><span>CNPJ / CPF EMITENTE</span><span>SÉRIE/NRO.DOCUMENTO</span><span>VALOR NOTA</span></div>
+              <div class="cte-doc-body" data-cte-slot="documents-left"></div>
+            </div>
+            <div class="cte-doc-half">
+              <div class="cte-doc-head"><span>TP DOC.</span><span>CNPJ / CPF EMITENTE</span><span>SÉRIE/NRO.DOCUMENTO</span><span>VALOR NOTA</span></div>
+              <div class="cte-doc-body" data-cte-slot="documents-right"></div>
+            </div>
+          </section>
+
+          <div class="cte-section-title">OBSERVAÇÕES</div>
+          <section class="cte-observations" data-cte="observations"></section>
+
+          <div class="cte-section-title" data-cte="modal-title">INFORMAÇÕES ESPECÍFICAS DO MODAL</div>
+          <section class="cte-modal-details" data-cte-slot="modal-details"></section>
+
+          <section class="cte-use">
+            <div class="cte-box cte-use-emitter"><span>USO EXCLUSIVO DO EMISSOR DO CT-e</span><b data-cte="emitter-use"></b></div>
+            <div class="cte-box"><span>RESERVADO AO FISCO</span><b data-cte="fiscal-use"></b></div>
+          </section>
+
+          <div class="cte-final-spacer"></div>
+          <div class="cte-cut"></div>
+          <section class="cte-receipt">
+            <div class="cte-receipt-declaration">DECLARO QUE RECEBI OS VOLUMES DESTE CONHECIMENTO EM PERFEITO ESTADO PELO QUE DOU POR CUMPRIDO O PRESENTE CONTRATO DE TRANSPORTE.</div>
+            <div class="cte-receipt-number"><span>CT-e Nº</span><b data-cte="receipt-number"></b></div>
+            <div class="cte-receipt-name"><span>NOME COMPLETO</span></div>
+            <div class="cte-receipt-arrival"><span>CHEGADA DATA / HORA</span></div>
+            <div class="cte-receipt-doc"><span>CPF/RG/DOC</span></div>
+            <div class="cte-receipt-sign"><span>ASSINATURA / CARIMBO</span></div>
+            <div class="cte-receipt-departure"><span>SAÍDA DATA / HORA</span></div>
+          </section>
+          <footer class="cte-footer">procurandodanfe.com.br</footer>
+        </article>
+      </section>
+    </template>
+  </body>
+</html>

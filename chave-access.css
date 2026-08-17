@@ -1,0 +1,2299 @@
+.key-query-panel[hidden],
+.tool-panel[hidden],
+#key-query-form[hidden],
+.key-result[hidden],
+#batch-panel[hidden]{
+  display: none !important;
+}
+
+.key-query-panel{
+  min-height: 310px;
+}
+
+.free-service-note{
+  color: var(--green);
+  font-size: 11px !important;
+  font-weight: 800;
+  margin-top: 6px !important;
+}
+
+.key-query-panel .key-field input{
+  line-height: 1.4;
+}
+
+.key-query-panel .primary-button:disabled{
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.key-query-panel .primary-button.is-loading{
+  cursor: wait;
+}
+
+.key-message{
+  min-height: 17px;
+  color: #a44132;
+  margin: 12px 0 0;
+  font-size: 10px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.key-result{
+  align-items: center;
+  animation: 0.35s both result-in;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0 8px;
+  text-align: center;
+}
+
+.key-result > small{
+  color: var(--green);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.key-result > h2{
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 7px 0 6px;
+}
+
+.key-result > p{
+  color: #74837e;
+  font-family: monospace;
+  font-size: 10px;
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.key-downloads{
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.key-downloads .primary-button{
+  margin-top: 0;
+  text-decoration: none;
+}
+
+.key-downloads .print-button{
+  min-height: 48px;
+}
+
+.key-result .change-xml-button{
+  margin-top: 14px;
+}
+
+.batch-panel{
+  min-height: 310px;
+}
+
+.batch-file-list{
+  border: 1px solid #dbe5df;
+  border-radius: 10px;
+  max-height: 255px;
+  overflow: auto;
+}
+
+.batch-file-row{
+  align-items: center;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 42px;
+  padding: 9px 12px;
+}
+
+.batch-file-row + .batch-file-row{
+  border-top: 1px solid #e5ece8;
+}
+
+.batch-file-name{
+  color: #445c53;
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batch-file-status{
+  border-radius: 999px;
+  color: #6e7e78;
+  font-size: 8px;
+  font-weight: 800;
+  max-width: 230px;
+  padding: 5px 8px;
+  text-align: right;
+}
+
+.batch-file-row.is-processing .batch-file-status{
+  background: #fff7df;
+  color: #806622;
+}
+
+.batch-file-row.is-ready .batch-file-status{
+  background: #e4f3ea;
+  color: #267052;
+}
+
+.batch-file-row.is-error .batch-file-status{
+  background: #fff0ed;
+  color: #a44132;
+}
+
+.batch-message{
+  color: #657a72;
+  font-size: 10px;
+  line-height: 1.55;
+  margin: 13px 0 0;
+  min-height: 16px;
+  text-align: center;
+}
+
+.batch-actions{
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 5px;
+}
+
+.batch-actions .primary-button{
+  margin-top: 10px;
+}
+
+.batch-actions .batch-print-button{
+  margin-top: 10px;
+  min-height: 47px;
+}
+
+.batch-actions button:disabled{
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.batch-panel > .change-xml-button{
+  display: block;
+  margin: 15px auto 0;
+}
+
+.batch-panel > .change-xml-button:disabled{
+  cursor: wait;
+  opacity: 0.5;
+}
+
+#batch-print-container{
+  left: -12000px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 280mm;
+}
+
+#batch-print-container .danfe-print{
+  display: block;
+  left: 0;
+  position: relative;
+  top: 0;
+  width: 194mm;
+}
+
+#batch-print-container .danfe-sheet{
+  min-height: 280mm;
+  padding: 0;
+  width: 194mm;
+}
+
+#single-official-print-container{
+  left: -12000px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 280mm;
+}
+
+.fiscal-standard-print{
+  background: #fff;
+  color: #000;
+  display: block;
+  left: 0;
+  position: relative;
+  top: 0;
+  width: 194mm;
+}
+
+.fiscal-standard-print.fiscal-landscape-print,
+#batch-print-container .fiscal-standard-print.fiscal-landscape-print{
+  width: 280mm;
+}
+
+/* Mantém a grade tributária do renderizador de reserva no padrão do DANFE:
+   cinco campos na primeira linha e seis na segunda, com o total à direita. */
+.danfe-row.danfe-row-5{
+  grid-template-columns: repeat(30, 1fr);
+}
+
+.danfe-row-5 > .danfe-field:nth-child(-n/**/+5){
+  grid-column: span 6;
+}
+
+.danfe-row-5 > .danfe-field:nth-child(n/**/+6){
+  grid-column: span 5;
+}
+
+.danfe-row-5 > .danfe-total,
+.official-tax-grid > .official-total{
+  grid-column: 26 / 31 !important;
+  grid-row: 2 !important;
+}
+
+.official-reform-tax-grid .fiscal-field > b{
+  font-weight: 500 !important;
+}
+
+.fiscal-sheet{
+  background: #fff;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 7.8pt;
+  break-inside: avoid;
+  height: 280mm;
+  line-height: 1.06;
+  min-height: 280mm;
+  overflow: hidden;
+  padding: 0;
+  page-break-inside: avoid;
+  width: 194mm;
+}
+
+.fiscal-sheet.fiscal-landscape,
+#batch-print-container .fiscal-sheet.fiscal-landscape{
+  display: grid;
+  gap: 1mm;
+  grid-template-columns: 13mm 1fr;
+  height: 193mm;
+  min-height: 193mm;
+  width: 280mm;
+}
+
+.official-landscape-main{
+  display: flex;
+  flex-direction: column;
+  height: 193mm;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.official-landscape-receipt{
+  border: 0.22mm solid #000;
+  display: grid;
+  grid-template-rows: 30mm 1fr;
+  height: 193mm;
+  overflow: hidden;
+  position: relative;
+}
+
+.official-landscape-nfe,
+.official-landscape-page-id{
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.official-landscape-nfe{
+  border-bottom: 0.22mm solid #000;
+}
+
+.official-landscape-nfe strong,
+.official-landscape-page-id strong{
+  font-size: 7.2pt;
+}
+
+.official-landscape-nfe b,
+.official-landscape-page-id b{
+  font-size: 6.1pt;
+  margin-top: 0.8mm;
+}
+
+.official-landscape-receipt-text{
+  /* DANFE tipo 2: mantém a frase como uma linha horizontal e gira o bloco
+     inteiro para a lateral. Evita letras "em pé" e cortes no PDF em lote. */
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  font-size: 5pt;
+  height: 11mm;
+  justify-content: center;
+  left: -73.5mm;
+  line-height: 1.06;
+  margin: 0;
+  overflow: hidden;
+  padding: 0.8mm 1.2mm;
+  position: absolute;
+  top: 106.5mm;
+  transform: rotate(-90deg);
+  transform-origin: center center;
+  white-space: normal;
+  width: 160mm;
+  writing-mode: horizontal-tb;
+}
+
+.official-landscape-page-id{
+  display: flex;
+  grid-template-rows: none;
+  padding: 1mm;
+}
+
+.fiscal-sheet *{
+  box-sizing: border-box;
+}
+
+.official-homologation,
+.official-contingency{
+  border: 0.45mm solid #000;
+  margin-bottom: 1mm;
+  padding: 1.2mm 1.5mm;
+  text-align: center;
+}
+
+.official-homologation{
+  font-size: 12.1pt;
+  font-weight: 800;
+}
+
+.official-contingency{
+  align-items: center;
+  display: flex;
+  gap: 2mm;
+  justify-content: center;
+}
+
+.official-contingency strong{
+  font-size: 8.4pt;
+}
+
+.official-contingency span{
+  font-size: 6.6pt;
+}
+
+.official-receipt{
+  border: 0.22mm solid #000;
+  display: grid;
+  grid-template-columns: 1fr 32mm;
+  min-height: 17mm;
+}
+
+.official-receipt > div:first-child{
+  display: grid;
+  grid-template-rows: 1fr 6mm;
+}
+
+.official-receipt p{
+  font-size: 7.4pt;
+  margin: 1.6mm;
+}
+
+.official-receipt > div > div{
+  border-top: 0.25mm solid #000;
+  display: grid;
+  grid-template-columns: 43mm 1fr;
+}
+
+.official-receipt > div > div span{
+  font-size: 6.1pt;
+  padding: 0.7mm;
+}
+
+.official-receipt > div > div span + span{
+  border-left: 0.2mm solid #000;
+}
+
+.official-receipt aside{
+  align-items: center;
+  border-left: 0.22mm solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.official-receipt aside strong{
+  font-size: 13.2pt;
+}
+
+.official-receipt aside b{
+  font-size: 8.4pt;
+  margin-top: 0.7mm;
+}
+
+.official-cut{
+  border-bottom: 0.25mm dashed #000;
+  font-size: 5.6pt;
+  letter-spacing: 0.18mm;
+  margin: 1mm 0 1.3mm;
+  padding-bottom: 0.5mm;
+  text-align: right;
+}
+
+.official-header{
+  border: 0.2mm solid #000;
+  border-radius: 1.6mm;
+  display: grid;
+  overflow: hidden;
+}
+
+.official-nfe-header{
+  grid-template-columns: 73mm 39mm 1fr;
+  min-height: 37mm;
+}
+
+.fiscal-landscape .official-nfe-header{
+  grid-template-columns: 70mm 38mm 1fr;
+  min-height: 32mm;
+}
+
+
+
+.official-header > div + div{
+  border-left: 0.2mm solid #000;
+}
+
+.official-emitter,
+.official-identity{
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.2mm;
+  text-align: center;
+}
+
+.official-emitter-label{
+  font-size: 5.3pt;
+  font-weight: 800;
+  letter-spacing: 0.03mm;
+  margin-bottom: 0.55mm;
+}
+
+.official-emitter > strong{
+  font-size: 10.2pt;
+  line-height: 1.04;
+  text-transform: none;
+}
+
+.official-emitter > b{
+  font-size: 7.9pt;
+  margin-top: 0.6mm;
+}
+
+.official-emitter p{
+  font-size: 7pt;
+  line-height: 1.2;
+  margin: 1.3mm 0 0.6mm;
+}
+
+.official-emitter small{
+  font-size: 6.4pt;
+}
+
+.official-identity > strong{
+  font-size: 16.4pt;
+}
+
+.official-identity > span{
+  font-size: 5.8pt;
+  line-height: 1.15;
+  margin: 0.35mm 0 0.45mm;
+}
+
+.official-identity-direction{
+  align-items: stretch;
+  display: grid;
+  gap: 0.7mm;
+  grid-template-columns: 1fr 7.2mm;
+  margin: 0.15mm auto 0.45mm;
+  max-width: 29mm;
+  width: 100%;
+}
+
+.official-identity-direction > div{
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.official-identity-direction > div b{
+  font-size: 5.5pt;
+  line-height: 1.12;
+}
+
+.official-identity-direction > strong{
+  align-items: center;
+  border: 0.2mm solid #000;
+  border-radius: 1.3mm;
+  display: flex;
+  font-size: 11pt;
+  justify-content: center;
+  line-height: 1;
+  min-height: 8.5mm;
+}
+
+.official-identity h1{
+  font-size: 9.6pt;
+  margin: 0.35mm 0 0.25mm;
+  white-space: nowrap;
+}
+
+.official-identity-meta{
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35mm;
+  justify-content: center;
+}
+
+.official-identity h2{
+  font-size: 7.1pt;
+  margin: 0;
+}
+
+.official-identity small{
+  font-size: 5.7pt;
+  margin: 0;
+}
+
+.official-access{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.2mm;
+}
+
+.official-access svg{
+  display: block;
+  height: 13mm;
+  max-width: 100%;
+  width: 100%;
+}
+
+.official-access > span{
+  font-size: 5.8pt;
+  font-weight: 800;
+  margin-top: 0.5mm;
+}
+
+.official-access > strong{
+  font-size: 7.1pt;
+  letter-spacing: 0.1mm;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.fiscal-landscape .official-access > strong{
+  font-size: 6.7pt;
+  letter-spacing: 0.06mm;
+}
+
+.official-access > p{
+  border-top: 0.2mm solid #000;
+  font-size: 6.1pt;
+  margin: 0.7mm 0 0;
+  padding-top: 0.6mm;
+  text-align: center;
+}
+
+.fiscal-barcode-missing{
+  align-items: center;
+  border: 0.25mm solid #000;
+  display: flex;
+  font-size: 7.2pt;
+  height: 13mm;
+  justify-content: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.fiscal-grid{
+  border-left: 0.22mm solid #000;
+  border-top: 0.22mm solid #000;
+  display: grid;
+}
+
+.columns-12{
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.fiscal-field{
+  border-bottom: 0.22mm solid #000;
+  border-right: 0.22mm solid #000;
+  display: flex;
+  flex-direction: column;
+  min-height: 6.8mm;
+  overflow: hidden;
+  padding: 0.65mm 0.8mm;
+}
+
+.fiscal-field > span{
+  font-size: 5.6pt;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.6mm;
+  text-transform: uppercase;
+}
+
+.fiscal-field > b{
+  font-size: 7.5pt;
+  font-weight: 500;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.span-1{ grid-column: span 1; }
+.span-2{ grid-column: span 2; }
+.span-3{ grid-column: span 3; }
+.span-4{ grid-column: span 4; }
+.span-5{ grid-column: span 5; }
+.span-6{ grid-column: span 6; }
+.span-7{ grid-column: span 7; }
+.span-8{ grid-column: span 8; }
+
+.official-section-title{
+  font-size: 6.5pt;
+  font-weight: 800;
+  letter-spacing: 0.1mm;
+  margin: 1mm 0 0.35mm;
+}
+
+.official-billing{
+  border: 0.22mm solid #000;
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(5, 1fr);
+  min-height: 7mm;
+}
+
+.official-billing > div{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 0.7mm;
+}
+
+.official-billing > div + div{
+  border-left: 0.2mm solid #000;
+}
+
+.official-billing span,
+.official-billing b,
+.official-billing strong{
+  font-size: 5.8pt;
+}
+
+.official-billing strong{
+  text-align: right;
+}
+
+.official-tax-grid{
+  border-left: 0.22mm solid #000;
+  border-top: 0.22mm solid #000;
+  display: grid;
+  grid-template-columns: repeat(30, 1fr);
+}
+
+.official-tax-grid .fiscal-field{
+  min-height: 6.7mm;
+}
+
+.official-tax-grid .tax-first-row{
+  grid-column: span 6;
+}
+
+.official-tax-grid .tax-second-row{
+  grid-column: span 5;
+}
+
+.official-tax-grid .official-total > b{
+  font-size: 8.4pt;
+  font-weight: 800;
+}
+
+.official-service-tax-grid,
+.official-reform-tax-grid{
+  border-left: 0.22mm solid #000;
+  border-top: 0.22mm solid #000;
+  display: grid;
+}
+
+.official-service-tax-grid{
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.official-reform-tax-grid{
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.official-service-tax-grid .fiscal-field,
+.official-reform-tax-grid .fiscal-field{
+  min-height: 6.7mm;
+}
+
+.fiscal-landscape .official-section-title{
+  margin-top: 0.55mm;
+}
+
+.fiscal-landscape .fiscal-field{
+  min-height: 5.5mm;
+  padding: 0.45mm 0.6mm;
+}
+
+.fiscal-landscape .fiscal-field > span{
+  font-size: 4.9pt;
+  margin-bottom: 0.35mm;
+}
+
+.fiscal-landscape .fiscal-field > b{
+  font-size: 6.5pt;
+}
+
+.fiscal-landscape .official-products th,
+.fiscal-landscape .official-products td{
+  font-size: 4.9pt;
+  padding: 0.35mm;
+}
+
+.fiscal-landscape .official-additional,
+.fiscal-landscape .official-additional .fiscal-field{
+  min-height: 15mm;
+}
+
+.official-products-area{
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 22mm;
+}
+
+.official-products{
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.official-products{
+  flex: 1;
+  height: 100%;
+}
+
+.official-products th,
+.official-products td{
+  border: 0.22mm solid #000;
+  font-size: 5.7pt;
+  overflow-wrap: anywhere;
+  padding: 0.55mm 0.4mm;
+  text-align: right;
+  vertical-align: top;
+}
+
+.official-products th{
+  background: #f2f2f2;
+  font-size: 5.1pt;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.official-products th:nth-child(1){ width: 6%; }
+.official-products th:nth-child(2){ width: 22%; }
+.official-products th:nth-child(3){ width: 6%; }
+.official-products th:nth-child(4){ width: 4%; }
+.official-products th:nth-child(5){ width: 5%; }
+.official-products th:nth-child(6){ width: 3%; }
+.official-products th:nth-child(7){ width: 7%; }
+.official-products th:nth-child(8){ width: 8%; }
+.official-products th:nth-child(9){ width: 8%; }
+.official-products th:nth-child(10){ width: 7%; }
+.official-products th:nth-child(11){ width: 6%; }
+.official-products th:nth-child(12){ width: 6%; }
+.official-products th:nth-child(13),
+.official-products th:nth-child(14){ width: 6%; }
+
+
+.official-products td:nth-child(2){
+  font-size: 6.3pt;
+  line-height: 1.15;
+}
+
+.fiscal-landscape .official-products td:nth-child(2){
+  font-size: 5.6pt;
+  line-height: 1.14;
+}
+
+.official-products td:nth-child(-n/**/+6){
+  text-align: left;
+}
+
+.official-products tr{
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.official-additional{
+  border-left: 0.22mm solid #000;
+  border-top: 0.22mm solid #000;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  min-height: 20mm;
+}
+
+.official-additional .fiscal-field{
+  min-height: 20mm;
+}
+
+.official-document-footer{
+  background: transparent;
+  color: #000;
+  display: block;
+  font-size: 5.5pt;
+  min-height: 0;
+  padding: 0.7mm 0 0;
+  text-align: right;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.guides-home{
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 62px;
+  grid-template-columns: 0.75fr 1.7fr;
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 88px 24px 100px;
+}
+
+.guides-home-heading > span{
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.guides-home-heading h2{
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 33px;
+  font-weight: 500;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin: 15px 0 12px;
+}
+
+.guides-home-heading p{
+  color: #667b73;
+  font-size: 11px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.guides-home-heading a{
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.guide-card-grid{
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.guide-card{
+  background: #fff;
+  border: 1px solid #dbe4de;
+  border-radius: 13px;
+  min-height: 178px;
+  padding: 22px;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.guide-card:hover{
+  border-color: #a9cbbd;
+  box-shadow: 0 13px 32px #17393012;
+  transform: translateY(-2px);
+}
+
+.guide-card small{
+  color: var(--green);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+.guide-card h3{
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: 500;
+  margin: 10px 0 8px;
+}
+
+.guide-card p{
+  color: #71817b;
+  font-size: 10px;
+  line-height: 1.6;
+  margin: 0 0 17px;
+}
+
+.guide-card > span{
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+@media (max-width: 560px) {
+  .key-downloads{
+    grid-template-columns: 1fr;
+  }
+
+  .batch-actions,
+.guide-card-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .batch-file-row{
+    align-items: start;
+  }
+
+  .batch-file-status{
+    max-width: 130px;
+    white-space: normal;
+  }
+
+  .guides-home{
+    gap: 34px;
+    grid-template-columns: 1fr;
+    padding: 64px 20px 72px;
+  }
+}
+
+@page {
+  margin: 8mm;
+  size: auto;
+}
+
+@page fiscal-portrait {
+  margin: 8mm;
+  size: A4 portrait;
+}
+
+@page fiscal-landscape {
+  margin: 8mm;
+  size: A4 landscape;
+}
+
+.fiscal-portrait-print{
+  page: fiscal-portrait;
+}
+
+.fiscal-landscape-print{
+  page: fiscal-landscape;
+}
+
+/* v23: aplica a página nomeada diretamente em cada folha fiscal. Isso evita
+   que um DANFE paisagem force o Chrome a reduzir as folhas retrato do lote. */
+.fiscal-sheet.fiscal-portrait{
+  page: fiscal-portrait;
+}
+
+.fiscal-sheet.fiscal-landscape{
+  page: fiscal-landscape;
+}
+
+@media print {
+  html,
+body{
+    margin: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+  }
+
+  /* O aplicativo fica antes dos documentos oficiais no DOM. Mesmo vazio,
+     alguns navegadores reservam uma primeira folha para ele antes de aplicar
+     a página nomeada (retrato/paisagem) do DANFE. */
+  body.official-print-ready #root,
+body.batch-print-mode #root{
+    display: none !important;
+  }
+
+  /* Anúncios automáticos e scripts de métricas podem inserir elementos como
+     irmãos do aplicativo. Na impressão, qualquer um deles pode reservar uma
+     folha vazia antes do documento fiscal. */
+  body.official-print-ready:not(.batch-print-mode) > :not(#single-official-print-container),
+body.batch-print-mode > :not(#batch-print-container){
+    display: none !important;
+  }
+
+  .key-query-panel{
+    display: none !important;
+  }
+
+  #single-official-print-container,
+#batch-print-container{
+    display: none !important;
+  }
+
+  .danfe-print{
+    margin: 0 !important;
+    min-height: 0 !important;
+    width: 194mm !important;
+  }
+
+  .danfe-sheet{
+    min-height: 280mm !important;
+    padding: 0 !important;
+    width: 194mm !important;
+  }
+
+  body.official-print-ready:not(.batch-print-mode) #root .danfe-print{
+    display: none !important;
+  }
+
+  body.official-print-ready:not(.batch-print-mode) #single-official-print-container{
+    display: block !important;
+    left: auto;
+    position: static;
+    top: auto;
+    width: auto !important;
+  }
+
+  body.official-print-ready:not(.batch-print-mode) #single-official-print-container .fiscal-standard-print{
+    display: block !important;
+    left: auto;
+    position: static;
+    top: auto;
+  }
+
+  /* O contêiner começa na mesma página nomeada do primeiro documento.
+     Isso evita a folha A4 vazia que o Chrome pode criar antes de um DANFE
+     paisagem quando a página padrão anterior era retrato. */
+  #single-official-print-container.print-start-landscape,
+#batch-print-container.print-start-landscape{
+    page: fiscal-landscape;
+  }
+
+  #single-official-print-container.print-start-portrait,
+#batch-print-container.print-start-portrait{
+    page: fiscal-portrait;
+  }
+
+  body.batch-print-mode #root .danfe-print{
+    display: none !important;
+  }
+
+  body.batch-print-mode #batch-print-container{
+    display: block !important;
+    left: auto;
+    position: static;
+    top: auto;
+    width: auto;
+  }
+
+  body.batch-print-mode #single-official-print-container{
+    display: none !important;
+  }
+
+  body.batch-print-mode #batch-print-container .danfe-print{
+    display: block !important;
+    left: auto;
+    min-height: 0 !important;
+    position: static;
+    top: auto;
+  }
+
+  body.batch-print-mode #batch-print-container > :last-child{
+    break-after: auto;
+  }
+
+  .fiscal-sheet{
+    break-after: auto;
+    break-inside: avoid !important;
+    height: 280mm !important;
+    min-height: 280mm !important;
+    page-break-after: auto;
+    page-break-inside: avoid !important;
+  }
+
+  #single-official-print-container .fiscal-sheet + .fiscal-sheet,
+#batch-print-container .fiscal-sheet + .fiscal-sheet,
+#batch-print-container > .fiscal-standard-print + .fiscal-standard-print .fiscal-sheet:first-child{
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .fiscal-sheet.fiscal-portrait{
+    height: 280mm !important;
+    min-height: 280mm !important;
+    width: 194mm !important;
+  }
+
+  .fiscal-sheet.fiscal-landscape,
+#batch-print-container .fiscal-sheet.fiscal-landscape{
+    height: 193mm !important;
+    min-height: 193mm !important;
+    width: 280mm !important;
+  }
+
+  .fiscal-standard-print.fiscal-landscape-print,
+#batch-print-container .fiscal-standard-print.fiscal-landscape-print{
+    min-height: 0 !important;
+    width: 280mm !important;
+  }
+
+  #single-official-print-container > .fiscal-standard-print:last-child .fiscal-sheet:last-child,
+#batch-print-container > :last-child .fiscal-sheet:last-child{
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  /* Mantém o contêiner como bloco real. Com a página inicial sincronizada
+     acima, não precisamos de display: contents, que é instável na impressão
+     do Chrome quando há scripts/iframes de publicidade na página publicada. */
+
+  .official-products thead{
+    display: table-header-group;
+  }
+}
+
+/* v39: aumenta especificamente a tabela de produtos/serviços.
+   O DANFE horizontal tinha regras próprias que mantinham essa área pequena. */
+.official-products th,
+.official-products td{
+  font-size: 6.2pt !important;
+  line-height: 1.12 !important;
+  padding: 0.55mm 0.45mm !important;
+}
+
+.official-products th{
+  font-size: 5.8pt !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+}
+
+.official-products td:nth-child(2){
+  font-size: 7.1pt !important;
+  line-height: 1.16 !important;
+}
+
+.fiscal-landscape .official-products th,
+.fiscal-landscape .official-products td{
+  font-size: 5.9pt !important;
+  padding: 0.45mm 0.38mm !important;
+}
+
+.fiscal-landscape .official-products th{
+  font-size: 5.5pt !important;
+}
+
+.fiscal-landscape .official-products td:nth-child(2){
+  font-size: 6.8pt !important;
+  line-height: 1.16 !important;
+}
+
+
+/* v56: visualização em tela do DANFE horizontal com folga inferior extra no Chrome. */
+/* A impressão continua com altura A4 fixa nas regras de @media print. */
+   A impressão continua com altura A4 fixa nas regras de @media print. */
+@media screen{
+  .fiscal-sheet.fiscal-landscape,
+  #batch-print-container .fiscal-sheet.fiscal-landscape {
+    height: auto;
+    min-height: 188mm;
+    overflow: visible;
+  }
+
+  .fiscal-sheet.fiscal-landscape .official-landscape-main {
+    height: auto;
+    min-height: 188mm;
+    overflow: visible;
+  }
+
+  .fiscal-sheet.fiscal-landscape .official-landscape-receipt {
+    height: auto;
+    min-height: 188mm;
+  }
+}
+
+/* v63: cabeçalho do DANFE mais compacto na impressão. */
+@media print {
+  .official-emitter > strong{
+    font-size: 9.8pt !important;
+    line-height: 1.03 !important;
+  }
+
+  .official-header{
+    border-width: 0.2mm !important;
+    border-radius: 1.6mm !important;
+  }
+}
+
+
+/* v64: bordas gerais mais finas e arredondadas no DANFE */
+.fiscal-grid,
+.official-tax-grid,
+.official-service-tax-grid,
+.official-reform-tax-grid,
+.official-billing,
+.official-additional,
+.official-products{
+  border-radius: 1.4mm;
+  overflow: hidden;
+}
+
+.official-products{
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.official-products th,
+.official-products td{
+  border-width: 0 0.2mm 0.2mm 0 !important;
+}
+
+.official-products tr > :first-child{
+  border-left: 0.2mm solid #000 !important;
+}
+
+.official-products thead tr:first-child > *{
+  border-top: 0.2mm solid #000 !important;
+}
+
+
+/* v67: bordas do DANFE em cinza mais claro e dados do XML preservando capitalização original. */
+.danfe-print,
+.danfe-print *{
+  border-color: #888 !important;
+}
+
+
+/* v68: DANFE com linhas realmente finas e mais suaves. */
+.danfe-print,
+.danfe-print *{
+  border-color: #999 !important;
+}
+
+.danfe-print .official-header,
+.danfe-print .fiscal-grid,
+.danfe-print .fiscal-field,
+.danfe-print .official-billing,
+.danfe-print .official-tax-grid,
+.danfe-print .official-service-tax-grid,
+.danfe-print .official-reform-tax-grid,
+.danfe-print .official-additional,
+.danfe-print .official-products,
+.danfe-print .official-products th,
+.danfe-print .official-products td,
+.danfe-print .official-receipt,
+.danfe-print .official-receipt aside,
+.danfe-print .official-access > p,
+.danfe-print .official-identity-direction > strong{
+  border-width: 0.12mm !important;
+}
+
+.danfe-print .official-products th,
+.danfe-print .official-products td{
+  border-width: 0 0.12mm 0.12mm 0 !important;
+}
+
+.danfe-print .official-products tr > :first-child{
+  border-left: 0.12mm solid #999 !important;
+}
+
+.danfe-print .official-products thead tr:first-child > *{
+  border-top: 0.12mm solid #999 !important;
+}
+
+@media print {
+  .danfe-print .official-header{
+    border-width: 0.12mm !important;
+  }
+}
+
+
+/* v69: tipografia do DANFE levemente menor; Inscrição Estadual mais compacta. */
+.danfe-print .fiscal-field > span{
+  font-size: 5.3pt !important;
+}
+
+.danfe-print .fiscal-field > b{
+  font-size: 7.1pt !important;
+}
+
+.danfe-print .official-section-title{
+  font-size: 6.2pt !important;
+}
+
+.danfe-print .official-emitter-label{
+  font-size: 5.0pt !important;
+}
+
+.danfe-print .official-emitter > strong{
+  font-size: 9.5pt !important;
+}
+
+.danfe-print .official-emitter > b{
+  font-size: 7.5pt !important;
+}
+
+.danfe-print .official-emitter p{
+  font-size: 6.7pt !important;
+}
+
+.danfe-print .official-emitter small{
+  font-size: 6.1pt !important;
+}
+
+.danfe-print .fiscal-field-ie > span{
+  font-size: 4.7pt !important;
+}
+
+.danfe-print .fiscal-field-ie > b{
+  font-size: 6.2pt !important;
+}
+
+.danfe-print .fiscal-landscape .fiscal-field > span,
+.danfe-print.fiscal-landscape-print .fiscal-field > span{
+  font-size: 4.7pt !important;
+}
+
+.danfe-print .fiscal-landscape .fiscal-field > b,
+.danfe-print.fiscal-landscape-print .fiscal-field > b{
+  font-size: 6.2pt !important;
+}
+
+.danfe-print .fiscal-landscape .fiscal-field-ie > span,
+.danfe-print.fiscal-landscape-print .fiscal-field-ie > span{
+  font-size: 4.4pt !important;
+}
+
+.danfe-print .fiscal-landscape .fiscal-field-ie > b,
+.danfe-print.fiscal-landscape-print .fiscal-field-ie > b{
+  font-size: 5.8pt !important;
+}
+
+
+/* v70: Inscrição Estadual não deve aumentar a altura dos campos vizinhos. */
+.danfe-print .fiscal-field-ie > span{
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  line-height: 1 !important;
+  margin-bottom: 0.35mm !important;
+}
+
+/* Bloco estreito do transportador: cabe em uma única linha sem alterar a linha toda. */
+.danfe-print .fiscal-field-ie.span-1 > span{
+  font-size: 3.7pt !important;
+  letter-spacing: -0.04mm !important;
+}
+
+.danfe-print .fiscal-field-ie.span-1 > b{
+  font-size: 5.6pt !important;
+  line-height: 1.05 !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  white-space: nowrap !important;
+}
+
+.fiscal-landscape .danfe-print .fiscal-field-ie.span-1 > span,
+.danfe-print.fiscal-landscape-print .fiscal-field-ie.span-1 > span{
+  font-size: 3.4pt !important;
+}
+
+
+/* v71: recibo mais útil para escrita manual e cabeçalho do emitente sem espaço vazio */
+.official-receipt{
+  min-height: 19mm;
+  grid-template-columns: 1fr 32mm;
+}
+
+.official-receipt > div:first-child{
+  grid-template-rows: 1fr 8.2mm;
+}
+
+.official-receipt p{
+  font-size: 6.9pt;
+  line-height: 1.12;
+  margin: 0.9mm 1.2mm 0.5mm;
+}
+
+.official-receipt > div > div{
+  grid-template-columns: 46mm 1fr;
+}
+
+.official-receipt > div > div span{
+  padding: 0.75mm 0.8mm 4.4mm;
+  display: flex;
+  align-items: flex-start;
+}
+
+.official-cut{
+  border-bottom: 0.25mm dashed #999;
+  font-size: 0;
+  line-height: 0;
+  margin: 0.7mm 0 0.9mm;
+  padding-bottom: 0.15mm;
+}
+
+.official-emitter{
+  justify-content: flex-start;
+  padding-top: 0.6mm;
+  padding-bottom: 0.8mm;
+}
+
+.official-emitter-label{
+  align-self: center;
+  margin: 0 0 0.35mm;
+}
+
+.official-emitter > strong{
+  margin-top: 0;
+}
+
+.danfe-print .official-receipt{
+  min-height: 19mm;
+}
+
+.danfe-print .official-receipt > div:first-child{
+  grid-template-rows: 1fr 8.2mm;
+}
+
+.danfe-print .official-receipt p{
+  font-size: 6.7pt !important;
+  line-height: 1.1 !important;
+  margin: 0.85mm 1.1mm 0.45mm !important;
+}
+
+.danfe-print .official-receipt > div > div span{
+  font-size: 5.9pt !important;
+  padding: 0.7mm 0.75mm 4.2mm !important;
+}
+
+.danfe-print .official-emitter{
+  justify-content: flex-start !important;
+  padding-top: 0.55mm !important;
+  padding-bottom: 0.75mm !important;
+}
+
+.danfe-print .official-emitter-label{
+  margin: 0 0 0.3mm !important;
+}
+
+
+/* v72: conteúdo do emitente mais para o topo, não só o rótulo */
+.official-emitter{
+  gap: 0.12mm;
+  padding-top: 0.25mm;
+  align-items: center;
+}
+
+.official-emitter-label{
+  margin: 0 0 0.15mm;
+}
+
+.official-emitter > strong,
+.official-emitter > b,
+.official-emitter p,
+.official-emitter small{
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.official-emitter p{
+  margin: 0.55mm 0 0.25mm !important;
+  line-height: 1.12;
+}
+
+.danfe-print .official-emitter{
+  gap: 0.08mm !important;
+  padding-top: 0.2mm !important;
+}
+
+.danfe-print .official-emitter-label{
+  margin: 0 0 0.1mm !important;
+}
+
+.danfe-print .official-emitter p{
+  margin: 0.45mm 0 0.2mm !important;
+  line-height: 1.08 !important;
+}
+
+
+/* v73: área reservada para logo à esquerda e dados do emitente à direita */
+.official-emitter{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0.35mm 0.75mm 0.6mm;
+  text-align: center;
+}
+
+.official-emitter-label{
+  align-self: center;
+  flex: 0 0 auto;
+  margin: 0 0 0.45mm !important;
+  text-align: center;
+}
+
+.official-emitter-body{
+  display: grid;
+  grid-template-columns: 18mm minmax(0, 1fr);
+  gap: 1.2mm;
+  align-items: center;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.official-emitter-logo{
+  width: 18mm;
+  height: 18mm;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  align-self: center;
+  justify-self: center;
+}
+
+.official-emitter-data{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.official-emitter-data > strong{
+  font-size: 9.3pt;
+  line-height: 1.04;
+  font-weight: 700;
+  text-transform: none;
+  margin: 0 !important;
+}
+
+.official-emitter-data > b{
+  font-size: 7.1pt;
+  line-height: 1.05;
+  margin: 0.35mm 0 0 !important;
+}
+
+.official-emitter-data p{
+  font-size: 6.35pt;
+  line-height: 1.13;
+  margin: 0.65mm 0 0.22mm !important;
+}
+
+.official-emitter-data small{
+  font-size: 5.9pt;
+  line-height: 1.05;
+  margin: 0 !important;
+}
+
+.fiscal-landscape .official-emitter-body{
+  grid-template-columns: 16mm minmax(0, 1fr);
+  gap: 0.9mm;
+}
+
+.fiscal-landscape .official-emitter-logo{
+  width: 16mm;
+  height: 16mm;
+}
+
+.fiscal-landscape .official-emitter-data > strong{
+  font-size: 8.4pt;
+}
+
+.fiscal-landscape .official-emitter-data > b{
+  font-size: 6.5pt;
+}
+
+.fiscal-landscape .official-emitter-data p{
+  font-size: 5.8pt;
+  line-height: 1.08;
+  margin-top: 0.45mm !important;
+}
+
+.fiscal-landscape .official-emitter-data small{
+  font-size: 5.4pt;
+}
+
+.danfe-print .official-emitter{
+  align-items: stretch !important;
+  gap: 0 !important;
+  padding: 0.3mm 0.7mm 0.55mm !important;
+}
+
+.danfe-print .official-emitter-label{
+  margin: 0 0 0.4mm !important;
+}
+
+/* v75: estatísticas de documentos, números públicos da NF-e e Impostômetro no desktop */
+.local-statistics-home,
+.national-statistics-home{
+  margin: 0 auto;
+  max-width: 1100px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.local-statistics-home{
+  border-top: 1px solid var(--line);
+  padding-top: 78px;
+  padding-bottom: 86px;
+}
+
+.local-statistics-home[hidden]{
+  display: none !important;
+}
+
+.local-statistics-heading{
+  max-width: 690px;
+  margin-bottom: 28px;
+}
+
+.local-statistics-heading > span,
+.national-statistics-copy > span{
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.local-statistics-heading h2,
+.national-statistics-copy h2{
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 500;
+  letter-spacing: -1.1px;
+  line-height: 1.1;
+  margin: 13px 0 11px;
+}
+
+.local-statistics-heading p,
+.national-statistics-copy p{
+  color: #667b73;
+  font-size: 11px;
+  line-height: 1.72;
+  margin: 0;
+}
+
+.local-stat-cards{
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.local-stat-cards article,
+.local-stat-chart,
+.national-stat-primary,
+.national-stat-secondary article{
+  background: #fff;
+  border: 1px solid #dbe4de;
+  border-radius: 13px;
+  box-shadow: 0 12px 32px #1739300a;
+}
+
+.local-stat-cards article{
+  min-height: 132px;
+  padding: 20px;
+}
+
+.local-stat-cards small,
+.local-stat-chart small,
+.national-stat-visual small{
+  color: #70817a;
+  display: block;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.local-stat-cards strong{
+  color: #173930;
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1.08;
+  margin: 10px 0 8px;
+}
+
+.local-stat-cards span,
+.national-stat-visual span{
+  color: #7a8b84;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.local-stat-charts{
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 14px;
+}
+
+.local-stat-chart{
+  min-height: 245px;
+  padding: 22px;
+}
+
+.local-stat-chart h3{
+  color: #284d41;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: 500;
+  margin: 7px 0 19px;
+}
+
+.local-stat-bar-row + .local-stat-bar-row{
+  margin-top: 14px;
+}
+
+.local-stat-bar-label{
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.local-stat-bar-label span,
+.local-stat-bar-label strong{
+  color: #526c62;
+  font-size: 9px;
+}
+
+.local-stat-bar-label strong{
+  font-weight: 800;
+}
+
+.local-stat-bar-track{
+  background: #edf3ef;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.local-stat-bar-track > span{
+  background: var(--green);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  min-width: 4px;
+  transition: width .35s ease;
+}
+
+.local-stat-empty{
+  color: #72847d;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.national-statistics-home{
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 58px;
+  grid-template-columns: .9fr 1.1fr;
+  padding-top: 82px;
+  padding-bottom: 88px;
+}
+
+.national-statistics-copy p{
+  max-width: 510px;
+}
+
+.national-stat-source{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 20px;
+}
+
+.national-stat-source a{
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.national-stat-visual{
+  display: grid;
+  gap: 12px;
+}
+
+.national-stat-primary{
+  padding: 26px;
+}
+
+.national-stat-primary strong{
+  color: #173930;
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 6vw, 64px);
+  font-weight: 500;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin: 12px 0 8px;
+}
+
+.national-stat-meter{
+  background: #edf3ef;
+  border-radius: 999px;
+  height: 10px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.national-stat-meter i{
+  background: var(--green);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  width: 99%;
+}
+
+.national-stat-secondary{
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.national-stat-secondary article{
+  min-height: 118px;
+  padding: 20px;
+}
+
+.national-stat-secondary strong{
+  color: #294f42;
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  font-weight: 500;
+  margin: 9px 0 6px;
+}
+
+.impostometro-floating{
+  background: #fff;
+  border: 1px solid #d6e0da;
+  border-radius: 12px;
+  bottom: 14px;
+  box-shadow: 0 14px 44px #17393022;
+  display: block;
+  overflow: hidden;
+  position: fixed;
+  right: 14px;
+  width: 330px;
+  z-index: 45;
+}
+
+.impostometro-floating-label{
+  align-items: center;
+  background: #f7faf8;
+  border-bottom: 1px solid #e1e9e4;
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 10px;
+}
+
+.impostometro-floating-label strong{
+  color: #31564a;
+  font-size: 9px;
+  letter-spacing: .4px;
+}
+
+.impostometro-floating-label a{
+  color: var(--green);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.impostometro-floating iframe{
+  display: block;
+  height: 82px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .impostometro-floating{
+    display: none !important;
+  }
+
+  .local-stat-cards{
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .national-statistics-home{
+    gap: 34px;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .local-statistics-home,
+.national-statistics-home{
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .local-statistics-home{
+    padding-top: 60px;
+    padding-bottom: 66px;
+  }
+
+  .national-statistics-home{
+    padding-top: 62px;
+    padding-bottom: 70px;
+  }
+
+  .local-stat-cards,
+.local-stat-charts,
+.national-stat-secondary{
+    grid-template-columns: 1fr;
+  }
+
+  .local-stat-cards article{
+    min-height: 112px;
+  }
+}
+
+@media print {
+  .impostometro-floating,
+.local-statistics-home,
+.national-statistics-home{
+    display: none !important;
+  }
+}
+
+
+/* v78: aviso discreto para lotes grandes, sem limitar ou dividir o processamento */
+.batch-large-warning{
+  background: #fff8e7;
+  border: 1px solid #ead9a8;
+  border-radius: 9px;
+  color: #746137;
+  font-size: 9px;
+  line-height: 1.45;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+/* v109: acesso à área ProcurandoDashboard, sem interferir na impressão fiscal */
+.dashboard-nav-link{
+  align-items: center;
+  background: #f2c811;
+  border: 1px solid #d7ad00;
+  border-radius: 8px;
+  color: #28230d !important;
+  display: inline-flex;
+  font-weight: 800 !important;
+  padding: 9px 12px;
+  white-space: nowrap;
+}
+
+.site-header nav{
+  align-items: center;
+  gap: 20px;
+}
+
+.site-header nav a{
+  white-space: nowrap;
+}
+
+.dashboard-nav-link:hover{
+  background: #ddb600;
+  color: #151100 !important;
+}
+
+.dashboard-promo-home{
+  align-items: center;
+  background: linear-gradient(135deg, #fff8cf 0%, #ffe36e 100%);
+  border: 1px solid #ecd05b;
+  border-radius: 22px;
+  box-shadow: 0 22px 60px #7f610f18;
+  display: grid;
+  gap: 48px;
+  grid-template-columns: .92fr 1.08fr;
+  margin: 28px auto 88px;
+  max-width: 1052px;
+  overflow: hidden;
+  padding: 54px 58px;
+}
+
+.dashboard-promo-copy > span{
+  color: #765900;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.dashboard-promo-copy h2{
+  color: #2c291d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(31px, 4vw, 43px);
+  font-weight: 500;
+  letter-spacing: -1.4px;
+  line-height: 1.06;
+  margin: 14px 0 15px;
+}
+
+.dashboard-promo-copy p{
+  color: #655b34;
+  font-size: 11px;
+  line-height: 1.75;
+  margin: 0 0 23px;
+}
+
+.dashboard-promo-copy a{
+  align-items: center;
+  background: #24231f;
+  border-radius: 9px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 800;
+  gap: 12px;
+  padding: 13px 16px;
+}
+
+.dashboard-promo-copy a:hover{
+  background: #000;
+}
+
+.dashboard-promo-copy a b{
+  color: #f2c811;
+  font-size: 15px;
+}
+
+.dashboard-promo-preview{
+  perspective: 900px;
+}
+
+.dashboard-promo-window{
+  background: #fff;
+  border: 1px solid #d7c978;
+  border-radius: 12px;
+  box-shadow: 0 26px 55px #51430e24;
+  min-height: 270px;
+  padding: 18px;
+  transform: rotateY(-4deg) rotateX(2deg);
+}
+
+.dashboard-promo-window-top{
+  align-items: center;
+  border-bottom: 1px solid #ece7cd;
+  display: flex;
+  gap: 6px;
+  padding-bottom: 12px;
+}
+
+.dashboard-promo-window-top i{
+  background: #ded8bc;
+  border-radius: 50%;
+  height: 6px;
+  width: 6px;
+}
+
+.dashboard-promo-window-top i:first-child{
+  background: #f2c811;
+}
+
+.dashboard-promo-window-top strong{
+  color: #474335;
+  font-size: 8px;
+  margin-left: auto;
+}
+
+.dashboard-promo-kpis{
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 15px 0;
+}
+
+.dashboard-promo-kpis span{
+  background: #fbfaf4;
+  border: 1px solid #eee8cc;
+  border-radius: 7px;
+  padding: 12px 10px;
+}
+
+.dashboard-promo-kpis small{
+  color: #8a8266;
+  display: block;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .7px;
+}
+
+.dashboard-promo-kpis b{
+  color: #2d2a20;
+  display: block;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.dashboard-promo-chart{
+  align-items: end;
+  background: repeating-linear-gradient(to top, #eee9d5 0 1px, transparent 1px 42px);
+  border-bottom: 1px solid #a69d7b;
+  display: flex;
+  gap: 12px;
+  height: 135px;
+  padding: 8px 13px 0;
+}
+
+.dashboard-promo-chart span{
+  background: linear-gradient(#f2c811, #d4a900);
+  border-radius: 4px 4px 0 0;
+  flex: 1;
+  min-height: 8px;
+}
+
+@media (max-width: 820px){
+  .dashboard-promo-home{
+    gap: 34px;
+    grid-template-columns: 1fr;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 42px;
+  }
+}
+
+@media (max-width: 1180px){
+  .site-header .header-badge{
+    display: none;
+  }
+
+  .site-header nav{
+    gap: 15px;
+  }
+}
+
+@media (max-width: 560px){
+  .dashboard-promo-home{
+    border-radius: 17px;
+    margin-bottom: 64px;
+    padding: 34px 22px;
+  }
+
+  .dashboard-promo-window{
+    min-height: 230px;
+    padding: 13px;
+    transform: none;
+  }
+
+  .dashboard-promo-kpis{
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-promo-kpis span:nth-child(n+2){
+    display: none;
+  }
+
+  .dashboard-promo-chart{
+    height: 118px;
+  }
+}
+
+@media print{
+  .dashboard-promo-home{
+    display: none !important;
+  }
+}
+
+.batch-large-warning[hidden]{
+  display: none !important;
+}
+
+
+
+
+/* Estatísticas: gráfico por tipo ocupa a largura útil. */
+.local-stat-charts { grid-template-columns: 1fr; }
+
+/* Preserva os ajustes atuais do DANFE. */
+.danfe-print .official-additional {
+  border-radius: 0 !important;
+}
+
+.danfe-print .official-section-title {
+  min-height: 1.8mm !important;
+  padding: 0.08mm 0.18mm !important;
+  font-size: 3.7pt !important;
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Veja por que um XML de NF-e ou CT-e pode não abrir e como identificar arquivo inválido, evento fiscal, XML incompleto ou documento incorreto." />
+    <meta name="google-adsense-account" content="ca-pub-5674140399014280" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://procurandodanfe.com.br/guias/erros-comuns-xml/" />
+    <link rel="icon" href="/favicon.svg" />
+    <title>Erros comuns ao abrir XML de NF-e ou CT-e | ProcurandoNFe</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5674140399014280" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/assets/index-Rj_DCHNM.css" />
+    <link rel="stylesheet" href="/conteudo.css" />
+  </head>
+  <body>
+    <main class="content-page">
+      <header class="site-header"><a class="brand" href="/" aria-label="ProcurandoNFe — início"><span class="brand-mark" aria-hidden="true">N</span><span>Baixa<span>NFe</span></span></a><nav aria-label="Navegação principal"><a href="/">Ferramenta</a><a href="/guias/" aria-current="page">Guias</a><a href="/estatisticas/">Estatísticas</a><a href="/perguntas-frequentes/">Dúvidas</a><a href="/contato/">Entrar em contato</a></nav><a class="content-cta" href="/">Testar XML</a></header>
+      <div class="article-shell">
+        <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Início</a><span>›</span><a href="/guias/">Guias</a><span>›</span><span>Erros no XML</span></nav>
+        <header class="article-hero"><span class="article-kicker">SOLUÇÕES</span><h1>Erros comuns ao abrir um XML fiscal.</h1><p>Nem todo arquivo com extensão XML é uma NF-e ou um CT-e completo. Aprenda a reconhecer os problemas mais frequentes antes de tentar novamente.</p><div class="article-meta">Atualizado em 5 de agosto de 2026 · Leitura de 5 minutos</div></header>
+        <div class="article-layout">
+          <article class="article-content">
+            <section><h2>O arquivo não é o documento autorizado</h2><p>Uma operação fiscal pode gerar vários XMLs: nota, protocolo, cancelamento, carta de correção, manifestação, inutilização ou recibo. Para montar DANFE ou DACTE, a ferramenta precisa dos dados principais da NF-e ou do CT-e. Um XML contendo apenas um evento não possui itens, participantes e totais suficientes.</p><p>Procure no conteúdo elementos como <strong>infNFe</strong> para NF-e ou <strong>infCte</strong> para CT-e. Nos arquivos processados, também podem aparecer <strong>nfeProc</strong> ou <strong>cteProc</strong>.</p></section>
+            <section><h2>O XML está incompleto ou malformado</h2><p>Se o download foi interrompido, o arquivo pode terminar no meio de uma tag. Ele também pode ter sido copiado de um e-mail de forma incompleta ou salvo por um editor que alterou caracteres especiais.</p><h3>Como verificar</h3><ul><li>Baixe novamente na origem.</li><li>Compare o tamanho com o arquivo enviado pelo emissor.</li><li>Abra apenas para leitura em um navegador ou visualizador confiável.</li><li>Não apague tags nem tente “corrigir” manualmente o documento fiscal.</li></ul></section>
+            <section><h2>A extensão não corresponde ao conteúdo</h2><p>Renomear PDF, HTML ou texto para “.xml” não transforma o arquivo em XML fiscal. O mesmo vale para um ZIP que ainda não foi extraído. Confira a extensão real e, se o sistema esconder extensões, veja as propriedades do arquivo.</p><div class="article-warning"><p>Arquivos fiscais podem conter dados comerciais e pessoais. Evite visualizadores desconhecidos e não publique o conteúdo em fóruns ou redes sociais.</p></div></section>
+            <section><h2>O documento usa outro modelo</h2><p>A NF-e de mercadorias normalmente usa o modelo 55, enquanto o CT-e usa o modelo 57. Outros documentos eletrônicos, como NFC-e, NFS-e e MDF-e, possuem estruturas próprias. Uma ferramenta voltada para DANFE e DACTE pode não interpretar esses outros formatos.</p><table class="key-table"><thead><tr><th>Indício</th><th>Possível documento</th><th>Resultado esperado</th></tr></thead><tbody><tr><td>infNFe / modelo 55</td><td>NF-e</td><td>DANFE</td></tr><tr><td>infCte / modelo 57</td><td>CT-e</td><td>DACTE</td></tr><tr><td>procEvento</td><td>Evento isolado</td><td>Não gera documento completo</td></tr></tbody></table></section>
+            <section><h2>A chave ou os dados não batem</h2><p>Se a chave encontrada no XML não tiver 44 posições, o arquivo pode estar truncado ou não corresponder a uma NF-e/CT-e. Se os dados visuais parecem diferentes dos esperados, consulte a chave no portal oficial e peça ao emissor uma nova cópia do XML.</p><div class="article-note"><p>No processamento em lote, um arquivo com erro não bloqueia necessariamente os demais. A lista mostra individualmente quais DANFEs ou DACTEs ficaram prontos.</p></div></section>
+            <div class="official-sources"><strong>Fontes oficiais</strong><a href="https://www.nfe.fazenda.gov.br/portal/exibirArquivo.aspx?conteudo=LrBx7WT9PuA%3D" rel="noopener noreferrer" target="_blank">Manual de Orientação do Contribuinte da NF-e</a><a href="https://www.cte.fazenda.gov.br/portal/listaConteudo.aspx?tipoConteudo=YIi+H8VETH0%3D" rel="noopener noreferrer" target="_blank">Portal do CT-e — manuais</a></div>
+          </article>
+          <aside class="article-aside"><div class="aside-card"><h2>Teste seu arquivo</h2><p>Use um XML autorizado de NF-e ou CT-e.</p><a class="aside-button" href="/">Abrir ferramenta</a></div><div class="aside-card"><h2>Leia também</h2><a href="/guias/imprimir-danfe-com-xml/">Como imprimir DANFE</a><a href="/guias/cte-e-dacte/">CT-e e DACTE</a><a href="/guias/segunda-via-nota-fiscal/">Recuperar segunda via</a></div></aside>
+        </div>
+      </div>
+      <footer class="content-footer"><a class="brand brand-footer" href="/"><span class="brand-mark">N</span><span>Baixa<span>NFe</span></span></a><p>Ferramenta independente. Não possui vínculo com a Receita Federal ou Secretarias da Fazenda.</p><div><a href="/guias/">Guias</a><a href="/estatisticas/">Estatísticas</a><a href="/privacidade">Privacidade</a><a href="/cookies">Cookies</a><a href="/sobre/">Sobre</a><a href="/contato/">Entrar em contato</a></div></footer>
+    </main>
+  </body>
+</html>
