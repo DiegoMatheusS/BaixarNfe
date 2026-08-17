@@ -6,16 +6,30 @@ const STATUS_INTERVAL_MS = 1_100;
 const STATUS_MAX_ATTEMPTS = 18;
 const requestBuckets = new Map();
 const activeKeys = new Set();
+const SECURITY_HEADERS = {
+  "Strict-Transport-Security": "max-age=31536000",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+  "X-Permitted-Cross-Domain-Policies": "none",
+  "Content-Security-Policy": "base-uri 'self'; frame-ancestors 'none'; object-src 'none'; form-action 'self'; upgrade-insecure-requests",
+};
+
+function applySecurityHeaders(headers) {
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
+  return headers;
+}
 
 function jsonResponse(body, status = 200, extraHeaders = {}) {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store, no-cache, must-revalidate",
+    ...extraHeaders,
+  }));
   return new Response(JSON.stringify(body), {
     status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store, no-cache, must-revalidate",
-      "X-Content-Type-Options": "nosniff",
-      ...extraHeaders,
-    },
+    headers,
   });
 }
 
@@ -276,9 +290,26 @@ async function consultarChave(request, env) {
     );
   }
 
+  let rawPayload;
+  try {
+    rawPayload = await request.text();
+  } catch {
+    return jsonResponse(
+      { error: "json_invalido", message: "Não foi possível ler a solicitação." },
+      400,
+    );
+  }
+
+  if (new TextEncoder().encode(rawPayload).byteLength > 2_048) {
+    return jsonResponse(
+      { error: "solicitacao_muito_grande", message: "Solicitação acima do limite permitido." },
+      413,
+    );
+  }
+
   let payload;
   try {
-    payload = await request.json();
+    payload = JSON.parse(rawPayload);
   } catch {
     return jsonResponse(
       { error: "json_invalido", message: "Não foi possível ler a solicitação." },
@@ -362,6 +393,12 @@ export default {
       return consultarChave(request, env);
     }
 
-    return env.ASSETS.fetch(request);
+    const response = await env.ASSETS.fetch(request);
+    const headers = applySecurityHeaders(new Headers(response.headers));
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   },
 };

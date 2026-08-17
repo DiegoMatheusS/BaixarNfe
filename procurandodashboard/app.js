@@ -631,6 +631,41 @@ function formatPrice(template) {
   }).format(price);
 }
 
+function purchaseEmail() {
+  const email = config.purchaseEmail || {};
+  const local = Array.isArray(email.localParts) ? email.localParts.join("") : "";
+  const domain = Array.isArray(email.domainParts) ? email.domainParts.join(".") : "";
+  return local && domain ? `${local}@${domain}` : "";
+}
+
+function purchaseUrl(template) {
+  const recipient = purchaseEmail();
+  if (!recipient) return "";
+  const price = formatPrice(template);
+  const subject = `Compra de dashboard - ${template.nome}`;
+  const body = [
+    "Olá,",
+    "",
+    "Quero comprar o dashboard abaixo:",
+    `Dashboard: ${template.nome}`,
+    `Valor: ${price}`,
+    "",
+    "Nome completo:",
+    "E-mail para receber o arquivo:",
+    "",
+    "Vou anexar o comprovante de transferência nesta mensagem.",
+    "Após a confirmação do pagamento, aguardo o envio do dashboard e das instruções de uso."
+  ].join("\n");
+  const params = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: recipient,
+    su: subject,
+    body
+  });
+  return `https://mail.google.com/mail/?${params.toString()}`;
+}
+
 function cardAction(template) {
   if (Array.isArray(template.modelos) && template.modelos.length) {
     return `<button class="template-action models" type="button" data-models-id="${escapeHtml(template.id)}">Ver modelos</button>`;
@@ -640,12 +675,19 @@ function cardAction(template) {
   const available = template.status === "disponivel";
   const targetUrl = safeUrl(paid ? template.checkoutUrl : template.arquivoUrl);
 
+  if (paid) {
+    const emailUrl = safeUrl(purchaseUrl(template));
+    if (emailUrl) {
+      return `<a class="template-action professional" href="${escapeHtml(emailUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Comprar ${escapeHtml(template.nome)} por e-mail">Comprar</a>`;
+    }
+  }
+
   if (available && targetUrl) {
     const label = paid ? "Comprar agora" : "Baixar grátis";
     return `<a class="template-action ${paid ? "professional" : "free"}" href="${escapeHtml(targetUrl)}">${label}</a>`;
   }
 
-  return `<button type="button" disabled aria-disabled="true">${paid ? "Comprar em breve" : "Download em breve"}</button>`;
+  return `<button type="button" disabled aria-disabled="true">${paid ? "Compra indisponível" : "Download em breve"}</button>`;
 }
 
 function planInfo(type) {

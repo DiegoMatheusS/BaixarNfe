@@ -3,7 +3,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()
-  Content-Security-Policy: base-uri 'self'; frame-ancestors 'none'; object-src 'none'
+  Strict-Transport-Security: max-age=31536000
+  X-Permitted-Cross-Domain-Policies: none
+  Content-Security-Policy: base-uri 'self'; frame-ancestors 'none'; object-src 'none'; form-action 'self'; upgrade-insecure-requests
 
 /ads.txt
   Content-Type: text/plain; charset=utf-8

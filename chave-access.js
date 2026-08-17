@@ -2,6 +2,9 @@ import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=54"
 
 const API_URL = "/api/consultar-chave";
 const ACCEPTED_UPLOAD_EXTENSIONS = [".xml", ".txt", ".doc", ".docx"];
+const MAX_UPLOAD_FILES = 20;
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_BATCH_SIZE_BYTES = 50 * 1024 * 1024;
 
 let pdfUrl = "";
 let xmlUrl = "";
@@ -125,6 +128,9 @@ function showMode(mode) {
 async function describeXmlFile(file) {
   if (!hasAcceptedUploadExtension(file.name)) {
     throw new Error("Envie XML, TXT ou arquivo Word com conteúdo XML fiscal.");
+  }
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    throw new Error("O arquivo ultrapassa o limite de 10 MB.");
   }
   const xml = await file.text();
   if (/<!DOCTYPE|<!ENTITY/i.test(xml)) {
@@ -389,6 +395,17 @@ async function processBatchFiles(files) {
   message.textContent = "";
   if (largeWarning) largeWarning.hidden = files.length < 30;
   showMode("xml");
+
+  const batchSize = files.reduce((total, file) => total + Number(file.size || 0), 0);
+  if (files.length > MAX_UPLOAD_FILES || batchSize > MAX_BATCH_SIZE_BYTES) {
+    progress.textContent = "Lote não processado";
+    message.textContent = files.length > MAX_UPLOAD_FILES
+      ? "Selecione no máximo 20 arquivos por vez."
+      : "O lote ultrapassa o limite total de 50 MB.";
+    if (largeWarning) largeWarning.hidden = true;
+    clearButton.disabled = false;
+    return;
+  }
 
   const rows = files.map((file) => addBatchRow(list, file));
   let failures = 0;
@@ -1716,6 +1733,7 @@ function updatePrivacyPage() {
   const thirdParties = sections.find((section) => section.querySelector("h2")?.textContent.startsWith("3."));
   const retention = sections.find((section) => section.querySelector("h2")?.textContent.startsWith("5."));
   const rights = sections.find((section) => section.querySelector("h2")?.textContent.startsWith("6."));
+  const policyCard = document.querySelector(".policy-card");
   const updated = document.querySelector(".policy-intro small");
   const summary = document.querySelector(".policy-highlight p");
 
@@ -1745,7 +1763,18 @@ function updatePrivacyPage() {
     }
   }
 
-  if (updated) updated.textContent = "Última atualização: 5 de agosto de 2026";
+  if (policyCard && !policyCard.querySelector("[data-dashboard-purchase-privacy]")) {
+    const purchase = document.createElement("section");
+    purchase.dataset.dashboardPurchasePrivacy = "true";
+    const heading = document.createElement("h2");
+    heading.textContent = "8. Compra de dashboards por e-mail";
+    const paragraph = document.createElement("p");
+    paragraph.textContent = "Ao clicar em Comprar, o navegador abre uma mensagem no Gmail com o dashboard e o preço preenchidos. Nome, e-mail de entrega e comprovante somente são enviados quando o próprio usuário confirma o envio. O site não armazena essas informações; o tratamento da mensagem também depende do provedor de e-mail utilizado.";
+    purchase.append(heading, paragraph);
+    policyCard.insertBefore(purchase, policyCard.querySelector(".policy-highlight"));
+  }
+
+  if (updated) updated.textContent = "Última atualização: 17 de agosto de 2026";
   if (summary) {
     summary.textContent =
       "O XML enviado permanece no dispositivo. A consulta por chave usa um serviço externo apenas para localizar e devolver a NF-e ou o CT-e.";
