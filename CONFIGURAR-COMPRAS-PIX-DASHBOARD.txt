@@ -1,0 +1,74 @@
+PROCURANDODASHBOARDBI - CONFIGURAÇÃO DO CHECKOUT PIX
+====================================================
+
+A implementação já está no código. O DANFE/NF-e e o DACTE/CT-e não foram alterados nesta versão.
+
+1) CLOUDFLARE D1
+Crie um banco D1 e adicione ao projeto Pages com o binding:
+DASHBOARD_DB
+
+O Worker cria a tabela automaticamente no primeiro uso. O arquivo dashboard-store-schema.sql também está incluído para criação manual.
+
+2) CLOUDFLARE R2
+Crie/use um bucket R2 PRIVADO e adicione ao projeto Pages com o binding:
+DASHBOARD_FILES
+
+Não habilite URL pública para os arquivos pagos.
+Os .pbip devem ser enviados para a pasta dashboards/ usando o ID do dashboard.
+Exemplo:
+dashboards/financeiro-empresarial.pbip
+dashboards/contas-a-pagar.pbip
+
+O checkout verifica se o arquivo existe no R2 ANTES de cobrar o cliente.
+
+3) VARIÁVEIS/SECRETS NO CLOUDFLARE
+Cadastre em Settings > Variables and Secrets:
+
+MP_ACCESS_TOKEN=Access Token privado do Mercado Pago
+MP_WEBHOOK_SECRET=chave secreta gerada na configuração de Webhooks do Mercado Pago
+RESEND_API_KEY=chave privada da API Resend
+DASHBOARD_EMAIL_FROM=ProcurandoDashboardBI <vendas@SEU_DOMINIO_VERIFICADO>
+DASHBOARD_SALES_EMAIL=seu e-mail que receberá os avisos de venda
+DASHBOARD_SECURITY_SECRET=segredo aleatório longo (mínimo recomendado: 32 bytes)
+DASHBOARD_DOWNLOAD_SECRET=outro segredo aleatório longo e diferente
+
+Nunca coloque esses valores em app.js, config.js, HTML ou Git.
+
+4) MERCADO PAGO
+Use Checkout Transparente via Orders API.
+Configure o Webhook de produção para:
+https://procurandodanfe.com.br/api/dashboard-store/webhooks/mercadopago
+
+Evento a selecionar:
+Order (Mercado Pago)
+
+Depois copie a chave secreta gerada para MP_WEBHOOK_SECRET.
+A conta Mercado Pago precisa estar apta a receber Pix.
+
+5) RESEND
+Verifique o domínio de envio e crie a API Key.
+O cliente recebe o .pbip anexado quando o arquivo tiver até 18 MB.
+Se for maior, recebe um link privado de download válido por 7 dias.
+O e-mail administrativo recebe nome, sobrenome, telefone, e-mail, dashboard, valor, pedido e ID do Mercado Pago.
+
+6) SEGURANÇA IMPLEMENTADA
+- preço e arquivo definidos somente no Worker; o navegador não controla o valor cobrado;
+- arquivo R2 verificado antes da cobrança;
+- bucket pago deve permanecer privado;
+- Access Token do Mercado Pago nunca vai para o navegador;
+- Webhook validado por HMAC-SHA256 com x-signature;
+- a order é consultada diretamente no Mercado Pago após o Webhook;
+- entrega só ocorre com order e transação processed/accredited e valor exato;
+- idempotência na criação da order;
+- token aleatório para consulta do status;
+- link de download assinado e temporário;
+- limites de tentativa por hash de IP e e-mail; IP bruto não é salvo;
+- prepared statements no D1;
+- validação/tamanho máximo do JSON;
+- honeypot anti-bot;
+- checagem de mesma origem + header específico no checkout;
+- respostas de API com no-store;
+- envio de e-mail com chave de idempotência.
+
+7) FLUXO
+Comprar > preencher Nome/Sobrenome/Telefone/E-mail > Gerar Pix > QR Code/Copia e Cola > Webhook Mercado Pago > confirmação real da order > Compra realizada com sucesso > envio automático do .pbip ao cliente > aviso automático para o administrador.

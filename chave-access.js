@@ -1666,6 +1666,78 @@ function bindKeyPanel(panel) {
   });
 }
 
+
+function setupMainMobileMenu() {
+  if (window.location.pathname !== "/" && window.location.pathname !== "") return;
+
+  const header = document.querySelector(".site-header");
+  const nav = header?.querySelector("nav");
+  if (!header || !nav) return;
+
+  let button = header.querySelector(".main-mobile-menu-toggle");
+  let panel = header.querySelector(".main-mobile-menu-panel");
+
+  if (!button) {
+    button = document.createElement("button");
+    button.type = "button";
+    button.className = "main-mobile-menu-toggle";
+    button.setAttribute("aria-label", "Abrir menu");
+    button.setAttribute("aria-expanded", "false");
+    button.innerHTML = '<span></span><span></span><span></span>';
+    header.append(button);
+  }
+
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.className = "main-mobile-menu-panel";
+    panel.setAttribute("aria-hidden", "true");
+    header.append(panel);
+  }
+
+  const links = [...nav.querySelectorAll("a")];
+  const signature = links.map((link) => `${link.textContent.trim()}|${link.getAttribute("href") || ""}`).join(";");
+  if (panel.dataset.signature !== signature) {
+    panel.innerHTML = "";
+    links.forEach((link) => {
+      const clone = link.cloneNode(true);
+      clone.classList.add("main-mobile-menu-link");
+      clone.addEventListener("click", () => closeMenu());
+      panel.append(clone);
+    });
+    panel.dataset.signature = signature;
+  }
+
+  const closeMenu = () => {
+    button.classList.remove("is-open");
+    panel.classList.remove("is-open");
+    button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-label", "Abrir menu");
+    panel.setAttribute("aria-hidden", "true");
+  };
+
+  const openMenu = () => {
+    button.classList.add("is-open");
+    panel.classList.add("is-open");
+    button.setAttribute("aria-expanded", "true");
+    button.setAttribute("aria-label", "Fechar menu");
+    panel.setAttribute("aria-hidden", "false");
+  };
+
+  if (button.dataset.bound !== "true") {
+    button.dataset.bound = "true";
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      panel.classList.contains("is-open") ? closeMenu() : openMenu();
+    });
+    document.addEventListener("click", (event) => {
+      if (!header.contains(event.target)) closeMenu();
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 720) closeMenu();
+    });
+  }
+}
+
 function enhanceHome() {
   document.title = "ProcurandoNFe";
   const toolBody = document.querySelector(".tool-body");
@@ -1785,6 +1857,7 @@ function enhance() {
   if (window.location.pathname === "/" || window.location.pathname === "") enhanceHome();
   updatePrivacyPage();
   enhanceSiteLinks();
+  setupMainMobileMenu();
 }
 
 enhance();

@@ -15,7 +15,26 @@ const modelsModalList = document.querySelector("#models-modal-list");
 const modelsModalPrice = document.querySelector("#models-modal-price");
 const modelsModalAction = document.querySelector("#models-modal-action");
 const scrollTopButton = document.querySelector("#scroll-top");
+const purchaseModal = document.querySelector("#purchase-modal");
+const purchaseForm = document.querySelector("#purchase-form");
+const purchaseTitle = document.querySelector("#purchase-title");
+const purchaseDashboardName = document.querySelector("#purchase-dashboard-name");
+const purchaseDashboardPrice = document.querySelector("#purchase-dashboard-price");
+const purchaseMessage = document.querySelector("#purchase-message");
+const purchaseSubmit = document.querySelector("#purchase-submit");
+const purchasePixArea = document.querySelector("#purchase-pix-area");
+const purchaseQr = document.querySelector("#purchase-qr");
+const purchasePixCode = document.querySelector("#purchase-pix-code");
+const purchaseCopy = document.querySelector("#purchase-copy");
+const purchaseSuccess = document.querySelector("#purchase-success");
+const dashboardMenuToggle = document.querySelector("#dashboard-menu-toggle");
+const dashboardMobileMenu = document.querySelector("#dashboard-mobile-menu");
 let modalTrigger = null;
+let purchaseTrigger = null;
+let activePurchaseTemplate = null;
+let purchasePollTimer = null;
+let purchasePollBusy = false;
+let purchasePollCount = 0;
 
 const catalogTemplates = [
   {
@@ -639,51 +658,26 @@ function formatPrice(template) {
   }).format(price);
 }
 
-function purchaseEmail() {
-  const email = config.purchaseEmail || {};
-  const local = Array.isArray(email.localParts) ? email.localParts.join("") : "";
-  const domain = Array.isArray(email.domainParts) ? email.domainParts.join(".") : "";
-  return local && domain ? `${local}@${domain}` : "";
-}
-
-function purchaseUrl(template) {
-  const recipient = purchaseEmail();
-  if (!recipient) return "";
-  const price = formatPrice(template);
-  const subject = `Compra de dashboard - ${template.nome}`;
-  const body = [
-    "Olá,",
-    "",
-    "Quero comprar o dashboard abaixo:",
-    `Dashboard: ${template.nome}`,
-    `Valor: ${price}`,
-    "",
-    "Nome completo:",
-    "E-mail para receber o arquivo:",
-    "",
-    "Vou anexar o comprovante de transferência nesta mensagem.",
-    "Após a confirmação do pagamento, aguardo o envio do dashboard e das instruções de uso."
-  ].join("\n");
-  const params = new URLSearchParams({
-    view: "cm",
-    fs: "1",
-    to: recipient,
-    su: subject,
-    body
-  });
-  return `https://mail.google.com/mail/?${params.toString()}`;
-}
+const PURCHASABLE_DASHBOARD_IDS = new Set([
+  "agronegocio",
+  "restaurante-e-delivery",
+  "vendas-e-faturamento",
+  "ecommerce",
+  "compras-e-fornecedores",
+  "contas-a-receber"
+]);
 
 function finalAction(template) {
   const paid = template.tipo !== "gratuito";
   const available = template.status === "disponivel";
   const targetUrl = safeUrl(paid ? template.checkoutUrl : template.arquivoUrl);
 
+  if (paid && PURCHASABLE_DASHBOARD_IDS.has(template.id)) {
+    return `<button class="template-action professional detail-action" type="button" data-buy-id="${escapeHtml(template.id)}" aria-label="Comprar ${escapeHtml(template.nome)} com Pix">Comprar</button>`;
+  }
+
   if (paid) {
-    const emailUrl = safeUrl(purchaseUrl(template));
-    if (emailUrl) {
-      return `<a class="template-action professional detail-action" href="${escapeHtml(emailUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Comprar ${escapeHtml(template.nome)} por e-mail">Comprar</a>`;
-    }
+    return `<button class="template-action detail-action" type="button" disabled aria-disabled="true">Comprar<small>Em breve</small></button>`;
   }
 
   if (available && targetUrl) {
@@ -896,8 +890,243 @@ modelsModal?.addEventListener("click", (event) => {
   if (event.target === modelsModal || event.target.closest("[data-close-models]")) closeModelsModal();
 });
 
+function closeDashboardMobileMenu() {
+  if (!dashboardMenuToggle || !dashboardMobileMenu) return;
+  dashboardMobileMenu.hidden = true;
+  dashboardMenuToggle.setAttribute("aria-expanded", "false");
+  dashboardMenuToggle.setAttribute("aria-label", "Abrir menu");
+}
+
+function toggleDashboardMobileMenu() {
+  if (!dashboardMenuToggle || !dashboardMobileMenu) return;
+  const willOpen = dashboardMobileMenu.hidden;
+  dashboardMobileMenu.hidden = !willOpen;
+  dashboardMenuToggle.setAttribute("aria-expanded", String(willOpen));
+  dashboardMenuToggle.setAttribute("aria-label", willOpen ? "Fechar menu" : "Abrir menu");
+}
+
+dashboardMenuToggle?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleDashboardMobileMenu();
+});
+
+dashboardMobileMenu?.addEventListener("click", (event) => {
+  if (event.target.closest("a")) closeDashboardMobileMenu();
+});
+
+document.addEventListener("click", (event) => {
+  if (!dashboardMobileMenu || dashboardMobileMenu.hidden) return;
+  if (event.target.closest("#dashboard-mobile-menu") || event.target.closest("#dashboard-menu-toggle")) return;
+  closeDashboardMobileMenu();
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 900) closeDashboardMobileMenu();
+}, { passive: true });
+
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !modelsModal?.hidden) closeModelsModal();
+  if (event.key !== "Escape") return;
+  if (dashboardMobileMenu && !dashboardMobileMenu.hidden) {
+    closeDashboardMobileMenu();
+    dashboardMenuToggle?.focus();
+    return;
+  }
+  if (purchaseModal && !purchaseModal.hidden) {
+    closePurchaseModal();
+    return;
+  }
+  if (!modelsModal?.hidden) closeModelsModal();
+});
+
+function clearPurchasePolling() {
+  if (purchasePollTimer) window.clearInterval(purchasePollTimer);
+  purchasePollTimer = null;
+  purchasePollBusy = false;
+  purchasePollCount = 0;
+}
+
+function setPurchaseMessage(text = "", type = "") {
+  if (!purchaseMessage) return;
+  purchaseMessage.textContent = text;
+  purchaseMessage.className = `purchase-message${type ? ` ${type}` : ""}`;
+  purchaseMessage.hidden = !text;
+}
+
+function resetPurchaseModal() {
+  clearPurchasePolling();
+  purchaseForm?.reset();
+  if (purchasePixArea) purchasePixArea.hidden = true;
+  if (purchaseSuccess) purchaseSuccess.hidden = true;
+  if (purchaseQr) purchaseQr.removeAttribute("src");
+  if (purchasePixCode) purchasePixCode.value = "";
+  if (purchaseSubmit) {
+    purchaseSubmit.disabled = false;
+    purchaseSubmit.textContent = "Gerar Pix";
+  }
+  setPurchaseMessage();
+}
+
+function openPurchaseModal(template, trigger) {
+  if (!purchaseModal || !purchaseForm) return;
+  activePurchaseTemplate = template;
+  purchaseTrigger = trigger || document.activeElement;
+  resetPurchaseModal();
+  if (purchaseTitle) purchaseTitle.textContent = "Comprar com Pix";
+  if (purchaseDashboardName) purchaseDashboardName.textContent = template.nome;
+  if (purchaseDashboardPrice) purchaseDashboardPrice.textContent = formatPrice(template);
+  purchaseForm.elements.dashboardId.value = template.id;
+  purchaseForm.elements.formStartedAt.value = String(Date.now());
+  purchaseModal.hidden = false;
+  document.body.classList.add("purchase-modal-open");
+  window.setTimeout(() => purchaseForm.elements.firstName?.focus(), 0);
+}
+
+function closePurchaseModal() {
+  if (!purchaseModal) return;
+  clearPurchasePolling();
+  purchaseModal.hidden = true;
+  document.body.classList.remove("purchase-modal-open");
+  purchaseTrigger?.focus();
+  purchaseTrigger = null;
+  activePurchaseTemplate = null;
+}
+
+async function parseApiResponse(response) {
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+}
+
+async function pollPurchaseStatus(purchaseId, token) {
+  if (purchasePollBusy) return;
+  purchasePollBusy = true;
+  purchasePollCount += 1;
+  const verifyWithMercadoPago = purchasePollCount >= 3 && purchasePollCount % 4 === 3;
+  try {
+    const verifyQuery = verifyWithMercadoPago ? "?verify=1" : "";
+    const response = await fetch(`/api/dashboard-store/purchases/${encodeURIComponent(purchaseId)}/status${verifyQuery}`, {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        "X-Purchase-Token": token,
+        "X-Dashboard-Checkout": "1"
+      }
+    });
+    if (!response.ok) return;
+    const data = await parseApiResponse(response);
+    if (data.status === "paid") {
+      clearPurchasePolling();
+      if (purchaseSuccess) {
+        purchaseSuccess.hidden = false;
+        const delivery = data.emailStatus === "sent"
+          ? "O arquivo foi enviado para o seu e-mail."
+          : "Pagamento confirmado. O arquivo está sendo enviado para o seu e-mail.";
+        purchaseSuccess.innerHTML = `<strong>Compra realizada com sucesso!</strong><span>${escapeHtml(delivery)}</span>`;
+      }
+      if (purchasePixArea) purchasePixArea.classList.add("purchase-paid");
+      setPurchaseMessage();
+    } else if (["failed", "canceled", "expired"].includes(data.status)) {
+      clearPurchasePolling();
+      setPurchaseMessage("Este Pix não foi concluído. Gere uma nova cobrança para tentar novamente.", "error");
+    }
+  } finally {
+    purchasePollBusy = false;
+  }
+}
+
+function startPurchasePolling(purchaseId, token) {
+  clearPurchasePolling();
+  pollPurchaseStatus(purchaseId, token);
+  purchasePollTimer = window.setInterval(() => pollPurchaseStatus(purchaseId, token), 2500);
+}
+
+purchaseForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!activePurchaseTemplate || !purchaseSubmit) return;
+  const formData = new FormData(purchaseForm);
+  const payload = {
+    dashboardId: String(formData.get("dashboardId") || ""),
+    firstName: String(formData.get("firstName") || ""),
+    lastName: String(formData.get("lastName") || ""),
+    phone: String(formData.get("phone") || ""),
+    email: String(formData.get("email") || ""),
+    companyWebsite: String(formData.get("companyWebsite") || ""),
+    formStartedAt: Number(formData.get("formStartedAt") || 0)
+  };
+
+  purchaseSubmit.disabled = true;
+  purchaseSubmit.textContent = "Gerando Pix...";
+  setPurchaseMessage("Criando cobrança segura no Mercado Pago...", "info");
+
+  try {
+    const response = await fetch(config.checkoutEndpoint || "/api/dashboard-store/checkout", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Dashboard-Checkout": "1"
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseApiResponse(response);
+    if (!response.ok) throw new Error(data.message || "Não foi possível gerar o Pix.");
+
+    if (purchaseQr && data.qrCodeBase64) {
+      purchaseQr.src = `data:image/png;base64,${data.qrCodeBase64}`;
+    }
+    if (purchasePixCode) purchasePixCode.value = data.qrCode || "";
+    if (purchasePixArea) {
+      purchasePixArea.hidden = false;
+      purchasePixArea.classList.remove("purchase-paid");
+    }
+    purchaseSubmit.textContent = "Pix gerado";
+    setPurchaseMessage("Aguardando o pagamento. A confirmação é automática.", "info");
+    startPurchasePolling(data.purchaseId, data.statusToken);
+  } catch (error) {
+    purchaseSubmit.disabled = false;
+    purchaseSubmit.textContent = "Gerar Pix";
+    setPurchaseMessage(error instanceof Error ? error.message : "Não foi possível gerar o Pix.", "error");
+  }
+});
+
+purchaseCopy?.addEventListener("click", async () => {
+  const value = purchasePixCode?.value || "";
+  if (!value) return;
+  try {
+    await navigator.clipboard.writeText(value);
+    purchaseCopy.textContent = "Copiado!";
+    window.setTimeout(() => { purchaseCopy.textContent = "Copiar Pix"; }, 1600);
+  } catch {
+    purchasePixCode?.select();
+    document.execCommand("copy");
+  }
+});
+
+modelsModalAction?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-buy-id]");
+  if (!button) return;
+  const template = catalogTemplates.find((item) => item.id === button.dataset.buyId);
+  if (!template) return;
+
+  // No celular, dois modais fixos sobrepostos podem bloquear toque/rolagem.
+  // Fecha a prévia antes de abrir o checkout e preserva o botão como origem.
+  const trigger = button;
+  if (modelsModal) {
+    modelsModal.hidden = true;
+    document.body.classList.remove("models-modal-open");
+    modalTrigger = null;
+  }
+  openPurchaseModal(template, trigger);
+});
+
+purchaseModal?.addEventListener("click", (event) => {
+  if (event.target === purchaseModal || event.target.closest("[data-close-purchase]")) closePurchaseModal();
 });
 
 function updateScrollTopButton() {

@@ -12,9 +12,9 @@
     <title>ProcurandoDashboardBI — Templates para Power BI</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5674140399014280" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/assets/index-Rj_DCHNM.css" />
-    <link rel="stylesheet" href="/procurandodashboard/styles.css?v=6" />
-    <script src="/procurandodashboard/config.js?v=3" defer></script>
-    <script src="/procurandodashboard/app.js?v=12" defer></script>
+    <link rel="stylesheet" href="/procurandodashboard/styles.css?v=30" />
+    <script src="/procurandodashboard/config.js?v=30" defer></script>
+    <script src="/procurandodashboard/app.js?v=30" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -39,6 +39,16 @@
           <a href="#duvidas">Dúvidas</a>
         </nav>
         <a class="dashboard-back" href="/">Voltar ao ProcurandoNFe</a>
+        <button class="dashboard-menu-toggle" id="dashboard-menu-toggle" type="button" aria-label="Abrir menu" aria-controls="dashboard-mobile-menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="dashboard-mobile-menu" id="dashboard-mobile-menu" hidden>
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#preparar-planilha">Preparar dados</a>
+          <a href="#templates">Templates</a>
+          <a href="#duvidas">Dúvidas</a>
+          <a class="dashboard-mobile-back" href="/">Voltar ao ProcurandoNFe</a>
+        </div>
       </header>
 
       <section class="dashboard-hero">
@@ -150,7 +160,7 @@
         </div>
         <div class="templates-grid" id="templates-grid" aria-label="Modelos de dashboards"></div>
         <button class="catalog-more" id="catalog-more" type="button" hidden>Ver mais dashboards</button>
-        <p class="catalog-payment-note">Clique em Ver mais para abrir a prévia completa. Nos modelos gratuitos, o download será liberado nessa tela. Nos pagos, o botão Comprar abre um e-mail com dashboard e preço preenchidos.</p>
+        <p class="catalog-payment-note">Clique em Ver mais para abrir a prévia completa. Nos modelos gratuitos, o download será liberado nessa tela. Nos pagos, o botão Comprar abre o pagamento seguro por Pix, com confirmação automática e envio do arquivo por e-mail.</p>
       </section>
 
       <section class="dashboard-section package-section" id="pacotes">
@@ -177,7 +187,7 @@
           <details><summary>Posso usar Excel ou JSON?</summary><p>Sim. Cada template informará os nomes das colunas do Excel e dos campos do JSON que precisam ser mantidos para atualizar o dashboard.</p></details>
           <details><summary>Como informo os dados do Dashboard de Vendas?</summary><p>Escolha um dos modelos e use os campos indicados. No Multicanal, por exemplo, informe Plataforma, Data, Quantidade, Receita, Custos e Taxas ou Débitos: Mercado Livre 25 vendas e Amazon 12 vendas. O lucro será calculado pelo dashboard. O site não acessa suas contas.</p></details>
           <details><summary>Qual a diferença entre Gratuito, Pessoal Pro e Profissional?</summary><p>Gratuito é um modelo básico para uso pessoal. Pessoal Pro possui mais páginas, filtros e indicadores. Profissional é desenvolvido para empresas, equipes e atividades comerciais.</p></details>
-          <details><summary>Como funciona a compra por transferência?</summary><p>Clique em Comprar para abrir o Gmail com o nome e o preço do dashboard preenchidos. Complete seus dados e anexe o comprovante. O site não armazena o comprovante; ele é enviado diretamente por e-mail. A entrega é realizada após a confirmação do pagamento.</p></details>
+          <details><summary>Como funciona a compra por Pix?</summary><p>Clique em Comprar, informe nome, sobrenome, telefone e e-mail e gere o Pix. O QR Code e o Pix Copia e Cola aparecem na própria tela. Após a confirmação do Mercado Pago, a compra é aprovada automaticamente e o arquivo do dashboard é enviado ao e-mail informado.</p></details>
           <details><summary>Os dashboards já estão disponíveis?</summary><p>A área está sendo preparada. Os primeiros modelos serão publicados gradualmente, começando por Finanças Pessoais.</p></details>
         </div>
       </section>
@@ -209,6 +219,44 @@
               </div>
             </div>
           </div>
+        </section>
+      </div>
+
+      <div class="purchase-modal" id="purchase-modal" hidden>
+        <section class="purchase-modal-card" role="dialog" aria-modal="true" aria-labelledby="purchase-title">
+          <button class="models-modal-close" type="button" data-close-purchase aria-label="Fechar">×</button>
+          <span class="models-modal-eyebrow">PAGAMENTO SEGURO</span>
+          <h2 id="purchase-title">Comprar com Pix</h2>
+          <div class="purchase-summary">
+            <span id="purchase-dashboard-name">Dashboard</span>
+            <strong id="purchase-dashboard-price">R$ 0,00</strong>
+          </div>
+
+          <form class="purchase-form" id="purchase-form">
+            <input type="hidden" name="dashboardId" value="" />
+            <input type="hidden" name="formStartedAt" value="" />
+            <label><span>Nome</span><input name="firstName" type="text" minlength="2" maxlength="60" autocomplete="given-name" required /></label>
+            <label><span>Sobrenome</span><input name="lastName" type="text" minlength="2" maxlength="80" autocomplete="family-name" required /></label>
+            <label><span>Telefone</span><input name="phone" type="tel" inputmode="tel" maxlength="24" autocomplete="tel" placeholder="(11) 99999-9999" required /></label>
+            <label><span>E-mail</span><input name="email" type="email" maxlength="254" autocomplete="email" required /></label>
+            <label class="purchase-honeypot" aria-hidden="true"><span>Site da empresa</span><input name="companyWebsite" type="text" tabindex="-1" autocomplete="off" /></label>
+            <div class="purchase-consent">Seus dados são usados somente para processar a compra, confirmar o pagamento e entregar o dashboard.</div>
+            <button class="purchase-submit" id="purchase-submit" type="submit">Gerar Pix</button>
+          </form>
+
+          <p class="purchase-message" id="purchase-message" hidden></p>
+
+          <section class="purchase-pix-area" id="purchase-pix-area" hidden>
+            <div class="purchase-qr-wrap"><img id="purchase-qr" alt="QR Code Pix da compra" /></div>
+            <div class="purchase-pix-copy">
+              <span>Pix Copia e Cola</span>
+              <textarea id="purchase-pix-code" rows="3" readonly></textarea>
+              <button id="purchase-copy" type="button">Copiar Pix</button>
+            </div>
+            <small>A confirmação ocorre automaticamente pelo Mercado Pago. Não feche esta janela enquanto estiver aguardando.</small>
+          </section>
+
+          <div class="purchase-success" id="purchase-success" hidden></div>
         </section>
       </div>
     </main>
