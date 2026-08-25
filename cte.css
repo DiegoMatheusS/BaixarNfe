@@ -647,3 +647,155 @@
   margin:0 0 0.8mm;
   border-top:0.12mm dashed #666;
 }
+
+/* v2.33 - DACTE: legibilidade maior e documentos originários mais claros. */
+.cte-print .cte-emitter b { font-size:6.35pt; }
+.cte-print .cte-emitter p { font-size:5pt; }
+.cte-print .cte-emitter small { font-size:4.75pt; }
+.cte-print .cte-inline span { font-size:4.2pt; }
+.cte-print .cte-inline b { font-size:5.25pt; }
+.cte-print .cte-title span { font-size:3.7pt; }
+.cte-print .cte-modal span { font-size:4pt; }
+.cte-print .cte-modal b { font-size:5.75pt; }
+.cte-print .cte-meta-row span { font-size:3.75pt; }
+.cte-print .cte-meta-row b { font-size:5.8pt; }
+.cte-print .cte-meta-issued b { font-size:4.95pt; }
+.cte-print .cte-key-line span { font-size:3.55pt; }
+.cte-print .cte-key-line strong { font-size:5.7pt; }
+.cte-print .cte-box > span { font-size:3.85pt; }
+.cte-print .cte-box > b { font-size:5.1pt; }
+.cte-print .cte-party-title span { font-size:4.05pt; }
+.cte-print .cte-party-title strong { font-size:5.5pt; }
+.cte-print .cte-party-address span { font-size:3.65pt; }
+.cte-print .cte-party-address b { font-size:4.6pt; }
+.cte-print .cte-party-meta > span { font-size:3.5pt; }
+.cte-print .cte-party-meta > span b { font-size:4.35pt; }
+.cte-print .cte-taker-line span { font-size:3.65pt; }
+.cte-print .cte-taker-line strong { font-size:5.35pt; }
+.cte-print .cte-taker-line b { font-size:4.5pt; }
+.cte-print .cte-section-title { font-size:4.15pt; }
+.cte-print .cte-component-head span { font-size:3.8pt; }
+.cte-print .cte-component-row span,
+.cte-print .cte-component-row b { font-size:4.5pt; }
+.cte-print .cte-component-totals .cte-box > span { font-size:3.8pt; }
+.cte-print .cte-component-totals .cte-box > b { font-size:5.55pt; }
+.cte-print .cte-taxes .cte-box > span { font-size:3.65pt; }
+.cte-print .cte-taxes .cte-box > b { font-size:4.9pt; }
+.cte-print .cte-doc-half { grid-template-rows:4.8mm 1fr; }
+.cte-print .cte-doc-head span { font-size:3.75pt; line-height:1.05; }
+.cte-print .cte-doc-item { margin-bottom:0.3mm; }
+.cte-print .cte-doc-item span {
+  font-size:4.15pt;
+  line-height:1.08;
+  min-width:0;
+  overflow-wrap:anywhere;
+  padding-right:0.25mm;
+}
+.cte-print .cte-observations { font-size:4.3pt; line-height:1.08; }
+.cte-print .cte-modal-details .cte-field > span { font-size:3.65pt; }
+.cte-print .cte-modal-details .cte-field > b { font-size:4.55pt; }
+.cte-print .cte-use .cte-box > span { font-size:3.7pt; }
+.cte-print .cte-use .cte-box > b { font-size:4.5pt; }
+.cte-print .cte-receipt > div { font-size:4.05pt; }
+.cte-print .cte-receipt > div span { font-size:3.65pt; }
+.cte-print .cte-receipt > div b { font-size:4.55pt; }
+.cte-print .cte-footer { font-size:3.7pt; }
+
+
+/* v2.34 - DACTE: fonte realmente maior, mantendo DANFE intocado. */
+.cte-print .cte-emitter b { font-size:7.2pt; }
+.cte-print .cte-emitter p { font-size:5.8pt; line-height:1.08; }
+.cte-print .cte-emitter small { font-size:5.5pt; line-height:1.08; }
+.cte-print .cte-inline span { font-size:4.9pt; }
+.cte-print .cte-inline b { font-size:6.15pt; }
+.cte-print .cte-title span { font-size:4.6pt; line-height:1.08; }
+.cte-print .cte-modal span { font-size:4.8pt; }
+.cte-print .cte-modal b { font-size:6.5pt; }
+.cte-print .cte-meta-row span { font-size:4.55pt; }
+.cte-print .cte-meta-row b { font-size:6.5pt; }
+.cte-print .cte-meta-issued b { font-size:5.65pt; }
+.cte-print .cte-key-line span { font-size:4.25pt; }
+.cte-print .cte-key-line strong { font-size:6.25pt; }
+.cte-print .cte-box > span { font-size:4.65pt; line-height:1.05; }
+.cte-print .cte-box > b { font-size:6.15pt; line-height:1.08; }
+.cte-print .cte-choice-row span { font-size:4.9pt; }
+.cte-print .cte-party-title span { font-size:4.8pt; }
+.cte-print .cte-party-title strong { font-size:6.35pt; line-height:1.07; }
+.cte-print .cte-party-address span { font-size:4.35pt; }
+.cte-print .cte-party-address b { font-size:5.55pt; line-height:1.07; }
+.cte-print .cte-party-meta > span { font-size:4.1pt; }
+.cte-print .cte-party-meta > span b { font-size:5.15pt; line-height:1.06; }
+.cte-print .cte-taker-line span { font-size:4.35pt; }
+.cte-print .cte-taker-line strong { font-size:6.25pt; }
+.cte-print .cte-taker-line b { font-size:5.35pt; }
+.cte-print .cte-section-title { font-size:5.25pt; line-height:1.05; }
+.cte-print .cte-component-head span { font-size:4.7pt; }
+.cte-print .cte-component-row span,
+.cte-print .cte-component-row b { font-size:5.55pt; line-height:1.08; }
+.cte-print .cte-component-totals .cte-box > span { font-size:4.6pt; }
+.cte-print .cte-component-totals .cte-box > b { font-size:6.25pt; }
+.cte-print .cte-taxes .cte-box > span { font-size:4.45pt; }
+.cte-print .cte-taxes .cte-box > b { font-size:5.75pt; }
+.cte-print .cte-doc-head span { font-size:4.7pt; line-height:1.05; }
+.cte-print .cte-doc-item span { font-size:5.35pt; line-height:1.1; }
+.cte-print .cte-observations { font-size:5.35pt; line-height:1.1; }
+.cte-print .cte-modal-details .cte-field > span { font-size:4.5pt; }
+.cte-print .cte-modal-details .cte-field > b { font-size:5.45pt; }
+.cte-print .cte-use .cte-box > span { font-size:4.5pt; }
+.cte-print .cte-use .cte-box > b { font-size:5.4pt; }
+.cte-print .cte-receipt > div { font-size:4.9pt; }
+.cte-print .cte-receipt > div span { font-size:4.45pt; }
+.cte-print .cte-receipt > div b { font-size:5.4pt; }
+.cte-print .cte-footer { font-size:4.5pt; }
+.cte-print .cte-final-spacer { min-height:10mm; }
+
+
+/* v2.36 - Documentos Originários: chave completa + número da NF-e abaixo. */
+.cte-print .cte-doc-item { margin-bottom:0.7mm; }
+.cte-print .cte-doc-item > span { font-size:5.45pt; line-height:1.12; }
+.cte-print .cte-doc-reference { display:flex; flex-direction:column; gap:0.22mm; min-width:0; }
+.cte-print .cte-doc-reference small { display:block; font-size:4.55pt; font-weight:700; line-height:1.05; }
+.cte-print .cte-doc-access-key { display:block; font-family:monospace; font-size:5.05pt !important; font-weight:600; line-height:1.12 !important; overflow-wrap:anywhere; }
+.cte-print .cte-doc-nfe-number { display:block; font-size:6.1pt; font-weight:900; line-height:1.08; margin-top:0.25mm; }
+
+/* v2.37 - NF-e de referência: chave de acesso completa em uma única linha. */
+.cte-print .cte-doc-access-key {
+  display:block;
+  max-width:100%;
+  font-family:monospace;
+  font-size:2.95pt !important;
+  font-weight:600;
+  letter-spacing:-0.015mm;
+  line-height:1.08 !important;
+  white-space:nowrap !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+}
+/* Mantém o número da NF-e destacado como aprovado. */
+.cte-print .cte-doc-nfe-number {
+  font-size:6.1pt;
+  font-weight:900;
+}
+
+
+/* v2.38 - NF-e de referência: chave maior, inteira e sem quebra. */
+.cte-print .cte-doc-head,
+.cte-print .cte-doc-item {
+  grid-template-columns:10mm 27mm 44mm 11mm;
+}
+.cte-print .cte-doc-access-key {
+  display:block;
+  max-width:100%;
+  font-family:monospace;
+  font-size:4.35pt !important;
+  font-weight:700;
+  letter-spacing:-0.02mm;
+  line-height:1.08 !important;
+  white-space:nowrap !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+}
+.cte-print .cte-doc-nfe-number {
+  font-size:6.1pt;
+  font-weight:900;
+}

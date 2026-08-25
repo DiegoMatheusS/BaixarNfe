@@ -3,21 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Entre em contato com o responsável pelo projeto ProcurandoNFe para dúvidas, sugestões ou relato de problemas." />
+    <meta name="description" content="Entre em contato com o Procurando DANFE para dúvidas, sugestões ou relato de problemas." />
     <meta name="google-adsense-account" content="ca-pub-5674140399014280" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://procurandodanfe.com.br/contato/" />
     <link rel="icon" href="/favicon.svg" />
-    <title>Entrar em contato — ProcurandoNFe</title>
+    <title>Entrar em contato — Procurando DANFE</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5674140399014280" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/assets/index-Rj_DCHNM.css" />
-    <link rel="stylesheet" href="/conteudo.css" />
+    <link rel="stylesheet" href="/conteudo.css?v=240" />
   </head>
   <body>
     <main class="content-page">
       <header class="site-header">
-        <a class="brand" href="/" aria-label="ProcurandoNFe — início"><span class="brand-mark" aria-hidden="true">N</span><span>Baixa<span>NFe</span></span></a>
-        <nav aria-label="Navegação principal"><a href="/">Ferramenta</a><a href="/guias/">Guias</a><a href="/estatisticas/">Estatísticas</a><a href="/perguntas-frequentes/">Dúvidas</a><a href="/contato/" aria-current="page">Entrar em contato</a></nav>
+        <a class="brand" href="/" aria-label="Procurando DANFE — início"><span class="brand-mark" aria-hidden="true">N</span><span>Baixa<span>NFe</span></span></a>
+        <nav aria-label="Navegação principal"><a href="/">Ferramenta</a><a href="/ferramentas/">Ferramentas</a><a href="/guias/">Guias</a><a href="/estatisticas/">Estatísticas</a><a href="/perguntas-frequentes/">Dúvidas</a><a href="/contato/" aria-current="page">Entrar em contato</a></nav>
         <a class="content-cta" href="/">Usar ferramenta</a>
       </header>
 
@@ -25,28 +25,69 @@
         <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Início</a><span>›</span><span>Contato</span></nav>
         <header class="article-hero">
           <span class="article-kicker">CONTATO</span>
-          <h1>Fale com o responsável pelo ProcurandoNFe.</h1>
-          <p>Use este canal para enviar dúvidas, sugestões, avisar sobre algum XML que não abriu corretamente ou relatar problemas na ferramenta.</p>
+          <h1>Fale com o Procurando DANFE.</h1>
+          <p>Envie dúvidas, sugestões, avise sobre algum XML que não abriu corretamente ou relate problemas na ferramenta.</p>
         </header>
 
-        <div class="article-layout">
+        <div class="article-layout contact-layout">
           <article class="article-content">
             <section>
-              <h2>Como entrar em contato</h2>
-              <p>Clique em <strong>Enviar mensagem</strong>. Uma nova mensagem será aberta no Gmail com o destinatário e o assunto preenchidos automaticamente.</p>
-              <p>O endereço de contato não é exibido publicamente nesta página.</p>
+              <h2>Entre em contato</h2>
+              <p>Você pode escrever diretamente para <a class="contact-email-link" href="mailto:contato@procurandodanfe.com.br">contato@procurandodanfe.com.br</a> ou usar o formulário abaixo.</p>
+
+              <p class="contact-form-status" id="contact-form-status" role="status" aria-live="polite" hidden></p>
+
+              <form class="contact-form" id="contact-form">
+                <div class="contact-form-grid">
+                  <label>
+                    <span>Nome</span>
+                    <input type="text" name="name" maxlength="80" autocomplete="name" required />
+                  </label>
+                  <label>
+                    <span>E-mail</span>
+                    <input type="email" name="email" maxlength="254" autocomplete="email" required />
+                  </label>
+                </div>
+
+                <label>
+                  <span>Assunto</span>
+                  <select name="subject" required>
+                    <option value="" selected disabled>Selecione um assunto</option>
+                    <option value="Suporte">Suporte</option>
+                    <option value="Dúvida">Dúvida</option>
+                    <option value="Sugestão">Sugestão</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Mensagem</span>
+                  <textarea name="message" rows="7" minlength="10" maxlength="4000" required></textarea>
+                </label>
+
+                <label class="contact-honeypot" aria-hidden="true">
+                  <span>Site</span>
+                  <input type="text" name="website" tabindex="-1" autocomplete="off" />
+                </label>
+
+                <div class="contact-form-actions">
+                  <button type="submit" id="contact-submit">Enviar mensagem</button>
+                </div>
+              </form>
             </section>
+
             <section>
               <h2>Ao relatar um problema</h2>
               <p>Se puder, informe qual recurso estava utilizando — XML, lote, consulta por chave, DANFE ou DACTE — e descreva o que aconteceu. Evite enviar dados fiscais sensíveis que não sejam necessários para explicar o problema.</p>
             </section>
           </article>
+
           <aside class="article-aside">
             <div class="aside-card">
-              <h2>Enviar mensagem</h2>
-              <p>Dúvidas, sugestões ou encontrou algum problema?</p>
-              <a class="aside-button" id="contact-email-button" href="#">Enviar mensagem</a>
-              <small>Contato direto com o responsável pelo projeto</small>
+              <h2>Contato</h2>
+              <p>Prefere usar seu próprio aplicativo de e-mail?</p>
+              <a class="aside-button" href="mailto:contato@procurandodanfe.com.br?subject=Contato%20-%20Procurando%20DANFE">Enviar por e-mail</a>
+              <small>contato@procurandodanfe.com.br</small>
             </div>
             <div class="aside-card"><h2>Outras páginas</h2><a href="/sobre/">Sobre o projeto</a><a href="/privacidade">Política de Privacidade</a><a href="/perguntas-frequentes/">Perguntas frequentes</a></div>
           </aside>
@@ -56,20 +97,67 @@
       <footer class="content-footer">
         <a class="brand brand-footer" href="/"><span class="brand-mark">N</span><span>Baixa<span>NFe</span></span></a>
         <p>Ferramenta independente. Não possui vínculo com a Receita Federal ou Secretarias da Fazenda.</p>
-        <div><a href="/guias/">Guias</a><a href="/estatisticas/">Estatísticas</a><a href="/privacidade">Privacidade</a><a href="/cookies">Cookies</a><a href="/sobre/">Sobre</a><a href="/contato/" aria-current="page">Entrar em contato</a></div>
+        <div><a href="/ferramentas/">Ferramentas</a><a href="/guias/">Guias</a><a href="/estatisticas/">Estatísticas</a><a href="/privacidade">Privacidade</a><a href="/cookies">Cookies</a><a href="/sobre/">Sobre</a><a href="/contato/" aria-current="page">Entrar em contato</a></div>
       </footer>
     </main>
+
     <script>
       (() => {
-        const localPart = ['dms', 'diego', '2013'].join('');
-        const domainPart = ['gmail', 'com'].join('.');
-        const recipient = localPart + '@' + domainPart;
-        const button = document.getElementById('contact-email-button');
-        const subject = encodeURIComponent('Contato - ProcurandoNFe');
-        button.href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(recipient) + '&su=' + subject;
-        button.target = '_blank';
-        button.rel = 'noopener noreferrer';
+        const form = document.getElementById('contact-form');
+        const submit = document.getElementById('contact-submit');
+        const status = document.getElementById('contact-form-status');
+        const openedAt = Date.now();
+
+        if (!form || !submit || !status) return;
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          status.className = 'contact-form-status';
+          status.textContent = '';
+          status.hidden = true;
+
+          if (!form.reportValidity()) return;
+
+          const data = new FormData(form);
+          const payload = {
+            name: String(data.get('name') || ''),
+            email: String(data.get('email') || ''),
+            subject: String(data.get('subject') || ''),
+            message: String(data.get('message') || ''),
+            website: String(data.get('website') || ''),
+            elapsedMs: Date.now() - openedAt,
+          };
+
+          submit.disabled = true;
+          submit.textContent = 'Enviando...';
+
+          try {
+            const response = await fetch('/api/contact', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) throw new Error(result.message || 'Não foi possível enviar a mensagem.');
+
+            form.reset();
+            status.className = 'contact-form-status is-success';
+            status.textContent = 'Enviado com sucesso!';
+            status.hidden = false;
+            status.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } catch (error) {
+            status.className = 'contact-form-status is-error';
+            status.textContent = error?.message || 'Não foi possível enviar a mensagem. Tente novamente.';
+            status.hidden = false;
+            status.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } finally {
+            submit.disabled = false;
+            submit.textContent = 'Enviar mensagem';
+          }
+        });
       })();
     </script>
-  </body>
+  <script src="/content-nav.js?v=242" defer></script>
+</body>
 </html>

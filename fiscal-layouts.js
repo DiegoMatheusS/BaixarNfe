@@ -178,7 +178,7 @@ function parseNfe(documentNode) {
       code: text(product, "cProd"),
       description: [text(product, "xProd"), text(detail, "infAdProd")].filter(Boolean).join(" · "),
       ncm: text(product, "NCM"),
-      cst: text(tax, "CST") || text(tax, "CSOSN"),
+      cst: (text(tax, "orig") || "") + (text(tax, "CST") || text(tax, "CSOSN") || ""),
       cfop: text(product, "CFOP"),
       unit: text(product, "uCom"),
       quantity: text(product, "qCom"),
@@ -375,17 +375,117 @@ function parseCte(documentNode) {
     ? party(toma4, "enderToma")
     : knownTakers[takerCode] || sender;
 
+  const documentScope = documentsNode || normalNode || info;
+  const documentTypeLabels = {
+    "00": "DECLARAÇÃO",
+    "10": "DUTOVIÁRIO",
+    "59": "CF-e SAT",
+    "65": "NFC-e",
+    "99": "OUTRO",
+  };
+  const accessKeyParts = (rawKey) => {
+    const key = cleanKey(rawKey);
+    if (key.length !== 44) return { key, issuerDocument: "", series: "", number: "" };
+    const trimNumeric = (value) => String(Number(value || "0"));
+    return {
+      key,
+      issuerDocument: key.slice(6, 20),
+      model: key.slice(20, 22),
+      series: trimNumeric(key.slice(22, 25)),
+      number: trimNumeric(key.slice(25, 34)),
+    };
+  };
+  // Documentos originários do CT-e. Procura em todo o infCTeNorm/infCte,
+  // porque XMLs reais podem trazer os grupos em posições/versões diferentes.
+  // Além dos documentos transportados (chNFe), também tratamos refNFe
+  // usado como NF-e de referência em layouts legados/substituição.
+  // Documentos originários: varre o CT-e inteiro. Alguns emissores/versões
+  // distribuem chNFe/refNFe em grupos diferentes, então não dependemos
+  // apenas do primeiro infDoc.
+  const sourceDocumentScope = normalNode || info;
+  const infNfeNodes = elements(info, "infNFe");
+  const nfeKeyNodes = elements(info, "chNFe");
+  const refNfeKeyNodes = elements(info, "refNFe");
+  const infNfeKeyNodes = infNfeNodes
+    .map((node) => directElement(node, "chave") || directElement(node, "chNFe"))
+    .filter(Boolean);
+  const nfNodes = elements(info, "infNF");
+  const otherNodes = elements(info, "infOutros");
+  const cteNodes = elements(info, "infCTe");
+
   const sourceDocuments = [
-    ...elements(documentsNode || normalNode || info, "infNFe").map((node) => ({ type: "NF-e", value: text(node, "chNFe") })),
-    ...elements(documentsNode || normalNode || info, "infNF").map((node) => ({
-      type: text(node, "mod") || "NF",
-      value: [text(node, "serie"), text(node, "nDoc"), text(node, "dEmi")].filter(Boolean).join(" / "),
+    ...infNfeKeyNodes.map((keyNode) => {
+      const keyInfo = accessKeyParts(keyNode.textContent || "");
+      return {
+        type: "NF-e",
+        issuerDocument: keyInfo.issuerDocument,
+        document: [keyInfo.series && `SÉRIE ${keyInfo.series}`, keyInfo.number && `Nº ${keyInfo.number}`].filter(Boolean).join(" / ") || keyInfo.key,
+        value: "",
+        accessKey: keyInfo.key,
+        nfeNumber: keyInfo.number,
+      };
+    }),
+    ...nfeKeyNodes.map((keyNode) => {
+      const keyInfo = accessKeyParts(keyNode.textContent || "");
+      return {
+        type: "NF-e",
+        issuerDocument: keyInfo.issuerDocument,
+        document: [keyInfo.series && `SÉRIE ${keyInfo.series}`, keyInfo.number && `Nº ${keyInfo.number}`].filter(Boolean).join(" / ") || keyInfo.key,
+        value: "",
+        accessKey: keyInfo.key,
+        nfeNumber: keyInfo.number,
+      };
+    }),
+    ...refNfeKeyNodes.map((keyNode) => {
+      const keyInfo = accessKeyParts(keyNode.textContent || "");
+      return {
+        type: "NF-e REF.",
+        issuerDocument: keyInfo.issuerDocument,
+        document: [keyInfo.series && `SÉRIE ${keyInfo.series}`, keyInfo.number && `Nº ${keyInfo.number}`].filter(Boolean).join(" / ") || keyInfo.key,
+        value: "",
+        accessKey: keyInfo.key,
+        nfeNumber: keyInfo.number,
+      };
+    }),
+    ...nfNodes.map((node) => ({
+      type: text(node, "mod") ? `NF ${text(node, "mod")}` : "NF",
+      issuerDocument: text(node, "CNPJ") || text(node, "CPF"),
+      document: [text(node, "serie") && `SÉRIE ${text(node, "serie")}`, (text(node, "nDoc") || text(node, "nNF")) && `Nº ${text(node, "nDoc") || text(node, "nNF")}`].filter(Boolean).join(" / "),
+      value: text(node, "vNF") || text(node, "vDocFisc"),
     })),
-    ...elements(documentsNode || normalNode || info, "infOutros").map((node) => ({
-      type: text(node, "tpDoc") || "OUTRO",
-      value: [text(node, "descOutros"), text(node, "nDoc"), text(node, "dEmi")].filter(Boolean).join(" / "),
-    })),
-  ].filter((item) => item.value);
+    ...otherNodes.map((node) => {
+      const typeCode = text(node, "tpDoc");
+      const description = text(node, "descOutros");
+      return {
+        type: documentTypeLabels[typeCode] || description || typeCode || "OUTRO",
+        issuerDocument: text(node, "CNPJ") || text(node, "CPF"),
+        document: text(node, "nDoc") || description,
+        value: text(node, "vDocFisc"),
+      };
+    }),
+    ...cteNodes.map((node) => {
+      const keyInfo = accessKeyParts(text(node, "chCTe"));
+      return {
+        type: "CT-e",
+        issuerDocument: keyInfo.issuerDocument,
+        document: [keyInfo.series && `SÉRIE ${keyInfo.series}`, keyInfo.number && `Nº ${keyInfo.number}`].filter(Boolean).join(" / ") || keyInfo.key,
+        value: "",
+        accessKey: keyInfo.key,
+      };
+    }),
+  ]
+    .filter((item) => item.document || item.accessKey || item.value)
+    .filter((item, index, list) => {
+      const signature = item.accessKey
+        ? `${item.type.startsWith("NF-e") ? "NF-e" : item.type}|${item.accessKey}`
+        : [item.type, item.issuerDocument, item.document, item.value].join("|");
+      return list.findIndex((other) => {
+        const otherSignature = other.accessKey
+          ? `${other.type.startsWith("NF-e") ? "NF-e" : other.type}|${other.accessKey}`
+          : [other.type, other.issuerDocument, other.document, other.value].join("|");
+        return otherSignature === signature;
+      }) === index;
+    });
 
   const quantities = elements(cargoNode, "infQ").map((node) => ({
     measure: text(node, "tpMed") || "QUANTIDADE",
@@ -905,17 +1005,43 @@ function fillCteTemplate(wrapper, data, rendered) {
     if (!slot) return;
     const row = document.createElement('div');
     row.className = 'cte-doc-item';
-    const values = item ? [
-      item.type || '—',
-      '—',
-      /^\d{44}$/.test(item.value || '') ? keyGroups(item.value) : (item.value || '—'),
-      '—',
-    ] : [' ', ' ', ' ', ' '];
-    values.forEach((value) => {
-      const span = document.createElement('span');
-      span.textContent = value;
-      row.append(span);
-    });
+
+    if (!item) {
+      [' ', ' ', ' ', ' '].forEach((value) => {
+        const span = document.createElement('span');
+        span.textContent = value;
+        row.append(span);
+      });
+      slot.append(row);
+      return;
+    }
+
+    const typeCell = document.createElement('span');
+    typeCell.textContent = item.type || '—';
+
+    const issuerCell = document.createElement('span');
+    issuerCell.textContent = item.issuerDocument ? formatDocument(item.issuerDocument) : '—';
+
+    const documentCell = document.createElement('span');
+    documentCell.className = 'cte-doc-reference';
+    if (item.accessKey && /^\d{44}$/.test(item.accessKey)) {
+      const keyLabel = document.createElement('small');
+      keyLabel.textContent = 'Chave de acesso';
+      const keyValue = document.createElement('span');
+      keyValue.className = 'cte-doc-access-key';
+      keyValue.textContent = item.accessKey;
+      const nfeNumber = document.createElement('strong');
+      nfeNumber.className = 'cte-doc-nfe-number';
+      nfeNumber.textContent = `NF-e: ${item.nfeNumber || accessKeyParts(item.accessKey).number || '—'}`;
+      documentCell.append(keyLabel, keyValue, nfeNumber);
+    } else {
+      documentCell.textContent = item.document || '—';
+    }
+
+    const valueCell = document.createElement('span');
+    valueCell.textContent = item.value ? formatNumber(item.value) : '—';
+
+    row.append(typeCell, issuerCell, documentCell, valueCell);
     slot.append(row);
   };
   if (documentsLeft || documentsRight) {

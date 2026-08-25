@@ -658,21 +658,12 @@ function formatPrice(template) {
   }).format(price);
 }
 
-const PURCHASABLE_DASHBOARD_IDS = new Set([
-  "agronegocio",
-  "restaurante-e-delivery",
-  "vendas-e-faturamento",
-  "ecommerce",
-  "compras-e-fornecedores",
-  "contas-a-receber"
-]);
-
 function finalAction(template) {
   const paid = template.tipo !== "gratuito";
   const available = template.status === "disponivel";
   const targetUrl = safeUrl(paid ? template.checkoutUrl : template.arquivoUrl);
 
-  if (paid && PURCHASABLE_DASHBOARD_IDS.has(template.id)) {
+  if (paid && available) {
     return `<button class="template-action professional detail-action" type="button" data-buy-id="${escapeHtml(template.id)}" aria-label="Comprar ${escapeHtml(template.nome)} com Pix">Comprar</button>`;
   }
 
@@ -1044,16 +1035,46 @@ function startPurchasePolling(purchaseId, token) {
   purchasePollTimer = window.setInterval(() => pollPurchaseStatus(purchaseId, token), 2500);
 }
 
+purchaseForm?.elements.email?.addEventListener("input", () => {
+  const confirmEmailField = purchaseForm?.elements.confirmEmail;
+  if (confirmEmailField) confirmEmailField.setCustomValidity("");
+  if (purchaseMessage?.classList.contains("error")) setPurchaseMessage();
+});
+
+purchaseForm?.elements.confirmEmail?.addEventListener("input", () => {
+  const confirmEmailField = purchaseForm?.elements.confirmEmail;
+  if (confirmEmailField) confirmEmailField.setCustomValidity("");
+  if (purchaseMessage?.classList.contains("error")) setPurchaseMessage();
+});
+
 purchaseForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!activePurchaseTemplate || !purchaseSubmit) return;
   const formData = new FormData(purchaseForm);
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const confirmEmail = String(formData.get("confirmEmail") || "").trim().toLowerCase();
+
+  if (!email || !confirmEmail || email !== confirmEmail) {
+    setPurchaseMessage("Os e-mails não coincidem.", "error");
+    const confirmEmailField = purchaseForm.elements.confirmEmail;
+    if (confirmEmailField) {
+      confirmEmailField.setCustomValidity("Os e-mails não coincidem.");
+      confirmEmailField.focus();
+      confirmEmailField.reportValidity();
+    }
+    return;
+  }
+
+  const confirmEmailField = purchaseForm.elements.confirmEmail;
+  if (confirmEmailField) confirmEmailField.setCustomValidity("");
+
   const payload = {
     dashboardId: String(formData.get("dashboardId") || ""),
     firstName: String(formData.get("firstName") || ""),
     lastName: String(formData.get("lastName") || ""),
     phone: String(formData.get("phone") || ""),
-    email: String(formData.get("email") || ""),
+    email,
+    confirmEmail,
     companyWebsite: String(formData.get("companyWebsite") || ""),
     formStartedAt: Number(formData.get("formStartedAt") || 0)
   };
@@ -1140,10 +1161,35 @@ scrollTopButton?.addEventListener("click", () => {
 window.addEventListener("scroll", updateScrollTopButton, { passive: true });
 updateScrollTopButton();
 
-function loadCatalog() {
+async function syncCatalogAvailability() {
+  try {
+    const response = await fetch("/api/dashboard-store/catalog", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { Accept: "application/json" }
+    });
+    if (!response.ok) return;
+    const data = await parseApiResponse(response);
+    const availability = new Map((Array.isArray(data.items) ? data.items : []).map((item) => [item.id, item]));
+
+    for (const template of catalogTemplates) {
+      const item = availability.get(template.id);
+      if (!item) continue;
+      template.status = item.available ? "disponivel" : (template.status === "modelos" ? "modelos" : "em_breve");
+      if (template.tipo === "gratuito") template.arquivoUrl = item.downloadUrl || "";
+    }
+  } catch {
+    // Mantém o catálogo utilizável mesmo se a verificação do R2 falhar temporariamente.
+  }
+}
+
+async function loadCatalog() {
   if (!grid) return;
   catalogState.templates = catalogTemplates;
   fillCategories();
+  renderCatalog();
+  await syncCatalogAvailability();
   renderCatalog();
 }
 

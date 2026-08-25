@@ -1,4 +1,4 @@
-import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=54";
+import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=59";
 
 const API_URL = "/api/consultar-chave";
 const ACCEPTED_UPLOAD_EXTENSIONS = [".xml", ".txt", ".doc", ".docx"];
@@ -1408,9 +1408,9 @@ function buildHomeGuides() {
   section.className = "guides-home";
   section.innerHTML = `
     <div class="guides-home-heading">
-      <span>GUIAS PRÁTICOS</span>
-      <h2>Entenda seus documentos fiscais.</h2>
-      <p>Respostas diretas para baixar, validar e imprimir NF-e e CT-e com mais segurança.</p>
+      <span>CENTRAL DE AJUDA</span>
+      <h2>Guias práticos para tirar dúvidas.</h2>
+      <p>Conteúdo organizado sobre NF-e, CT-e, XML, DANFE, DACTE, chave de acesso e situações comuns do dia a dia.</p>
       <a href="/guias/">Ver todos os guias →</a>
     </div>
     <div class="guide-card-grid">
@@ -1426,6 +1426,51 @@ function buildHomeGuides() {
       <a class="guide-card" href="/guias/cte-e-dacte/">
         <small>TRANSPORTE</small><h3>CT-e e DACTE</h3><p>Conheça a função de cada documento no transporte de cargas.</p><span>Ler guia →</span>
       </a>
+    </div>
+  `;
+  return section;
+}
+
+
+function buildHomeIntro() {
+  const section = document.createElement("section");
+  section.id = "sobre-a-ferramenta";
+  section.className = "home-value-content";
+  section.innerHTML = `
+    <div class="home-value-heading">
+      <span>O QUE É O PROCURANDONFE?</span>
+      <h2>Uma ferramenta gratuita para visualizar e imprimir documentos fiscais.</h2>
+    </div>
+    <div class="home-value-copy">
+      <p>O ProcurandoNFe foi criado para facilitar uma tarefa comum: transformar o arquivo XML de uma NF-e ou CT-e em uma representação organizada para consulta e impressão. Você pode selecionar um arquivo, processar vários XMLs em lote ou usar a consulta por chave quando esse recurso estiver disponível para o documento. O objetivo é reduzir etapas e deixar a informação fiscal mais fácil de visualizar, sem exigir cadastro para as funções principais.</p>
+      <p>No envio direto de XML, o processamento acontece no próprio navegador. Isso significa que o arquivo escolhido não precisa ser armazenado pelo site para montar o DANFE ou DACTE. A página mostra informações de segurança, orientações de uso e uma Central de Ajuda com guias sobre os principais conceitos desses documentos. Para confirmar a situação fiscal de uma nota ou conhecimento, a referência definitiva continua sendo o portal oficial da administração tributária correspondente.</p>
+      <p>Além da ferramenta fiscal, o site reúne uma área de dashboards para Power BI e uma seção de Ferramentas Online com utilidades simples para tarefas do dia a dia. A ideia é manter tudo direto: páginas rápidas, instruções claras e funções que possam ser utilizadas sem instalar programas desnecessários.</p>
+    </div>
+    <div class="home-value-links">
+      <a href="/sobre/">Conheça o projeto →</a>
+      <a href="/privacidade">Como tratamos seus dados →</a>
+      <a href="/guias/">Abrir Central de Ajuda →</a>
+    </div>
+  `;
+  return section;
+}
+
+function buildOnlineToolsHome() {
+  const section = document.createElement("section");
+  section.id = "ferramentas-online";
+  section.className = "online-tools-home";
+  section.innerHTML = `
+    <div class="online-tools-heading">
+      <span>FERRAMENTAS ONLINE</span>
+      <h2>Mais utilidades gratuitas no navegador.</h2>
+      <p>Use ferramentas simples sem cadastro. Imagens e QR Code são processados localmente no dispositivo.</p>
+      <a href="/ferramentas/">Ver todas as ferramentas →</a>
+    </div>
+    <div class="online-tools-grid">
+      <a href="/ferramentas/conversor-moedas/"><i>↔</i><small>MOEDAS</small><h3>Conversor de moedas</h3><p>Converta valores com uma cotação de referência recente.</p><b>Abrir →</b></a>
+      <a href="/ferramentas/gerador-qr-code/"><i>▦</i><small>QR CODE</small><h3>Gerador de QR Code</h3><p>Crie um QR Code para links ou textos e baixe em PNG.</p><b>Abrir →</b></a>
+      <a href="/ferramentas/remover-fundo-imagem/"><i>✂</i><small>IMAGEM</small><h3>Remover fundo</h3><p>Remova fundos lisos e exporte a imagem transparente.</p><b>Abrir →</b></a>
+      <a href="/ferramentas/converter-imagem/"><i>◫</i><small>IMAGEM</small><h3>Converter imagem</h3><p>Converta JPG, PNG e WEBP diretamente no navegador.</p><b>Abrir →</b></a>
     </div>
   `;
   return section;
@@ -1456,13 +1501,14 @@ function buildDashboardPromo() {
 function enhanceSiteLinks() {
   const nav = document.querySelector(".site-header nav");
   if (nav) {
-    const footerOnlyLabels = new Set(["segurança", "guias", "estatísticas", "entrar em contato"]);
+    const footerOnlyLabels = new Set(["segurança", "estatísticas"]);
     for (const link of nav.querySelectorAll("a")) {
       if (footerOnlyLabels.has(link.textContent.trim().toLocaleLowerCase("pt-BR"))) {
         link.remove();
       }
     }
   }
+
   if (nav && !nav.querySelector('[href="/procurandodashboard/"]')) {
     const dashboard = document.createElement("a");
     dashboard.href = "/procurandodashboard/";
@@ -1470,6 +1516,19 @@ function enhanceSiteLinks() {
     dashboard.className = "dashboard-nav-link";
     nav.append(dashboard);
   }
+
+  const dashboardLink = nav?.querySelector('[href="/procurandodashboard/"]');
+  const insertBeforeDashboard = (href, label) => {
+    if (!nav || nav.querySelector(`[href="${href}"]`)) return;
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = label;
+    dashboardLink ? nav.insertBefore(link, dashboardLink) : nav.append(link);
+  };
+  insertBeforeDashboard("/guias/", "Guias");
+  insertBeforeDashboard("/ferramentas/", "Ferramentas");
+  insertBeforeDashboard("/contato/", "Contato");
+
   for (const footerLinks of document.querySelectorAll("footer > div")) {
     if (![...footerLinks.querySelectorAll("a")].some((link) => link.textContent.trim() === "Segurança")) {
       const security = document.createElement("a");
@@ -1482,6 +1541,12 @@ function enhanceSiteLinks() {
       guides.href = "/guias/";
       guides.textContent = "Guias";
       footerLinks.prepend(guides);
+    }
+    if (!footerLinks.querySelector('[href="/ferramentas/"]')) {
+      const tools = document.createElement("a");
+      tools.href = "/ferramentas/";
+      tools.textContent = "Ferramentas";
+      footerLinks.append(tools);
     }
     if (!footerLinks.querySelector('[href="/estatisticas/"]')) {
       const statistics = document.createElement("a");
@@ -1777,18 +1842,24 @@ function enhanceHome() {
 
   const footer = document.querySelector(".site-content > footer");
   if (footer) {
+    if (!document.querySelector("#sobre-a-ferramenta")) {
+      footer.before(buildHomeIntro());
+    }
+    if (!document.querySelector("#ferramentas-online")) {
+      footer.before(buildOnlineToolsHome());
+    }
+    if (!document.querySelector("#guias")) {
+      footer.before(buildHomeGuides());
+    }
+    if (!document.querySelector("#procurando-dashboard")) {
+      footer.before(buildDashboardPromo());
+    }
     if (!document.querySelector("#estatisticas-locais")) {
       footer.before(buildLocalStatisticsSection());
       updateLocalStatistics(localStatisticsDocuments);
     }
     if (!document.querySelector("#nfe-em-numeros")) {
       footer.before(buildNationalStatisticsSection());
-    }
-    if (!document.querySelector("#procurando-dashboard")) {
-      footer.before(buildDashboardPromo());
-    }
-    if (!document.querySelector("#guias")) {
-      footer.before(buildHomeGuides());
     }
   }
 
@@ -1846,7 +1917,18 @@ function updatePrivacyPage() {
     policyCard.insertBefore(purchase, policyCard.querySelector(".policy-highlight"));
   }
 
-  if (updated) updated.textContent = "Última atualização: 17 de agosto de 2026";
+  if (policyCard && !policyCard.querySelector("[data-online-tools-privacy]")) {
+    const tools = document.createElement("section");
+    tools.dataset.onlineToolsPrivacy = "true";
+    const heading = document.createElement("h2");
+    heading.textContent = "9. Ferramentas Online";
+    const paragraph = document.createElement("p");
+    paragraph.textContent = "O gerador de QR Code, o conversor de imagens e a remoção de fundo processam o conteúdo localmente no navegador. O conversor de moedas consulta o serviço externo Frankfurter apenas para obter a taxa do par de moedas selecionado; o valor digitado é multiplicado localmente no navegador e não é incluído na consulta.";
+    tools.append(heading, paragraph);
+    policyCard.insertBefore(tools, policyCard.querySelector(".policy-highlight"));
+  }
+
+  if (updated) updated.textContent = "Última atualização: 24 de agosto de 2026";
   if (summary) {
     summary.textContent =
       "O XML enviado permanece no dispositivo. A consulta por chave usa um serviço externo apenas para localizar e devolver a NF-e ou o CT-e.";

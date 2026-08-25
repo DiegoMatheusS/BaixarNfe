@@ -12,9 +12,9 @@
     <title>ProcurandoDashboardBI — Templates para Power BI</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5674140399014280" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/assets/index-Rj_DCHNM.css" />
-    <link rel="stylesheet" href="/procurandodashboard/styles.css?v=30" />
-    <script src="/procurandodashboard/config.js?v=30" defer></script>
-    <script src="/procurandodashboard/app.js?v=30" defer></script>
+    <link rel="stylesheet" href="/procurandodashboard/styles.css?v=32" />
+    <script src="/procurandodashboard/config.js?v=32" defer></script>
+    <script src="/procurandodashboard/app.js?v=32" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -37,6 +37,8 @@
           <a href="#preparar-planilha">Preparar dados</a>
           <a href="#templates">Templates</a>
           <a href="#duvidas">Dúvidas</a>
+          <a href="/ferramentas/">Ferramentas</a>
+          <a href="/contato/">Contato</a>
         </nav>
         <a class="dashboard-back" href="/">Voltar ao ProcurandoNFe</a>
         <button class="dashboard-menu-toggle" id="dashboard-menu-toggle" type="button" aria-label="Abrir menu" aria-controls="dashboard-mobile-menu" aria-expanded="false">
@@ -47,6 +49,8 @@
           <a href="#preparar-planilha">Preparar dados</a>
           <a href="#templates">Templates</a>
           <a href="#duvidas">Dúvidas</a>
+          <a href="/ferramentas/">Ferramentas</a>
+          <a href="/contato/">Contato</a>
           <a class="dashboard-mobile-back" href="/">Voltar ao ProcurandoNFe</a>
         </div>
       </header>
@@ -238,7 +242,8 @@
             <label><span>Nome</span><input name="firstName" type="text" minlength="2" maxlength="60" autocomplete="given-name" required /></label>
             <label><span>Sobrenome</span><input name="lastName" type="text" minlength="2" maxlength="80" autocomplete="family-name" required /></label>
             <label><span>Telefone</span><input name="phone" type="tel" inputmode="tel" maxlength="24" autocomplete="tel" placeholder="(11) 99999-9999" required /></label>
-            <label><span>E-mail</span><input name="email" type="email" maxlength="254" autocomplete="email" required /></label>
+            <label><span>E-mail</span><input name="email" type="email" maxlength="254" autocomplete="email" autocapitalize="none" spellcheck="false" required /></label>
+            <label><span>Confirmar e-mail</span><input name="confirmEmail" type="email" maxlength="254" autocomplete="off" autocapitalize="none" spellcheck="false" required /></label>
             <label class="purchase-honeypot" aria-hidden="true"><span>Site da empresa</span><input name="companyWebsite" type="text" tabindex="-1" autocomplete="off" /></label>
             <div class="purchase-consent">Seus dados são usados somente para processar a compra, confirmar o pagamento e entregar o dashboard.</div>
             <button class="purchase-submit" id="purchase-submit" type="submit">Gerar Pix</button>

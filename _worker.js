@@ -6,6 +6,13 @@ const STATUS_INTERVAL_MS = 1_100;
 const STATUS_MAX_ATTEMPTS = 18;
 const requestBuckets = new Map();
 const activeKeys = new Set();
+const CONTACT_RECIPIENT = "contato@procurandodanfe.com.br";
+const CONTACT_RATE_LIMIT = 5;
+const CONTACT_RATE_WINDOW_MS = 60 * 60_000;
+const contactBuckets = new Map();
+const contactRecentMessages = new Map();
+const CONTACT_DUPLICATE_WINDOW_MS = 10 * 60_000;
+const CONTACT_ALLOWED_SUBJECTS = new Set(["Suporte", "Dúvida", "Sugestão", "Outros"]);
 const SECURITY_HEADERS = {
   "Strict-Transport-Security": "max-age=31536000",
   "X-Content-Type-Options": "nosniff",
@@ -393,11 +400,170 @@ const DASHBOARD_STATUS_TOKEN_TTL_MS = 24 * 60 * 60_000;
 const DASHBOARD_DOWNLOAD_TTL_MS = 7 * 24 * 60 * 60_000;
 const DASHBOARD_RATE_WINDOW_MS = 15 * 60_000;
 const DASHBOARD_MAX_PER_IP = 5;
+
+function consumeContactRateLimit(request) {
+  const now = Date.now();
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  let bucket = contactBuckets.get(ip);
+
+  if (!bucket || now >= bucket.resetAt) bucket = { count: 0, resetAt: now + CONTACT_RATE_WINDOW_MS };
+  bucket.count += 1;
+  contactBuckets.set(ip, bucket);
+
+  if (contactBuckets.size > 2_000) {
+    for (const [key, value] of contactBuckets) {
+      if (now >= value.resetAt) contactBuckets.delete(key);
+    }
+  }
+
+  return {
+    allowed: bucket.count <= CONTACT_RATE_LIMIT,
+    retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1_000)),
+  };
+}
+
+function contactCleanText(value, maxLength) {
+  return String(value || "").replace(/\u0000/g, "").trim().slice(0, maxLength);
+}
+
+function contactValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && value.length <= 254;
+}
+
+function contactEscapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function isDuplicateContact(request, signature) {
+  const now = Date.now();
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const recent = contactRecentMessages.get(ip);
+
+  if (recent && now < recent.expiresAt && recent.signature === signature) return true;
+
+  contactRecentMessages.set(ip, { signature, expiresAt: now + CONTACT_DUPLICATE_WINDOW_MS });
+
+  if (contactRecentMessages.size > 2_000) {
+    for (const [key, value] of contactRecentMessages) {
+      if (now >= value.expiresAt) contactRecentMessages.delete(key);
+    }
+  }
+
+  return false;
+}
+
+async function handleContactForm(request, env) {
+  const url = new URL(request.url);
+  if (request.method !== "POST") {
+    return jsonResponse({ error: "metodo_nao_permitido", message: "Use uma solicitação POST." }, 405, { Allow: "POST" });
+  }
+  if (!sameOrigin(request, url)) {
+    return jsonResponse({ error: "origem_nao_autorizada", message: "Solicitação não autorizada." }, 403);
+  }
+
+  const contentType = request.headers.get("Content-Type") || "";
+  if (!contentType.toLowerCase().includes("application/json")) {
+    return jsonResponse({ error: "conteudo_invalido", message: "Envie os dados em formato JSON." }, 415);
+  }
+
+  const contentLength = Number(request.headers.get("Content-Length") || 0);
+  if (contentLength > 12_000) {
+    return jsonResponse({ error: "solicitacao_muito_grande", message: "Mensagem acima do limite permitido." }, 413);
+  }
+
+  let rawPayload = "";
+  try {
+    rawPayload = await request.text();
+  } catch {
+    return jsonResponse({ error: "json_invalido", message: "Não foi possível ler a mensagem." }, 400);
+  }
+  if (new TextEncoder().encode(rawPayload).byteLength > 12_000) {
+    return jsonResponse({ error: "solicitacao_muito_grande", message: "Mensagem acima do limite permitido." }, 413);
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(rawPayload);
+  } catch {
+    return jsonResponse({ error: "json_invalido", message: "Não foi possível ler a mensagem." }, 400);
+  }
+
+  // Campo armadilha: bots costumam preenchê-lo. Respondemos como sucesso sem enviar nada.
+  if (contactCleanText(payload?.website, 200)) return jsonResponse({ ok: true }, 200);
+
+  const elapsedMs = Number(payload?.elapsedMs || 0);
+  if (!Number.isFinite(elapsedMs) || elapsedMs < 1200) return jsonResponse({ ok: true }, 200);
+
+  const rate = consumeContactRateLimit(request);
+  if (!rate.allowed) {
+    return jsonResponse(
+      { error: "muitas_mensagens", message: "Muitas mensagens enviadas. Aguarde um pouco e tente novamente." },
+      429,
+      { "Retry-After": String(rate.retryAfter) },
+    );
+  }
+
+  const name = contactCleanText(payload?.name, 80);
+  const email = contactCleanText(payload?.email, 254).toLowerCase();
+  const subject = contactCleanText(payload?.subject, 120);
+  const message = contactCleanText(payload?.message, 4000);
+
+  if (name.length < 2 || !contactValidEmail(email) || !CONTACT_ALLOWED_SUBJECTS.has(subject) || message.length < 10) {
+    return jsonResponse({ error: "dados_invalidos", message: "Confira nome, e-mail, assunto e mensagem." }, 400);
+  }
+
+  // Evita reenvio idêntico pelo mesmo IP em uma janela curta, inclusive por automações simples.
+  const duplicateSignature = `${email}\n${subject.toLowerCase()}\n${message}`;
+  if (isDuplicateContact(request, duplicateSignature)) {
+    return jsonResponse({ ok: true, message: "Mensagem recebida." }, 200);
+  }
+
+  const from = String(env.CONTACT_EMAIL_FROM || env.DASHBOARD_EMAIL_FROM || "").trim();
+  const to = String(env.CONTACT_EMAIL_TO || CONTACT_RECIPIENT).trim();
+  if (!env.RESEND_API_KEY || !from || !contactValidEmail(to)) {
+    return jsonResponse({ error: "contato_nao_configurado", message: "O formulário está temporariamente indisponível. Use contato@procurandodanfe.com.br." }, 503);
+  }
+
+  const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#24352f"><h2>Nova mensagem pelo site</h2><p><strong>Nome:</strong> ${contactEscapeHtml(name)}<br><strong>E-mail:</strong> ${contactEscapeHtml(email)}<br><strong>Assunto:</strong> ${contactEscapeHtml(subject)}</p><p><strong>Mensagem:</strong></p><p>${contactEscapeHtml(message).replace(/\r?\n/g, "<br>")}</p><hr style="border:0;border-top:1px solid #dfe7e3;margin:22px 0"><p style="font-size:12px;color:#6c7d76">Enviado pelo formulário de contato do Procurando DANFE.</p></div>`;
+
+  let response;
+  try {
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": `contact-${crypto.randomUUID()}`,
+      },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        reply_to: email,
+        subject: `Contato do site: ${subject}`,
+        html,
+      }),
+    });
+  } catch {
+    return jsonResponse({ error: "falha_no_envio", message: "Não foi possível enviar a mensagem agora. Tente novamente." }, 502);
+  }
+
+  if (!response.ok) {
+    return jsonResponse({ error: "falha_no_envio", message: "Não foi possível enviar a mensagem agora. Tente novamente." }, 502);
+  }
+  return jsonResponse({ ok: true, message: "Mensagem enviada com sucesso." }, 200);
+}
+
 const DASHBOARD_MAX_PER_EMAIL = 4;
 const DASHBOARD_MAX_ATTACHMENT_BYTES = 18 * 1024 * 1024;
 let dashboardSchemaReadyPromise = null;
 
 const DASHBOARD_PRODUCTS = Object.freeze({
+  "financas-pessoais-1": Object.freeze({ name: "Orçamento Pessoal Básico", priceCents: 0, fileKey: "dashboards/financas-pessoais/Orcamento_Pessoal_Basico.zip", fileName: "Orcamento_Pessoal_Basico.zip" }),
   "financeiro-empresarial": Object.freeze({ name: "Financeiro Empresarial", priceCents: 3990, fileKey: "dashboards/financeiro-empresarial.pbip", fileName: "financeiro-empresarial.pbip" }),
   "contas-a-pagar": Object.freeze({ name: "Contas a Pagar", priceCents: 2990, fileKey: "dashboards/contas-a-pagar.pbip", fileName: "contas-a-pagar.pbip" }),
   "vendas-e-faturamento": Object.freeze({ name: "Vendas e Faturamento", priceCents: 3990, fileKey: "dashboards/comercial/Vendas_e_Faturamento.zip", fileName: "Vendas_e_Faturamento.zip" }),
@@ -413,6 +579,7 @@ const DASHBOARD_PRODUCTS = Object.freeze({
   "dividendos-renda-passiva": Object.freeze({ name: "Dividendos e Renda Passiva", priceCents: 1990, fileKey: "dashboards/dividendos-renda-passiva.pbip", fileName: "dividendos-renda-passiva.pbip" }),
   "acoes-e-fiis": Object.freeze({ name: "Ações e FIIs", priceCents: 2490, fileKey: "dashboards/acoes-e-fiis.pbip", fileName: "acoes-e-fiis.pbip" }),
   "criptomoedas": Object.freeze({ name: "Criptomoedas", priceCents: 1990, fileKey: "dashboards/criptomoedas.pbip", fileName: "criptomoedas.pbip" }),
+  "metas-de-investimento": Object.freeze({ name: "Metas de Investimento", priceCents: 0, fileKey: "dashboards/investimentos/Metas_de_Investimento.zip", fileName: "Metas_de_Investimento.zip" }),
   "contas-a-receber": Object.freeze({ name: "Contas a Receber", priceCents: 2990, fileKey: "dashboards/contabilidade/Contas_a_Receber.zip", fileName: "Contas_a_Receber.zip" }),
   "dre-gerencial": Object.freeze({ name: "DRE Gerencial", priceCents: 3990, fileKey: "dashboards/dre-gerencial.pbip", fileName: "dre-gerencial.pbip" }),
   "orcamento-empresarial": Object.freeze({ name: "Orçamento Empresarial", priceCents: 3490, fileKey: "dashboards/orcamento-empresarial.pbip", fileName: "orcamento-empresarial.pbip" }),
@@ -426,6 +593,7 @@ const DASHBOARD_PRODUCTS = Object.freeze({
   "academias-e-alunos": Object.freeze({ name: "Academias e Alunos", priceCents: 2990, fileKey: "dashboards/academias-e-alunos.pbip", fileName: "academias-e-alunos.pbip" }),
   "manutencao-de-veiculos": Object.freeze({ name: "Manutenção de Veículos", priceCents: 1490, fileKey: "dashboards/manutencao-de-veiculos.pbip", fileName: "manutencao-de-veiculos.pbip" }),
   "agronegocio": Object.freeze({ name: "Gestão do Agronegócio", priceCents: 4490, fileKey: "dashboards/agronegocio/Gestao_do_Agronegocio.zip", fileName: "Gestao_do_Agronegocio.zip" }),
+  "orcamento-familiar-basico": Object.freeze({ name: "Orçamento Familiar Básico", priceCents: 0, fileKey: "dashboards/financas-pessoais/Orcamento_Familiar_Basico.zip", fileName: "Orcamento_Familiar_Basico.zip" }),
   "controle-de-dividas": Object.freeze({ name: "Controle de Dívidas", priceCents: 1490, fileKey: "dashboards/controle-de-dividas.pbip", fileName: "controle-de-dividas.pbip" }),
   "planejamento-de-aposentadoria": Object.freeze({ name: "Planejamento de Aposentadoria", priceCents: 1990, fileKey: "dashboards/planejamento-de-aposentadoria.pbip", fileName: "planejamento-de-aposentadoria.pbip" }),
   "comparador-de-investimentos": Object.freeze({ name: "Comparador de Investimentos", priceCents: 2490, fileKey: "dashboards/comparador-de-investimentos.pbip", fileName: "comparador-de-investimentos.pbip" }),
@@ -439,17 +607,97 @@ const DASHBOARD_PRODUCTS = Object.freeze({
   "atendimento-e-suporte": Object.freeze({ name: "Atendimento e Sucesso do Cliente", priceCents: 3490, fileKey: "dashboards/atendimento-e-suporte.pbip", fileName: "atendimento-e-suporte.pbip" }),
   "prevencao-fraudes-risco": Object.freeze({ name: "Prevenção de Fraudes e Risco", priceCents: 5990, fileKey: "dashboards/prevencao-fraudes-risco.pbip", fileName: "prevencao-fraudes-risco.pbip" }),
   "saude-gestao-hospitalar": Object.freeze({ name: "Saúde e Gestão Hospitalar", priceCents: 5990, fileKey: "dashboards/saude-gestao-hospitalar.pbip", fileName: "saude-gestao-hospitalar.pbip" }),
-  "dashboard-contabil": Object.freeze({ name: "Dashboard Contábil", priceCents: 4990, fileKey: "dashboards/dashboard-contabil.pbip", fileName: "dashboard-contabil.pbip" })
+  "dashboard-contabil": Object.freeze({ name: "Dashboard Contábil", priceCents: 4990, fileKey: "dashboards/dashboard-contabil.pbip", fileName: "dashboard-contabil.pbip" }),
+  "vendas-por-plataforma": Object.freeze({ name: "Dashboard de Vendas", priceCents: 0, fileKey: "dashboards/vendas/Dashboard_de_Vendas.zip", fileName: "Dashboard_de_Vendas.zip" })
 });
 
-const DASHBOARD_PURCHASABLE_IDS = new Set([
-  "agronegocio",
-  "restaurante-e-delivery",
-  "vendas-e-faturamento",
-  "ecommerce",
-  "compras-e-fornecedores",
-  "contas-a-receber",
+const DASHBOARD_FREE_IDS = new Set([
+  "financas-pessoais-1",
+  "metas-de-investimento",
+  "orcamento-familiar-basico",
+  "vendas-por-plataforma",
 ]);
+
+const DASHBOARD_FILE_ALIASES = Object.freeze({
+  // Nome já utilizado no R2. Mantém compatibilidade sem exigir renomear o arquivo.
+  "redes-sociais": Object.freeze(["Redes_socias"]),
+});
+
+const DASHBOARD_PURCHASABLE_IDS = new Set(
+  Object.keys(DASHBOARD_PRODUCTS).filter((dashboardId) => !DASHBOARD_FREE_IDS.has(dashboardId)),
+);
+
+let dashboardZipIndexCache = null;
+let dashboardZipIndexExpiresAt = 0;
+let dashboardZipIndexPromise = null;
+
+function dashboardFileToken(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\.(zip|pbip)$/i, "")
+    .replace(/_v\d+(?:[._-]\d+)*$/i, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function dashboardBaseName(key) {
+  const parts = String(key || "").split("/");
+  return parts[parts.length - 1] || "dashboard.zip";
+}
+
+async function dashboardZipIndex(env) {
+  const now = Date.now();
+  if (dashboardZipIndexCache && now < dashboardZipIndexExpiresAt) return dashboardZipIndexCache;
+  if (dashboardZipIndexPromise) return dashboardZipIndexPromise;
+
+  dashboardZipIndexPromise = (async () => {
+    const index = new Map();
+    let cursor;
+    do {
+      const listed = await env.DASHBOARD_FILES.list({ prefix: "dashboards/", limit: 1000, ...(cursor ? { cursor } : {}) });
+      for (const object of listed.objects || []) {
+        if (!/\.zip$/i.test(object.key || "")) continue;
+        const token = dashboardFileToken(dashboardBaseName(object.key));
+        if (token && !index.has(token)) index.set(token, object.key);
+      }
+      cursor = listed.truncated ? listed.cursor : undefined;
+    } while (cursor);
+    dashboardZipIndexCache = index;
+    dashboardZipIndexExpiresAt = Date.now() + 30_000;
+    return index;
+  })();
+
+  try {
+    return await dashboardZipIndexPromise;
+  } finally {
+    dashboardZipIndexPromise = null;
+  }
+}
+
+async function resolveDashboardFile(env, dashboardId) {
+  const product = DASHBOARD_PRODUCTS[dashboardId];
+  if (!product || !env.DASHBOARD_FILES) return null;
+
+  if (/\.zip$/i.test(product.fileKey || "")) {
+    const direct = await env.DASHBOARD_FILES.head(product.fileKey);
+    if (direct) return { key: product.fileKey, fileName: dashboardBaseName(product.fileKey) || product.fileName };
+  }
+
+  const index = await dashboardZipIndex(env);
+  const candidates = [
+    product.name,
+    dashboardId,
+    product.fileName,
+    ...(DASHBOARD_FILE_ALIASES[dashboardId] || []),
+  ].map(dashboardFileToken).filter(Boolean);
+
+  for (const token of candidates) {
+    const key = index.get(token);
+    if (key) return { key, fileName: dashboardBaseName(key) };
+  }
+  return null;
+}
 
 function dashboardRequiredConfig(env) {
   return Boolean(
@@ -686,12 +934,14 @@ async function createDashboardCheckout(request, env) {
   const lastName = normalizeHumanName(payload?.lastName, 80);
   const phone = normalizePhone(payload?.phone);
   const email = normalizeEmail(payload?.email);
-  if (!firstName || !lastName || !phone || !email) return dashboardJson({ error: "dados_invalidos", message: "Confira nome, sobrenome, telefone e e-mail." }, 400);
+  const confirmEmail = normalizeEmail(payload?.confirmEmail);
+  if (!firstName || !lastName || !phone || !email || !confirmEmail) return dashboardJson({ error: "dados_invalidos", message: "Confira nome, sobrenome, telefone e e-mail." }, 400);
+  if (email !== confirmEmail) return dashboardJson({ error: "emails_diferentes", message: "Os e-mails não coincidem." }, 400);
 
   const chargePriceCents = product.priceCents;
 
-  const fileExists = await env.DASHBOARD_FILES.head(product.fileKey);
-  if (!fileExists) return dashboardJson({ error: "arquivo_indisponivel", message: "Este dashboard ainda não está liberado para venda." }, 409);
+  const dashboardFile = await resolveDashboardFile(env, dashboardId);
+  if (!dashboardFile) return dashboardJson({ error: "arquivo_indisponivel", message: "Este dashboard ainda não está liberado para venda." }, 409);
 
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const [ipHash, emailHash] = await Promise.all([
@@ -887,10 +1137,11 @@ async function deliverDashboardPurchase(env, purchaseId) {
     let attachments = [];
     let attached = false;
     try {
-      const object = await env.DASHBOARD_FILES.get(product.fileKey);
+      const dashboardFile = await resolveDashboardFile(env, purchase.dashboard_id);
+      const object = dashboardFile ? await env.DASHBOARD_FILES.get(dashboardFile.key) : null;
       if (object && Number(object.size || 0) > 0 && Number(object.size || 0) <= DASHBOARD_MAX_ATTACHMENT_BYTES) {
         const content = arrayBufferToBase64(await object.arrayBuffer());
-        attachments = [{ filename: safeDashboardFileName(product.fileName), content }];
+        attachments = [{ filename: safeDashboardFileName(dashboardFile.fileName || product.fileName), content }];
         attached = true;
       }
     } catch {
@@ -1020,11 +1271,13 @@ async function dashboardDownload(request, env, purchaseId) {
   if (Date.now() - Date.parse(purchase.paid_at) > DASHBOARD_DOWNLOAD_TTL_MS) return new Response("Este link expirou", { status: 410 });
   const product = DASHBOARD_PRODUCTS[purchase.dashboard_id];
   if (!product) return new Response("Arquivo não localizado", { status: 404 });
-  const object = await env.DASHBOARD_FILES.get(product.fileKey);
+  const dashboardFile = await resolveDashboardFile(env, purchase.dashboard_id);
+  if (!dashboardFile) return new Response("Arquivo não localizado", { status: 404 });
+  const object = await env.DASHBOARD_FILES.get(dashboardFile.key);
   if (!object) return new Response("Arquivo não localizado", { status: 404 });
   const headers = applySecurityHeaders(new Headers({
-    "Content-Type": object.httpMetadata?.contentType || "application/octet-stream",
-    "Content-Disposition": `attachment; filename="${safeDashboardFileName(product.fileName)}"`,
+    "Content-Type": object.httpMetadata?.contentType || "application/zip",
+    "Content-Disposition": `attachment; filename="${safeDashboardFileName(dashboardFile.fileName || product.fileName)}"`,
     "Cache-Control": "private, no-store, no-cache, must-revalidate",
     "X-Robots-Tag": "noindex, nofollow, noarchive",
   }));
@@ -1032,7 +1285,47 @@ async function dashboardDownload(request, env, purchaseId) {
   return new Response(object.body, { status: 200, headers });
 }
 
+async function dashboardCatalog(request, env) {
+  if (request.method !== "GET") return dashboardJson({ error: "metodo_nao_permitido" }, 405, { Allow: "GET" });
+  if (!env.DASHBOARD_FILES) return dashboardJson({ error: "integracao_nao_configurada", items: [] }, 503);
+
+  const items = await Promise.all(Object.entries(DASHBOARD_PRODUCTS).map(async ([id]) => {
+    const dashboardFile = await resolveDashboardFile(env, id);
+    const free = DASHBOARD_FREE_IDS.has(id);
+    return {
+      id,
+      available: Boolean(dashboardFile),
+      free,
+      downloadUrl: free && dashboardFile ? `/api/dashboard-store/free/${encodeURIComponent(id)}` : "",
+    };
+  }));
+
+  return dashboardJson({ items }, 200, { "Cache-Control": "public, max-age=30" });
+}
+
+async function dashboardFreeDownload(request, env, dashboardId) {
+  if (request.method !== "GET") return new Response("Método não permitido", { status: 405, headers: applySecurityHeaders(new Headers({ Allow: "GET" })) });
+  if (!DASHBOARD_FREE_IDS.has(dashboardId)) return new Response("Arquivo não localizado", { status: 404 });
+  if (!env.DASHBOARD_FILES) return new Response("Indisponível", { status: 503 });
+  const product = DASHBOARD_PRODUCTS[dashboardId];
+  const dashboardFile = await resolveDashboardFile(env, dashboardId);
+  if (!product || !dashboardFile) return new Response("Arquivo não localizado", { status: 404 });
+  const object = await env.DASHBOARD_FILES.get(dashboardFile.key);
+  if (!object) return new Response("Arquivo não localizado", { status: 404 });
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": object.httpMetadata?.contentType || "application/zip",
+    "Content-Disposition": `attachment; filename="${safeDashboardFileName(dashboardFile.fileName || product.fileName)}"`,
+    "Cache-Control": "public, max-age=300",
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
+  }));
+  if (object.size) headers.set("Content-Length", String(object.size));
+  return new Response(object.body, { status: 200, headers });
+}
+
 async function routeDashboardStore(request, env, ctx, url) {
+  if (url.pathname === "/api/dashboard-store/catalog") return dashboardCatalog(request, env);
+  const freeMatch = url.pathname.match(/^\/api\/dashboard-store\/free\/([a-z0-9-]{2,80})$/i);
+  if (freeMatch) return dashboardFreeDownload(request, env, freeMatch[1].toLowerCase());
   if (url.pathname === "/api/dashboard-store/checkout") return createDashboardCheckout(request, env);
   if (url.pathname === "/api/dashboard-store/webhooks/mercadopago") return handleMercadoPagoWebhook(request, env, ctx);
   const statusMatch = url.pathname.match(/^\/api\/dashboard-store\/purchases\/(DB-[a-f0-9-]{36})\/status$/i);
@@ -1045,6 +1338,10 @@ async function routeDashboardStore(request, env, ctx, url) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/contact") {
+      return handleContactForm(request, env);
+    }
 
     if (url.pathname.startsWith("/api/dashboard-store/")) {
       const dashboardResponse = await routeDashboardStore(request, env, ctx, url);

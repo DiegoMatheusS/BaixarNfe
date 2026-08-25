@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://procurandodanfe.com.br/</loc>
-    <lastmod>2026-08-14</lastmod>
+    <lastmod>2026-08-24</lastmod>
   </url>
   <url>
     <loc>https://procurandodanfe.com.br/guias/</loc>
-    <lastmod>2026-08-14</lastmod>
+    <lastmod>2026-08-24</lastmod>
   </url>
   <url>
     <loc>https://procurandodanfe.com.br/guias/como-baixar-xml-nfe/</loc>
@@ -86,6 +86,26 @@
   </url>
   <url>
     <loc>https://procurandodanfe.com.br/procurandodashboard/</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-08-24</lastmod>
+  </url>
+  <url>
+    <loc>https://procurandodanfe.com.br/ferramentas/</loc>
+    <lastmod>2026-08-24</lastmod>
+  </url>
+  <url>
+    <loc>https://procurandodanfe.com.br/ferramentas/conversor-moedas/</loc>
+    <lastmod>2026-08-24</lastmod>
+  </url>
+  <url>
+    <loc>https://procurandodanfe.com.br/ferramentas/gerador-qr-code/</loc>
+    <lastmod>2026-08-24</lastmod>
+  </url>
+  <url>
+    <loc>https://procurandodanfe.com.br/ferramentas/remover-fundo-imagem/</loc>
+    <lastmod>2026-08-24</lastmod>
+  </url>
+  <url>
+    <loc>https://procurandodanfe.com.br/ferramentas/converter-imagem/</loc>
+    <lastmod>2026-08-24</lastmod>
   </url>
 </urlset>
