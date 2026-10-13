@@ -1,0 +1,20 @@
+{
+  "domain": "procurandodanfe.com.br",
+  "phase": "http_request_firewall_custom",
+  "rules": [
+    {
+      "description": "Bloqueio de Scan Malicioso",
+      "ref": "procurandodanfe_block_sensitive_scans_v1",
+      "expression": "(lower(http.request.uri.path) contains \".env\" or lower(http.request.uri.path) contains \"wp-login\")",
+      "action": "block",
+      "enabled": true
+    },
+    {
+      "description": "Desafio para tráfego estrangeiro",
+      "ref": "procurandodanfe_foreign_challenge_v1",
+      "expression": "(ip.src.country ne \"BR\" and not cf.client.bot and not starts_with(lower(http.request.uri.path), \"/api/\") and not starts_with(lower(http.request.uri.path), \"/cdn-cgi/\"))",
+      "action": "managed_challenge",
+      "enabled": false
+    }
+  ]
+}
