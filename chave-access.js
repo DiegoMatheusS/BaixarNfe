@@ -1062,6 +1062,68 @@ async function downloadBatchPdf(panel, compatibilityMode = false) {
   }
 }
 
+// Nos navegadores limitados ao Chromium 109 (Windows 8/8.1), o mecanismo
+// de impressão pode reinterpretar a orientação e comprimir DANFEs mistos.
+// Gera cada folha com sua orientação dentro de um PDF local, preservando o
+// mesmo processo de captura já usado em "Baixar PDF único".
+async function createCompatiblePrintPdf(documentNodes, onProgress = () => {}) {
+  const nodes = documentNodes.filter(Boolean);
+  if (!nodes.length) throw new Error("Nenhum documento disponível para impressão.");
+
+  await loadPdfLibraries();
+  const firstSheet = nodes[0].querySelector(".danfe-sheet, .cte-sheet") || nodes[0];
+  const pdf = new window.jspdf.jsPDF({
+    unit: "mm",
+    format: "a4",
+    orientation: sheetOrientation(firstSheet),
+    compress: true,
+  });
+  const hasPage = { value: false };
+
+  for (let index = 0; index < nodes.length; index += 1) {
+    const sheets = [...nodes[index].querySelectorAll(".danfe-sheet, .cte-sheet")];
+    for (const sheet of sheets.length ? sheets : [nodes[index]]) {
+      const canvas = await captureFiscalSheetCanvas(sheet, 1.7);
+      try {
+        appendCanvasPage(pdf, canvas, hasPage, sheetOrientation(sheet));
+      } finally {
+        canvas.width = 1;
+        canvas.height = 1;
+      }
+    }
+    onProgress(index + 1, nodes.length);
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+  }
+
+  if (!hasPage.value) throw new Error("Não foi possível gerar as páginas da impressão.");
+  return pdf;
+}
+
+const temporaryCompatiblePdfUrls = new Set();
+
+async function openCompatiblePrintPdf(documentNodes, viewer, onProgress) {
+  try {
+    const pdf = await createCompatiblePrintPdf(documentNodes, onProgress);
+    if (!viewer || viewer.closed) {
+      pdf.save("documentos-fiscais-compatibilidade.pdf");
+      return false;
+    }
+
+    const url = URL.createObjectURL(pdf.output("blob"));
+    temporaryCompatiblePdfUrls.add(url);
+    window.setTimeout(() => {
+      URL.revokeObjectURL(url);
+      temporaryCompatiblePdfUrls.delete(url);
+    }, 10 * 60 * 1000);
+    viewer.location.replace(url);
+    viewer.focus();
+    return true;
+  } catch (error) {
+    if (viewer && !viewer.closed) viewer.close();
+    throw error;
+  }
+}
+
 function preparePdfViewerTab() {
   const viewer = window.open("", "_blank");
   if (!viewer) return null;
@@ -1113,17 +1175,26 @@ async function printBatchDocuments(panel) {
   if (printButton.firstChild) printButton.firstChild.textContent = "Preparando impressão ";
   message.textContent = `Preparando ${documents.length} documento${documents.length === 1 ? "" : "s"} em um único trabalho de impressão…`;
 
+  // Abre a aba antes do trabalho assíncrono para evitar o bloqueador de pop-ups.
+  const legacyBrowser = requiresPdfPrintFallback();
+  const pdfViewer = legacyBrowser ? preparePdfViewerTab() : null;
+
   try {
-    // v46: imprime o HTML fiscal diretamente. Nada é convertido para canvas,
-    // JPEG ou PDF intermediário. As páginas usam @page nomeadas para manter
-    // DANFE vertical em A4 retrato e DANFE tipo 2 horizontal em A4 paisagem
-    // dentro do mesmo trabalho. Ao escolher “Salvar como PDF”, o navegador
-    // gera um único arquivo com todas as páginas e texto nítido.
-    await printFiscalDocumentsIsolated(documents, {
-      single: false,
-      waitForAfterPrint: true,
-    });
-    message.textContent = "Impressão preparada. Todos os documentos foram enviados juntos.";
+    if (legacyBrowser) {
+      const opened = await openCompatiblePrintPdf(documents, pdfViewer, (current, total) => {
+        message.textContent = `Preparando PDF compatível: ${current}/${total} documento(s)…`;
+      });
+      message.textContent = opened
+        ? "PDF compatível aberto. Imprima pela aba do PDF: cada DANFE conserva sua orientação."
+        : "PDF compatível baixado. Abra o arquivo para imprimir.";
+    } else {
+      // Navegadores modernos mantêm HTML nítido com páginas A4 nomeadas.
+      await printFiscalDocumentsIsolated(documents, {
+        single: false,
+        waitForAfterPrint: true,
+      });
+      message.textContent = "Impressão preparada. Todos os documentos foram enviados juntos.";
+    }
   } catch (error) {
     message.textContent = error instanceof Error
       ? error.message
@@ -1248,9 +1319,16 @@ function bindSinglePrint() {
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    // Usa exatamente o mesmo fluxo/configuração da impressão em lote,
-    // mesmo quando existe apenas um XML. Assim @page, margens, orientação
-    // e dimensões são idênticas nos dois casos.
+    if (requiresPdfPrintFallback()) {
+      // Windows 8/8.1: evita o diálogo HTML que distorce folhas.
+      const viewer = preparePdfViewerTab();
+      void openCompatiblePrintPdf([officialDocument], viewer).catch(() => {
+        void downloadSinglePdfForLegacy(button);
+      });
+      return;
+    }
+
+    // Navegadores atuais preservam texto vetorial e as páginas nomeadas.
     void printFiscalDocumentsIsolated([officialDocument], {
       single: false,
       waitForAfterPrint: true,
@@ -1972,6 +2050,8 @@ observer.observe(document.documentElement, {
 });
 
 window.addEventListener("pagehide", () => {
+  for (const url of temporaryCompatiblePdfUrls) URL.revokeObjectURL(url);
+  temporaryCompatiblePdfUrls.clear();
   releaseDownloads();
   batchDocuments = [];
   document.querySelector("#batch-print-container")?.replaceChildren();
