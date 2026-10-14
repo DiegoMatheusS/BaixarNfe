@@ -2670,26 +2670,37 @@ body.batch-print-mode > :not(#batch-print-container){
   font-size: 6.1pt !important;
 }
 
-/* Compatibilidade com o DANFE legado ainda visível na tela.
-   Placa e CNPJ fecham a linha de cima; UF duplicada é ocultada. */
-.danfe-print .danfe-transport > .danfe-field:nth-child(1){order:1;grid-column:span 4}
-.danfe-print .danfe-transport > .danfe-field:nth-child(2){order:2;grid-column:span 3}
-.danfe-print .danfe-transport > .danfe-field:nth-child(3){order:5;grid-column:span 2}
-.danfe-print .danfe-transport > .danfe-field:nth-child(4){order:3;grid-column:span 2}
-.danfe-print .danfe-transport > .danfe-field:nth-child(5){display:none!important}
-.danfe-print .danfe-transport > .danfe-field:nth-child(6){order:4;grid-column:span 3}
-.danfe-print .danfe-transport > .danfe-field:nth-child(7){order:6;grid-column:span 4}
-.danfe-print .danfe-transport > .danfe-field:nth-child(8){order:7;grid-column:span 3}
-.danfe-print .danfe-transport > .danfe-field:nth-child(9){order:8;grid-column:span 1}
-.danfe-print .danfe-transport > .danfe-field:nth-child(10){order:9;grid-column:span 2}
-.danfe-print .danfe-transport > .danfe-field:nth-child(n+11){order:10}
-.danfe-print .danfe-transport > .danfe-field:nth-child(10) > span{
+/* Impressão DANFE: a borda vertical esquerda do corpo horizontal
+   permanece contínua até o rodapé, inclusive ao gerar PDF. */
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-main{
+  box-sizing: border-box !important;
+  border-left: 0.22mm solid #000 !important;
+}
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-receipt{
+  box-sizing: border-box !important;
+  border-left: 0.22mm solid #000 !important;
+}
+
+/* O renderizador legado usado na prévia também recebe o layout correto.
+   Linha 1: Razão Social, Frete, Placa, CNPJ.
+   Linha 2: ANTT, Endereço, Município, UF única, Inscrição Estadual. */
+.danfe-print .danfe-transport > .danfe-field:nth-child(1){grid-column:span 4}
+.danfe-print .danfe-transport > .danfe-field:nth-child(2){grid-column:span 3}
+.danfe-print .danfe-transport > .danfe-field:nth-child(3){grid-column:span 2}
+.danfe-print .danfe-transport > .danfe-field:nth-child(4){grid-column:span 3}
+.danfe-print .danfe-transport > .danfe-field:nth-child(5){grid-column:span 2}
+.danfe-print .danfe-transport > .danfe-field:nth-child(6){grid-column:span 4}
+.danfe-print .danfe-transport > .danfe-field:nth-child(7){grid-column:span 3}
+.danfe-print .danfe-transport > .danfe-field:nth-child(8){grid-column:span 1}
+.danfe-print .danfe-transport > .danfe-field:nth-child(9){grid-column:span 2}
+.danfe-print .danfe-transport > .danfe-field:nth-child(9) > span{
   font-size: 5.4pt !important;
   line-height: 1 !important;
-  margin-bottom: 0.3mm !important;
-  white-space: nowrap;
+  margin-bottom: 0.2mm !important;
+  white-space: nowrap !important;
 }
-.danfe-print .danfe-transport > .danfe-field:nth-child(10) > b{
+.danfe-print .danfe-transport > .danfe-field:nth-child(9) > b{
   font-size: 7.2pt !important;
   line-height: 1.08 !important;
+  white-space: nowrap !important;
 }
