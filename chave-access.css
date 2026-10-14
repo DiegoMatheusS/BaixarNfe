@@ -2647,3 +2647,49 @@ body.batch-print-mode > :not(#batch-print-container){
     display: none !important;
   }
 }
+
+
+/* DANFE: a grade do transportador tem duas linhas de 12 colunas.
+   IE recebe largura suficiente sem alterar a altura das linhas. */
+.danfe-print .fiscal-transport-grid .fiscal-field-ie > span{
+  font-size: 5.6pt !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+  margin-bottom: 0.18mm !important;
+  white-space: nowrap !important;
+}
+.danfe-print .fiscal-transport-grid .fiscal-field-ie > b{
+  font-size: 6.7pt !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+}
+.danfe-print .fiscal-landscape .fiscal-transport-grid .fiscal-field-ie > span{
+  font-size: 5.1pt !important;
+}
+.danfe-print .fiscal-landscape .fiscal-transport-grid .fiscal-field-ie > b{
+  font-size: 6.1pt !important;
+}
+
+/* Compatibilidade com o DANFE legado ainda visível na tela.
+   Placa e CNPJ fecham a linha de cima; UF duplicada é ocultada. */
+.danfe-print .danfe-transport > .danfe-field:nth-child(1){order:1;grid-column:span 4}
+.danfe-print .danfe-transport > .danfe-field:nth-child(2){order:2;grid-column:span 3}
+.danfe-print .danfe-transport > .danfe-field:nth-child(3){order:5;grid-column:span 2}
+.danfe-print .danfe-transport > .danfe-field:nth-child(4){order:3;grid-column:span 2}
+.danfe-print .danfe-transport > .danfe-field:nth-child(5){display:none!important}
+.danfe-print .danfe-transport > .danfe-field:nth-child(6){order:4;grid-column:span 3}
+.danfe-print .danfe-transport > .danfe-field:nth-child(7){order:6;grid-column:span 4}
+.danfe-print .danfe-transport > .danfe-field:nth-child(8){order:7;grid-column:span 3}
+.danfe-print .danfe-transport > .danfe-field:nth-child(9){order:8;grid-column:span 1}
+.danfe-print .danfe-transport > .danfe-field:nth-child(10){order:9;grid-column:span 2}
+.danfe-print .danfe-transport > .danfe-field:nth-child(n+11){order:10}
+.danfe-print .danfe-transport > .danfe-field:nth-child(10) > span{
+  font-size: 5.4pt !important;
+  line-height: 1 !important;
+  margin-bottom: 0.3mm !important;
+  white-space: nowrap;
+}
+.danfe-print .danfe-transport > .danfe-field:nth-child(10) > b{
+  font-size: 7.2pt !important;
+  line-height: 1.08 !important;
+}
