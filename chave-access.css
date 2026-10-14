@@ -2670,15 +2670,11 @@ body.batch-print-mode > :not(#batch-print-container){
   font-size: 6.1pt !important;
 }
 
-/* Impressão DANFE: a borda vertical esquerda do corpo horizontal
-   permanece contínua até o rodapé, inclusive ao gerar PDF. */
-.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-main{
-  box-sizing: border-box !important;
-  border-left: 0.22mm solid #000 !important;
-}
-.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-receipt{
-  box-sizing: border-box !important;
-  border-left: 0.22mm solid #000 !important;
+/* DANFE horizontal: completa as linhas verticais exclusivamente do
+   cabeçalho NF-e no alto do canhoto destacável, sem contornar a folha.
+   A borda externa do canhoto permanece a definida no layout original. */
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe{
+  box-shadow: inset 0.22mm 0 0 #000, inset -0.22mm 0 0 #000;
 }
 
 /* O renderizador legado usado na prévia também recebe o layout correto.
