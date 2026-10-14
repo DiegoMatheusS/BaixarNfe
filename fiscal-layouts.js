@@ -730,17 +730,16 @@ function transport(data) {
   const value = data.transport;
   return `
     <h3 class="official-section-title">TRANSPORTADOR / VOLUMES TRANSPORTADOS</h3>
-    <div class="fiscal-grid columns-12">
+    <div class="fiscal-grid columns-12 fiscal-transport-grid">
       ${field("NOME / RAZÃO SOCIAL", value.carrier, "span-4")}
       ${field("FRETE POR CONTA", value.freightMode, "span-3")}
-      ${field("CÓDIGO ANTT", value.rntc, "span-2")}
       ${field("PLACA DO VEÍCULO", value.plate, "span-2")}
-      ${field("UF", value.plateState, "span-1")}
       ${field("CNPJ / CPF", formatDocument(value.document), "span-3")}
+      ${field("CÓDIGO ANTT", value.rntc, "span-2")}
       ${field("ENDEREÇO", value.address, "span-4")}
       ${field("MUNICÍPIO", value.city, "span-3")}
       ${field("UF", value.state, "span-1")}
-      ${field("INSCRIÇÃO ESTADUAL", value.ie, "span-1")}
+      ${field("INSCRIÇÃO ESTADUAL", value.ie, "span-2")}
       ${field("QUANTIDADE", value.quantity, "span-2")}
       ${field("ESPÉCIE", value.species, "span-2")}
       ${field("MARCA", value.brand, "span-2")}

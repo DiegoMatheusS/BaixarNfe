@@ -1,4 +1,4 @@
-import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=59";
+import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=60";
 
 const API_URL = "/api/consultar-chave";
 const ACCEPTED_UPLOAD_EXTENSIONS = [".xml", ".txt", ".doc", ".docx"];
@@ -514,7 +514,8 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
   const pageRules = forcePageSize
     ? `@page { margin: 0; ${pageSize} }`
     : `
-      @page { margin: 8mm; size: A4 portrait; }
+      /* Folha padrão neutra: cada folha escolhe sua página nomeada. */
+      @page { margin: 8mm; size: auto; }
       @page fiscal-portrait { margin: 8mm; size: A4 portrait; }
       @page fiscal-landscape { margin: 8mm; size: A4 landscape; }
     `;
@@ -593,6 +594,17 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
       break-after: auto !important;
       page-break-after: auto !important;
     }
+    /* A orientação pertence a cada documento, nunca ao lote inteiro. */
+    body.fiscal-isolated-print > .fiscal-standard-print.fiscal-portrait-print {
+      page: fiscal-portrait !important;
+    }
+    body.fiscal-isolated-print > .fiscal-standard-print.fiscal-landscape-print {
+      page: fiscal-landscape !important;
+    }
+    body.fiscal-isolated-print > .fiscal-standard-print + .fiscal-standard-print {
+      break-before: page !important;
+      page-break-before: always !important;
+    }
     body.fiscal-isolated-print .cte-print {
       display: block !important;
       margin: 0 !important;
@@ -627,9 +639,8 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
       margin-left: 0 !important;
       margin-right: 0 !important;
     }
-    /* Chrome/Edge horizontal: mantém o DANFE inteiro em 280x193 mm e
-       reduz o CONJUNTO no @media print. Assim os blocos internos de 193 mm
-       não ficam maiores que a folha externa e a borda inferior não é cortada. */
+    /* Chrome/Edge horizontal: 280x193 mm cabe integralmente na área
+       útil A4 paisagem de 281x194 mm (margens de 8 mm). Não reduzir escala. */
     @media print {
       body.fiscal-isolated-print.browser-chrome .fiscal-standard-print.fiscal-landscape-print {
         width: 280mm !important;
@@ -644,8 +655,7 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
         height: 193mm !important;
         min-height: 193mm !important;
         margin: 0 !important;
-        transform: translate(3.3mm, 1.5mm) scale(0.98) !important;
-        transform-origin: top left !important;
+        transform: none !important;
       }
       body.fiscal-isolated-print.browser-chrome .fiscal-sheet.fiscal-landscape .official-landscape-main,
       body.fiscal-isolated-print.browser-chrome .fiscal-sheet.fiscal-landscape .official-landscape-receipt {
@@ -690,10 +700,15 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
   const firstSheet = nodes[0].querySelector(".danfe-sheet, .cte-sheet") || nodes[0];
   const orientation = forcedOrientation || sheetOrientation(firstSheet);
   const landscape = orientation === "landscape";
+  // A largura do iframe não pode depender só da primeira folha: em lote
+  // misto, uma folha paisagem precisa manter toda sua largura natural.
+  const mixedOrientations = new Set(nodes.flatMap((node) =>
+    [...node.querySelectorAll(".fiscal-sheet, .cte-sheet")].map(sheetOrientation),
+  )).size > 1;
   const frame = document.createElement("iframe");
   frame.setAttribute("aria-hidden", "true");
   frame.setAttribute("title", "Área temporária de impressão do documento fiscal");
-  frame.style.cssText = `position:fixed;left:-12000px;top:0;width:${landscape ? "320mm" : "230mm"};height:320mm;border:0;opacity:0;pointer-events:none;`;
+  frame.style.cssText = `position:fixed;left:-12000px;top:0;width:${landscape || mixedOrientations ? "320mm" : "230mm"};height:320mm;border:0;opacity:0;pointer-events:none;`;
   document.body.append(frame);
 
   const frameDocument = frame.contentDocument;
@@ -702,7 +717,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
     throw new Error("Não foi possível abrir a área de impressão.");
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=101", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=143", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
@@ -791,7 +806,7 @@ function ensurePdfCaptureFrame() {
     return Promise.reject(new Error("Não foi possível preparar a página do PDF."));
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=101", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=143", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   frameDocument.open();
   frameDocument.write(`<!doctype html>
