@@ -717,7 +717,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
     throw new Error("Não foi possível abrir a área de impressão.");
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=149", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=150", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
@@ -806,7 +806,7 @@ function ensurePdfCaptureFrame() {
     return Promise.reject(new Error("Não foi possível preparar a página do PDF."));
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=149", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=150", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   frameDocument.open();
   frameDocument.write(`<!doctype html>
@@ -872,7 +872,7 @@ function replaceLandscapeReceiptTextWithCanvas(frameDocument) {
   context.translate(0, cssHeight);
   context.rotate(-Math.PI / 2);
   context.font = `${fontPx}px Arial, Helvetica, sans-serif`;
-  context.fillText(message, cssHeight / 2, (cssWidth / 2) + 4, maxLineWidth);
+  context.fillText(message, cssHeight / 2, (cssWidth / 2) - 4, maxLineWidth);
   context.restore();
 
   receiptText.replaceWith(canvas);
@@ -927,7 +927,7 @@ async function captureFiscalSheetCanvas(sheet, scale = 1.7) {
         height: 210mm !important;
         min-height: 210mm !important;
         grid-template-columns: 13mm 1fr !important;
-        gap: 1mm !important;
+        gap: 3.2mm !important;
       }
       .official-landscape-main,
       .official-landscape-receipt {
@@ -949,7 +949,7 @@ async function captureFiscalSheetCanvas(sheet, scale = 1.7) {
         position: absolute !important;
         width: 176mm !important;
         height: 11mm !important;
-        left: -81.5mm !important;
+        left: -82.5mm !important;
         top: 114.5mm !important;
         padding: 0.8mm 1.2mm !important;
         margin: 0 !important;

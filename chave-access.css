@@ -2772,46 +2772,62 @@ body.batch-print-mode > :not(#batch-print-container){
 /* O corte aparece fora da caixa fechada, na folga que antecede o DANFE. */
 .danfe-print .fiscal-sheet.fiscal-landscape{
   position: relative;
+  /* 13 mm de canhoto + 3,2 mm entre ele e o corpo. */
+  gap: 3.2mm !important;
+  grid-template-columns: 13mm minmax(0, 1fr) !important;
 }
 .danfe-print .fiscal-sheet.fiscal-landscape::before{
   content: "";
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 13.5mm;
+  /* Primeiro fecha a caixa do canhoto; depois vem a linha de corte.
+     Restam 2 mm livres até o corpo da DANFE. */
+  left: 14.2mm;
   border-left: 0.25mm dashed #000;
   pointer-events: none;
   z-index: 2;
 }
 
-/* Gira o conjunto Nota Fiscal / Nº / Série 90 graus à direita,
-   deixando todas as palavras legíveis (sem empilhar caracteres). */
+/* O conjunto "NOTA FISCAL / Nº / SÉRIE" precisava ser centralizado em
+   posição absoluta ANTES de girar. Como era um item flex com largura de
+   26 mm dentro de um canhoto de 13 mm, a rotação deslocava o Nº e a
+   Série para fora da faixa, onde o overflow:hidden os ocultava. */
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe,
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-page-id{
+  position: relative;
+}
 .danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe-rotated{
   align-items: center;
+  box-sizing: border-box;
   display: flex;
-  flex: 0 0 auto;
   flex-direction: column;
   justify-content: center;
-  width: 26mm;
-  height: 10.2mm;
+  gap: 0.25mm;
+  position: absolute;
+  width: 28mm;
+  height: 11mm;
+  left: calc(50% - 14mm);
+  top: calc(50% - 5.5mm);
   transform: rotate(-90deg);
   transform-origin: center center;
   white-space: nowrap;
+  overflow: visible;
+  padding: 0;
 }
 .danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe-rotated > strong{
-  font-size: 7.2pt;
-  line-height: 1.1;
+  font-size: 6.6pt;
+  line-height: 1.05;
 }
 .danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe-rotated > b{
-  font-size: 6.1pt;
-  line-height: 1.1;
-  margin-top: 0.6mm;
+  font-size: 5.6pt;
+  line-height: 1.05;
+  margin-top: 0 !important;
 }
 
-/* Desloca a declaração lateral discretamente para a direita sem
-   invadir a linha pontilhada, mantendo o giro anterior. */
+/* Aproxima o texto vertical da lateral esquerda do canhoto sem cortá-lo. */
 .danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-receipt-text{
-  left: -72.4mm;
+  left: -75.1mm !important;
 }
 
 /* Maior legibilidade para a ação de carregar outro arquivo na tela do XML. */
