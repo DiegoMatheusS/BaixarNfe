@@ -762,7 +762,10 @@ function productsTable(items) {
     <h3 class="official-section-title">DADOS DOS PRODUTOS / SERVIÇOS</h3>
     <table class="official-products">
       <thead><tr><th>CÓDIGO</th><th>DESCRIÇÃO DOS PRODUTOS / SERVIÇOS</th><th>NCM/SH</th><th>CST</th><th>CFOP</th><th>UN.</th><th>QUANT.</th><th>V. UNITÁRIO</th><th>V. TOTAL</th><th>BC ICMS</th><th>V. ICMS</th><th>V. IPI</th><th>ALÍQ. ICMS</th><th>ALÍQ. IPI</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="14">NENHUM ITEM LOCALIZADO NO XML.</td></tr>'}</tbody>
+      <tbody>
+        ${rows || '<tr><td colspan="14">NENHUM ITEM LOCALIZADO NO XML.</td></tr>'}
+        <tr class="official-products-fill" aria-hidden="true">${Array.from({ length: 14 }, () => "<td></td>").join("")}</tr>
+      </tbody>
     </table>`;
 }
 
