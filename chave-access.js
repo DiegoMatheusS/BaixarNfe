@@ -594,13 +594,15 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
       break-after: auto !important;
       page-break-after: auto !important;
     }
-    /* A orientação pertence a cada documento, nunca ao lote inteiro. */
+    /* Páginas nomeadas só são necessárias nos navegadores modernos.
+       Na impressão compatível (A4 fixo), não sobrescrever @page. */
+    ${forcePageSize ? "" : `
     body.fiscal-isolated-print > .fiscal-standard-print.fiscal-portrait-print {
       page: fiscal-portrait !important;
     }
     body.fiscal-isolated-print > .fiscal-standard-print.fiscal-landscape-print {
       page: fiscal-landscape !important;
-    }
+    }`}
     body.fiscal-isolated-print > .fiscal-standard-print + .fiscal-standard-print {
       break-before: page !important;
       page-break-before: always !important;
@@ -1088,62 +1090,6 @@ async function createCompatiblePrintPdf(documentNodes, onProgress = () => {}) {
   return pdf;
 }
 
-const temporaryCompatiblePdfUrls = new Set();
-
-async function openCompatiblePrintPdf(documentNodes, viewer, onProgress) {
-  try {
-    const pdf = await createCompatiblePrintPdf(documentNodes, onProgress);
-    if (!viewer || viewer.closed) {
-      pdf.save("documentos-fiscais-compatibilidade.pdf");
-      return false;
-    }
-
-    const url = URL.createObjectURL(pdf.output("blob"));
-    temporaryCompatiblePdfUrls.add(url);
-    window.setTimeout(() => {
-      URL.revokeObjectURL(url);
-      temporaryCompatiblePdfUrls.delete(url);
-    }, 10 * 60 * 1000);
-    viewer.location.replace(url);
-    viewer.focus();
-    return true;
-  } catch (error) {
-    if (viewer && !viewer.closed) viewer.close();
-    throw error;
-  }
-}
-
-function preparePdfViewerTab() {
-  const viewer = window.open("", "_blank");
-  if (!viewer) return null;
-
-  try {
-    viewer.document.open();
-    viewer.document.write(`<!doctype html>
-      <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Preparando PDF…</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 32px; color: #111827; }
-            p { line-height: 1.5; }
-          </style>
-        </head>
-        <body>
-          <p><strong>Preparando PDF único…</strong></p>
-          <p>Aguarde. O PDF será aberto nesta aba assim que estiver pronto.</p>
-        </body>
-      </html>`);
-    viewer.document.close();
-    viewer.focus();
-  } catch {
-    // A aba já foi criada pelo clique do usuário; ainda podemos navegar para o blob.
-  }
-
-  return viewer;
-}
-
 async function printBatchDocuments(panel) {
   if (!batchDocuments.length) return;
 
@@ -1164,22 +1110,30 @@ async function printBatchDocuments(panel) {
   if (printButton.firstChild) printButton.firstChild.textContent = "Preparando impressão ";
   message.textContent = `Preparando ${documents.length} documento${documents.length === 1 ? "" : "s"} em um único trabalho de impressão…`;
 
-  // Abre a aba antes do trabalho assíncrono para evitar o bloqueador de pop-ups.
   const legacyBrowser = requiresPdfPrintFallback();
-  const pdfViewer = legacyBrowser ? preparePdfViewerTab() : null;
+  const orientations = new Set(documents.flatMap((doc) => {
+    const sheets = [...doc.querySelectorAll(".danfe-sheet, .cte-sheet")];
+    return (sheets.length ? sheets : [doc]).map(sheetOrientation);
+  }));
+  const mixedLegacyBatch = legacyBrowser && orientations.size > 1;
 
   try {
-    if (legacyBrowser) {
-      const opened = await openCompatiblePrintPdf(documents, pdfViewer, (current, total) => {
-        message.textContent = `Preparando PDF compatível: ${current}/${total} documento(s)…`;
+    if (mixedLegacyBatch) {
+      /* Chrome 109 no Windows 8 não preserva orientações mistas num único
+         trabalho de impressão. Gera o PDF compatível sem abrir outra aba:
+         o usuário continua na tela normal do site até o download. */
+      const pdf = await createCompatiblePrintPdf(documents, (current, total) => {
+        message.textContent = `Preparando PDF com orientações mistas: ${current}/${total} documento(s)…`;
       });
-      message.textContent = opened
-        ? "PDF compatível aberto. Imprima pela aba do PDF: cada DANFE conserva sua orientação."
-        : "PDF compatível baixado. Abra o arquivo para imprimir.";
+      pdf.save("documentos-fiscais-compatibilidade.pdf");
+      message.textContent = "PDF baixado. Abra o arquivo para imprimir as folhas com orientações diferentes.";
     } else {
-      // Navegadores modernos mantêm HTML nítido com páginas A4 nomeadas.
+      /* Uma única orientação: mesmo diálogo de impressão do site normal.
+         No navegador antigo, fixa A4 para não depender de páginas nomeadas. */
+      const legacyOrientation = legacyBrowser ? [...orientations][0] : null;
       await printFiscalDocumentsIsolated(documents, {
-        single: false,
+        single: legacyBrowser,
+        forcedOrientation: legacyOrientation,
         waitForAfterPrint: true,
       });
       message.textContent = "Impressão preparada. Todos os documentos foram enviados juntos.";
@@ -1364,20 +1318,17 @@ function bindSinglePrint() {
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    if (requiresPdfPrintFallback()) {
-      // Windows 8/8.1: evita o diálogo HTML que distorce folhas.
-      const viewer = preparePdfViewerTab();
-      void openCompatiblePrintPdf([officialDocument], viewer).catch(() => {
-        void downloadSinglePdfForLegacy(button);
-      });
-      return;
-    }
-
-    // Navegadores atuais preservam texto vetorial e as páginas nomeadas.
+    /* Todos os navegadores abrem a impressão normal sem aba "Aguarde".
+       No Windows 8/Chrome 109 força A4 na orientação da nota para não
+       depender das regras @page nomeadas, pouco confiáveis nessa versão. */
+    const legacyBrowser = requiresPdfPrintFallback();
+    const firstSheet = officialDocument.querySelector(".danfe-sheet, .cte-sheet") || officialDocument;
     void printFiscalDocumentsIsolated([officialDocument], {
-      single: false,
+      single: legacyBrowser,
+      forcedOrientation: legacyBrowser ? sheetOrientation(firstSheet) : null,
       waitForAfterPrint: true,
     }).catch(() => {
+      /* Só gerar PDF local como último recurso se a impressão falhar. */
       void downloadSinglePdfForLegacy(button);
     });
   }, true);
@@ -2096,8 +2047,6 @@ observer.observe(document.documentElement, {
 });
 
 window.addEventListener("pagehide", () => {
-  for (const url of temporaryCompatiblePdfUrls) URL.revokeObjectURL(url);
-  temporaryCompatiblePdfUrls.clear();
   releaseDownloads();
   batchDocuments = [];
   document.querySelector("#batch-print-container")?.replaceChildren();
