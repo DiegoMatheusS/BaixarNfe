@@ -215,12 +215,18 @@ function parseNfe(documentNode) {
     const tax = element(detail, "imposto");
     /* Não pegar CST de PIS/COFINS nem base de IBS/CBS. */
     const icms = element(tax, "ICMS")?.firstElementChild || null;
+    const origin = text(icms, "orig");
+    const cst = text(icms, "CST");
+    const csosn = text(icms, "CSOSN");
+    /* CST é origem + código de ICMS. CSOSN é classificação separada
+       do Simples Nacional, nunca concatenada com a origem. */
+    const icmsCode = cst ? `${origin}${cst}` : csosn ? `CSOSN ${csosn}` : "";
     return {
       number: detail.getAttribute("nItem") || "",
       code: text(product, "cProd"),
       description: [text(product, "xProd"), text(detail, "infAdProd")].filter(Boolean).join(" · "),
       ncm: text(product, "NCM"),
-      cst: (text(icms, "orig") || "") + (text(icms, "CST") || text(icms, "CSOSN") || ""),
+      cst: icmsCode,
       cfop: text(product, "CFOP"),
       unit: text(product, "uCom"),
       quantity: text(product, "qCom"),
@@ -803,7 +809,7 @@ function productsTable(items) {
   return `
     <h3 class="official-section-title">DADOS DOS PRODUTOS / SERVIÇOS</h3>
     <table class="official-products">
-      <thead><tr><th>CÓDIGO</th><th>DESCRIÇÃO DOS PRODUTOS / SERVIÇOS</th><th>NCM/SH</th><th>CST</th><th>CFOP</th><th>UN.</th><th>QUANT.</th><th>V. UNITÁRIO</th><th>V. TOTAL</th><th>BC ICMS</th><th>V. ICMS</th><th>V. IPI</th><th>ALÍQ. ICMS</th><th>ALÍQ. IPI</th></tr></thead>
+      <thead><tr><th>CÓDIGO</th><th>DESCRIÇÃO DOS PRODUTOS / SERVIÇOS</th><th>NCM/SH</th><th>CST / CSOSN</th><th>CFOP</th><th>UN.</th><th>QUANT.</th><th>V. UNITÁRIO</th><th>V. TOTAL</th><th>BC ICMS</th><th>V. ICMS</th><th>V. IPI</th><th>ALÍQ. ICMS</th><th>ALÍQ. IPI</th></tr></thead>
       <tbody>
         ${rows || '<tr><td colspan="14">NENHUM ITEM LOCALIZADO NO XML.</td></tr>'}
         <tr class="official-products-fill" aria-hidden="true">${Array.from({ length: 14 }, () => "<td></td>").join("")}</tr>

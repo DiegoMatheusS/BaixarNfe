@@ -1,4 +1,4 @@
-import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=65";
+import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=66";
 
 const API_URL = "/api/consultar-chave";
 const ACCEPTED_UPLOAD_EXTENSIONS = [".xml", ".txt", ".doc", ".docx"];
