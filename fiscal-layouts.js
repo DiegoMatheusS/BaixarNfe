@@ -551,10 +551,22 @@ function parseCte(documentNode) {
 
   const observations = elements(complementNode || info, "xObs")
     .map((node) => node.textContent?.trim()).filter(Boolean).join(" · ");
-  const emitterUse = elements(info, "ObsCont").map((node) =>
-    [text(node, "xCampo"), text(node, "xTexto")].filter(Boolean).join(": ")).filter(Boolean).join(" · ");
-  const fiscalUse = elements(info, "ObsFisco").map((node) =>
-    [text(node, "xCampo"), text(node, "xTexto")].filter(Boolean).join(": ")).filter(Boolean).join(" · ");
+  /* Campo de uso exclusivo: alguns emissores guardam grupos separados
+     por ; e precisam de quebra de linha para serem lidos no impresso. */
+  const readableCteNotes = (nodes) => nodes.map((node) => {
+    const label = text(node, "xCampo");
+    const raw = text(node, "xTexto");
+    const pieces = raw.includes(";")
+      ? raw.split(";").map((part) => part.trim()).filter(Boolean)
+      : [raw].filter(Boolean);
+    const values = pieces.map((part) => part.replace(
+      /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::\d{2})?(?:[+-]\d{2}:\d{2}|Z)?$/,
+      "$3/$2/$1 às $4:$5",
+    ));
+    return [label && `${label}:`, ...values].filter(Boolean).join("\n");
+  }).filter(Boolean).join("\n\n");
+  const emitterUse = readableCteNotes(elements(info, "ObsCont"));
+  const fiscalUse = readableCteNotes(elements(info, "ObsFisco"));
   const modalCode = text(ide, "modal");
   const accessKey = cleanKey(info.getAttribute("Id")?.replace(/^CTe/i, "") || text(protocol, "chCTe"));
 
@@ -1022,12 +1034,13 @@ function fillCteTemplate(wrapper, data, rendered) {
   if (qrSlot && qrSource) qrSlot.innerHTML = qrSource.outerHTML;
 
   const componentSlots = [1, 2, 3].map((index) => wrapper.querySelector(`[data-cte-slot="components-${index}"]`));
-  const components = data.components?.length ? data.components.slice() : [{ name: "VALOR DA PRESTAÇÃO", value: data.totalService || 0 }];
+  /* ICMS aparece na seção de impostos, não entre componentes da prestação. */
+  const components = (data.components?.length
+    ? data.components
+    : [{ name: "VALOR DA PRESTAÇÃO", value: data.totalService || 0 }])
+    .filter((item) => !/\bICMS\b/i.test(String(item?.name || "")));
   const groups = [components.slice(0, 3), [], []];
   const remaining = components.slice(3);
-  if (Number(String(data.tax?.value || "0").replace(",", ".")) > 0) {
-    groups[1].push({ name: "ICMS", value: data.tax.value });
-  }
   remaining.forEach((item) => {
     const target = groups[1].length < 3 ? groups[1] : groups[2];
     if (target.length < 3) target.push(item);
