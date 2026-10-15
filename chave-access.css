@@ -182,6 +182,10 @@
 .batch-panel > .change-xml-button{
   display: block;
   margin: 15px auto 0;
+  /* Mesmo tamanho e destaque de "Usar outro arquivo" após um XML único. */
+  font-size: 14px !important;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .batch-panel > .change-xml-button:disabled{
