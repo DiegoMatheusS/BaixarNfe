@@ -91,8 +91,23 @@ function formatNumber(value, decimals = 2) {
     : "0,00";
 }
 
+/* Datas XML são datas de calendário locais, não instantes UTC.
+   Evita antecipar dVenc um dia em navegadores de fuso negativo. */
+function fiscalDateParts(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})(?:T|$)/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const check = new Date(Date.UTC(year, month - 1, day));
+  if (check.getUTCFullYear() !== year || check.getUTCMonth() + 1 !== month || check.getUTCDate() !== day) return null;
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
 function formatDate(value) {
   if (!value) return "—";
+  const xmlDate = fiscalDateParts(value);
+  if (xmlDate) return xmlDate;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat("pt-BR").format(date);
@@ -100,6 +115,8 @@ function formatDate(value) {
 
 function formatTime(value) {
   if (!value) return "—";
+  const match = String(value).match(/(?:T|^)(\d{2}):(\d{2})/);
+  if (match) return `${match[1]}:${match[2]}`;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(date);
@@ -107,6 +124,11 @@ function formatTime(value) {
 
 function formatDateTime(value) {
   if (!value) return "—";
+  const xmlDate = fiscalDateParts(value);
+  if (xmlDate) {
+    const match = String(value).match(/T(\d{2}):(\d{2})/);
+    return match ? `${xmlDate}, ${match[1]}:${match[2]}` : xmlDate;
+  }
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(date);
@@ -150,6 +172,22 @@ function fullAddress(value) {
     .join(" · ") || "NÃO INFORMADO";
 }
 
+/* Referências em ide/NFref/refNFe ou no grupo de cada item. */
+function referencedNfeNotes(info, additionalInfo) {
+  const keys = [
+    ...elements(info, "refNFe").map((node) => node.textContent?.trim() || ""),
+    ...elements(info, "DFeReferenciado").map((node) => text(node, "chaveAcesso")),
+  ];
+  return [...new Set(keys.map(cleanKey).filter((key) => /^\d{44}$/.test(key)))]
+    .filter((key) => !String(additionalInfo || "").includes(key))
+    .map((key) => {
+      const series = String(Number(key.slice(22, 25)));
+      const number = String(Number(key.slice(25, 34)));
+      return `NF-e referenciada nº ${number} (série ${series}), chave: ${key}`;
+    })
+    .join(" | ");
+}
+
 function parseNfe(documentNode) {
   const info = element(documentNode, "infNFe");
   const ide = element(info, "ide");
@@ -163,6 +201,8 @@ function parseNfe(documentNode) {
   const volumeNode = element(transportNode, "vol");
   const invoiceNode = element(info, "fat");
   const additionalNode = element(info, "infAdic");
+  const additionalText = text(additionalNode, "infCpl");
+  const referencedNotes = referencedNfeNotes(info, additionalText);
   const ibsCbsTotals = element(info, "IBSCBSTot");
   const issqnTotals = element(info, "ISSQNtot");
 
@@ -173,21 +213,23 @@ function parseNfe(documentNode) {
   const items = elements(info, "det").map((detail) => {
     const product = element(detail, "prod");
     const tax = element(detail, "imposto");
+    /* Não pegar CST de PIS/COFINS nem base de IBS/CBS. */
+    const icms = element(tax, "ICMS")?.firstElementChild || null;
     return {
       number: detail.getAttribute("nItem") || "",
       code: text(product, "cProd"),
       description: [text(product, "xProd"), text(detail, "infAdProd")].filter(Boolean).join(" · "),
       ncm: text(product, "NCM"),
-      cst: (text(tax, "orig") || "") + (text(tax, "CST") || text(tax, "CSOSN") || ""),
+      cst: (text(icms, "orig") || "") + (text(icms, "CST") || text(icms, "CSOSN") || ""),
       cfop: text(product, "CFOP"),
       unit: text(product, "uCom"),
       quantity: text(product, "qCom"),
       unitValue: text(product, "vUnCom"),
       total: text(product, "vProd"),
-      taxBase: text(tax, "vBC"),
-      icms: text(tax, "vICMS"),
+      taxBase: text(icms, "vBC"),
+      icms: text(icms, "vICMS"),
       ipi: text(tax, "vIPI"),
-      icmsRate: text(tax, "pICMS"),
+      icmsRate: text(icms, "pICMS"),
       ipiRate: text(tax, "pIPI"),
     };
   });
@@ -284,7 +326,7 @@ function parseNfe(documentNode) {
       net: text(invoiceNode, "vLiq"),
       duplicates,
     },
-    additionalInfo: text(additionalNode, "infCpl"),
+    additionalInfo: [additionalText, referencedNotes].filter(Boolean).join(" | "),
     fiscalInfo: text(additionalNode, "infAdFisco"),
   };
 }
