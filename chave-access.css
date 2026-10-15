@@ -2766,7 +2766,22 @@ body.batch-print-mode > :not(#batch-print-container){
 /* DANFE horizontal: ajustes restritos ao canhoto lateral destacável.
    O pontilhado ocupa somente a divisória do canhoto, não a moldura da folha. */
 .danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-receipt{
-  border-right: 0.34mm dashed #000 !important;
+  /* A caixa do canhoto deve ser fechada por linha contínua. */
+  border-right: 0.22mm solid #000 !important;
+}
+/* O corte aparece fora da caixa fechada, na folga que antecede o DANFE. */
+.danfe-print .fiscal-sheet.fiscal-landscape{
+  position: relative;
+}
+.danfe-print .fiscal-sheet.fiscal-landscape::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 13.5mm;
+  border-left: 0.25mm dashed #000;
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Gira o conjunto Nota Fiscal / Nº / Série 90 graus à direita,
@@ -2779,7 +2794,7 @@ body.batch-print-mode > :not(#batch-print-container){
   justify-content: center;
   width: 26mm;
   height: 10.2mm;
-  transform: rotate(90deg);
+  transform: rotate(-90deg);
   transform-origin: center center;
   white-space: nowrap;
 }
@@ -2797,4 +2812,11 @@ body.batch-print-mode > :not(#batch-print-container){
    invadir a linha pontilhada, mantendo o giro anterior. */
 .danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-receipt-text{
   left: -72.4mm;
+}
+
+/* Maior legibilidade para a ação de carregar outro arquivo na tela do XML. */
+.invoice-ready > .change-xml-button{
+  font-size: 14px !important;
+  font-weight: 700;
+  line-height: 1.3;
 }
