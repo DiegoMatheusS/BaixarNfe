@@ -610,7 +610,7 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
     body.fiscal-isolated-print .cte-print {
       display: block !important;
       margin: 0 !important;
-      page: fiscal-portrait !important;
+      page: ${forcePageSize ? "auto" : "fiscal-portrait"} !important;
       width: 190mm !important;
     }
     body.fiscal-isolated-print .cte-sheet {
