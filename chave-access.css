@@ -2762,3 +2762,39 @@ body.batch-print-mode > :not(#batch-print-container){
 .danfe-print.fiscal-landscape-print .fiscal-transport-grid > .fiscal-field:nth-child(9) > b{
   font-size: 8.0pt !important;
 }
+
+/* DANFE horizontal: ajustes restritos ao canhoto lateral destacável.
+   O pontilhado ocupa somente a divisória do canhoto, não a moldura da folha. */
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-receipt{
+  border-right: 0.34mm dashed #000 !important;
+}
+
+/* Gira o conjunto Nota Fiscal / Nº / Série 90 graus à direita,
+   deixando todas as palavras legíveis (sem empilhar caracteres). */
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe-rotated{
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  justify-content: center;
+  width: 26mm;
+  height: 10.2mm;
+  transform: rotate(90deg);
+  transform-origin: center center;
+  white-space: nowrap;
+}
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe-rotated > strong{
+  font-size: 7.2pt;
+  line-height: 1.1;
+}
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-nfe-rotated > b{
+  font-size: 6.1pt;
+  line-height: 1.1;
+  margin-top: 0.6mm;
+}
+
+/* Desloca a declaração lateral discretamente para a direita sem
+   invadir a linha pontilhada, mantendo o giro anterior. */
+.danfe-print .fiscal-sheet.fiscal-landscape .official-landscape-receipt-text{
+  left: -72.4mm;
+}
