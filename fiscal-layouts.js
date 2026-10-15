@@ -217,9 +217,13 @@ function parseNfe(documentNode) {
     const icms = element(tax, "ICMS")?.firstElementChild || null;
     const origin = text(icms, "orig");
     const cst = text(icms, "CST");
-    /* A coluna CST não mostra códigos CSOSN.
-       Sem CST no ICMS do XML, não inventar nem exibir CSOSN como CST. */
-    const icmsCode = origin && /^\d{2}$/.test(cst) ? `${origin}${cst}` : "";
+    const csosn = text(icms, "CSOSN");
+    /* Exibição compacta pedida para a coluna CST: origem+CST quando
+       houver CST; caso contrário, apenas o número CSOSN do grupo ICMS,
+       sem antepor letras nem concatenar a origem. */
+    const icmsCode = origin && /^\d{2}$/.test(cst)
+      ? `${origin}${cst}`
+      : /^\d{3}$/.test(csosn) ? csosn : "";
     return {
       number: detail.getAttribute("nItem") || "",
       code: text(product, "cProd"),
