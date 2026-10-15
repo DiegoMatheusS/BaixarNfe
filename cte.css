@@ -799,3 +799,39 @@
   font-size:6.1pt;
   font-weight:900;
 }
+
+/* v2.39 — Aproveitar a área inferior do DACTE nas observações,
+   sem cortar informações, e quebrar dados longos do emissor/modal. */
+.cte-print .cte-observations {
+  flex: 1 1 auto;
+  min-height: 18mm;
+  max-height: none;
+  overflow: visible;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  padding: 0.65mm 0.7mm;
+}
+.cte-print .cte-final-spacer {
+  flex: 0 0 0;
+  height: 0;
+  min-height: 0;
+}
+.cte-print .cte-use .cte-box {
+  height: auto;
+  min-width: 0;
+}
+.cte-print .cte-use .cte-box > b {
+  display: block;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.2;
+  margin-top: 0.35mm;
+}
+.cte-print .cte-modal-details .cte-field > b {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.15;
+}
