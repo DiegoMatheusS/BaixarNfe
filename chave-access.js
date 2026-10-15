@@ -717,7 +717,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
     throw new Error("Não foi possível abrir a área de impressão.");
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=150", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=151", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
@@ -806,7 +806,7 @@ function ensurePdfCaptureFrame() {
     return Promise.reject(new Error("Não foi possível preparar a página do PDF."));
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=150", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=151", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   frameDocument.open();
   frameDocument.write(`<!doctype html>
