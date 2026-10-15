@@ -717,7 +717,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
     throw new Error("Não foi possível abrir a área de impressão.");
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=148", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=149", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
@@ -806,7 +806,7 @@ function ensurePdfCaptureFrame() {
     return Promise.reject(new Error("Não foi possível preparar a página do PDF."));
   }
 
-  const stylesheetUrl = new URL("/chave-access.css?v=148", window.location.href).href;
+  const stylesheetUrl = new URL("/chave-access.css?v=149", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=1", window.location.href).href;
   frameDocument.open();
   frameDocument.write(`<!doctype html>
@@ -927,7 +927,7 @@ async function captureFiscalSheetCanvas(sheet, scale = 1.7) {
         height: 210mm !important;
         min-height: 210mm !important;
         grid-template-columns: 13mm 1fr !important;
-        gap: 0 !important;
+        gap: 1mm !important;
       }
       .official-landscape-main,
       .official-landscape-receipt {
@@ -1294,6 +1294,62 @@ async function downloadSinglePdfForLegacy(button) {
   } finally {
     button.disabled = false;
   }
+}
+
+/* Download do DANFE/DACTE a partir do XML enviado, sem oferecer
+   o XML original novamente. Aguarda a montagem da versão fiscal oficial. */
+function waitForSingleOfficialDownload(timeoutMs = 12_000) {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      const documentNode = document.querySelector(
+        "#single-official-print-container > .fiscal-standard-print, #single-official-print-container > .cte-print",
+      );
+      if (documentNode) return resolve(documentNode);
+      if (Date.now() - start > timeoutMs) {
+        return reject(new Error("O documento ainda não ficou pronto. Tente novamente."));
+      }
+      window.setTimeout(check, 80);
+    };
+    check();
+  });
+}
+
+async function downloadImportedOfficialPdf(button) {
+  if (button.disabled) return;
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Gerando PDF…";
+
+  try {
+    const officialDocument = await waitForSingleOfficialDownload();
+    const pdf = await createCompatiblePrintPdf([officialDocument]);
+    const accessKey = String(
+      officialDocument.dataset.accessKey || localStatisticsDocuments[0]?.accessKey || "documento-fiscal",
+    ).replace(/[^0-9A-Za-z_-]/g, "");
+    pdf.save(`${accessKey || "documento-fiscal"}.pdf`);
+    button.textContent = "PDF baixado";
+  } catch (error) {
+    button.textContent = "Falha ao baixar PDF";
+    window.setTimeout(() => {
+      if (button.isConnected) button.textContent = originalText;
+    }, 3_000);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function bindSinglePdfDownload() {
+  if (document.body.dataset.singlePdfDownloadBound === "true") return;
+  document.body.dataset.singlePdfDownloadBound = "true";
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".invoice-ready .download-official-pdf-button");
+    if (!button) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    void downloadImportedOfficialPdf(button);
+  }, true);
 }
 
 function bindSinglePrint() {
@@ -1691,7 +1747,7 @@ function buildKeyPanel() {
       <p id="key-result-number"></p>
       <div class="key-downloads">
         <a id="download-key-xml" class="primary-button" href="#">Baixar XML <span>↓</span></a>
-        <button id="open-key-pdf" class="print-button" type="button">Abrir / imprimir DANFE</button>
+        <button id="open-key-pdf" class="print-button" type="button">Imprimir DANFE</button>
       </div>
       <button id="change-key" class="change-xml-button" type="button">Consultar outra chave</button>
     </section>
@@ -1783,7 +1839,7 @@ function bindKeyPanel(panel) {
       const type = data.tipo === "CTE" || modelo === "57" ? "CT-e" : "NF-e";
       resultType.textContent = `${type.toUpperCase()} LOCALIZADO`;
       resultTitle.textContent = type === "CT-e" ? "DACTE e XML prontos" : "DANFE e XML prontos";
-      openPdf.textContent = type === "CT-e" ? "Abrir / imprimir DACTE" : "Abrir / imprimir DANFE";
+      openPdf.textContent = type === "CT-e" ? "Imprimir DACTE" : "Imprimir DANFE";
       number.textContent = `Chave: ${data.chave || chave}`;
       form.hidden = true;
       result.hidden = false;
@@ -1902,6 +1958,7 @@ function enhanceHome() {
 
   enhanceBatchUpload(toolBody);
   bindSinglePrint();
+  bindSinglePdfDownload();
 
   const xmlTab = tabs[0];
   const keyTab = tabs[1];
