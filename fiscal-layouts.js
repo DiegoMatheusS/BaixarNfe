@@ -807,10 +807,10 @@ function contingency(data) {
 
 function landscapeReceipt(data, firstPage) {
   if (!firstPage) {
-    return `<aside class="official-landscape-receipt official-landscape-page-id"><strong>NF-e</strong><b>Nº. ${esc(formatNfeNumber(data.number))}</b><b>SÉRIE ${esc(data.series)}</b></aside>`;
+    return `<aside class="official-landscape-receipt official-landscape-page-id"><div class="official-landscape-nfe-rotated"><strong>NF-e</strong><b>Nº. ${esc(formatNfeNumber(data.number))}</b><b>SÉRIE ${esc(data.series)}</b></div></aside>`;
   }
   return `<aside class="official-landscape-receipt">
-    <div class="official-landscape-nfe"><strong>NOTA FISCAL</strong><b>Nº. ${esc(formatNfeNumber(data.number))}</b><b>SÉRIE ${esc(data.series)}</b></div>
+    <div class="official-landscape-nfe"><div class="official-landscape-nfe-rotated"><strong>NOTA FISCAL</strong><b>Nº. ${esc(formatNfeNumber(data.number))}</b><b>SÉRIE ${esc(data.series)}</b></div></div>
     <div class="official-landscape-receipt-text">RECEBEMOS DE ${esc(data.emitter.name)} OS PRODUTOS E/OU SERVIÇOS CONSTANTES DA NOTA FISCAL ELETRÔNICA. DATA DE RECEBIMENTO · IDENTIFICAÇÃO E ASSINATURA DO RECEBEDOR</div>
   </aside>`;
 }
