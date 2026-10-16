@@ -504,7 +504,7 @@ function waitForIsolatedPrintFrame(frame) {
   });
 }
 
-function isolatedPrintCss({ single = false, orientation = "portrait", lockOrientation = false } = {}) {
+function isolatedPrintCss({ single = false, orientation = "portrait", lockOrientation = false, legacyNfeTopMargin = false } = {}) {
   const landscape = orientation === "landscape";
   const forcePageSize = single || lockOrientation;
   const pageSize = forcePageSize ? `size: A4 ${landscape ? "landscape" : "portrait"};` : "size: auto;";
@@ -512,7 +512,7 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
   const sheetHeight = landscape ? "210mm" : "297mm";
 
   const pageRules = forcePageSize
-    ? `@page { margin: 0; ${pageSize} }`
+    ? `@page { margin: ${legacyNfeTopMargin ? "8mm 0 0" : "0"}; ${pageSize} }`
     : `
       /* Folha padrão neutra: cada folha escolhe sua página nomeada. */
       @page { margin: 8mm; size: auto; }
@@ -728,6 +728,15 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
       ? "browser-chrome"
       : "browser-other";
 
+  // Chrome 109 no Windows 8/8.1 corta o topo da DANFE quando @page tem
+  // margem superior zero. Reserva 8 mm somente para a NF-e individual;
+  // as margens laterais/inferior e a impressão do CT-e não mudam.
+  const legacyNfeTopMargin = single
+    && nodes.length === 1
+    && nodes[0].classList.contains("danfe-print")
+    && /Windows NT 6\.[23]/i.test(userAgent)
+    && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent);
+
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
@@ -737,7 +746,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}</style>
+        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation), legacyNfeTopMargin })}</style>
       </head>
       <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
     </html>`);
