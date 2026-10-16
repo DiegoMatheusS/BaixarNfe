@@ -575,8 +575,7 @@
 .cte-print .cte-modal-details .cte-field > b {
   line-height:1.08;
 }
-.cte-print .cte-modal-details .cte-field-empty > span,
-.cte-print .cte-modal-details .cte-field-empty > b {
+.cte-print .cte-modal-details .cte-field-empty > span {
   color:transparent;
 }
 .cte-print .cte-use .cte-box {
@@ -837,9 +836,9 @@
 }
 
 
-/* v2.40 - Somente CT-e/DACTE: linha destacável a 10 mm do conteúdo
-   superior e a 10 mm do canhoto. Não interfere no DANFE/NF-e. */
+/* v2.41 - Somente CT-e/DACTE: mantém 10 mm acima do pontilhado,
+   mas deixa apenas 1 mm entre a linha e o canhoto. */
 .cte-print .cte-cut {
   flex-shrink: 0;
-  margin: 10mm 0 10mm;
+  margin: 10mm 0 1mm;
 }

@@ -1,4 +1,4 @@
-import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=69";
+import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=70";
 
 const API_URL = "/api/consultar-chave";
 const ACCEPTED_UPLOAD_EXTENSIONS = [".xml", ".txt", ".doc", ".docx"];
@@ -720,7 +720,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
   }
 
   const stylesheetUrl = new URL("/chave-access.css?v=152", window.location.href).href;
-  const cteStylesheetUrl = new URL("/cte.css?v=18", window.location.href).href;
+  const cteStylesheetUrl = new URL("/cte.css?v=19", window.location.href).href;
   const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
     ? "browser-firefox"
@@ -818,7 +818,7 @@ function ensurePdfCaptureFrame() {
   }
 
   const stylesheetUrl = new URL("/chave-access.css?v=152", window.location.href).href;
-  const cteStylesheetUrl = new URL("/cte.css?v=18", window.location.href).href;
+  const cteStylesheetUrl = new URL("/cte.css?v=19", window.location.href).href;
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">

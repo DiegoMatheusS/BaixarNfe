@@ -1128,17 +1128,17 @@ function fillCteTemplate(wrapper, data, rendered) {
   const modalDetails = wrapper.querySelector('[data-cte-slot="modal-details"]');
   if (modalDetails) {
     const details = data.modalDetails || [];
-    const normalized = details.length ? details : [{ label: "MODAL", value: data.modal || "—" }];
-    const filled = normalized.slice(0, 5);
-    while (filled.length < 5) filled.push({ label: " ", value: " " });
+    // Os cinco quadros do modal permanecem visíveis mesmo sem dados no XML.
+    const filled = details.slice(0, 5);
+    while (filled.length < 5) filled.push({ label: "", value: "-" });
     filled.forEach((item) => {
       const field = document.createElement("div");
       field.className = "cte-field";
-      if (!item.label || !item.value || item.label === " ") field.classList.add("cte-field-empty");
+      if (!String(item.label || "").trim()) field.classList.add("cte-field-empty");
       const label = document.createElement("span");
-      label.textContent = item.label || " ";
+      label.textContent = String(item.label || "").trim() || " ";
       const value = document.createElement("b");
-      value.textContent = item.value || " ";
+      value.textContent = String(item.value ?? "").trim() || "-";
       field.append(label, value);
       modalDetails.append(field);
     });
