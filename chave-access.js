@@ -2072,7 +2072,7 @@ observer.observe(document.documentElement, {
   subtree: true,
   childList: true,
   attributes: true,
-  attributeFilter: ["disabled", "aria-disabled", "multiple", "accept"],
+  attributeFilter: ["disabled", "aria-disabled", "multiple"],
 });
 
 window.addEventListener("pagehide", () => {
