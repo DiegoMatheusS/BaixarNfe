@@ -1606,33 +1606,45 @@ function buildDashboardPromo() {
 function enhanceSiteLinks() {
   const nav = document.querySelector(".site-header nav");
   if (nav) {
-    const footerOnlyLabels = new Set(["segurança", "estatísticas"]);
-    for (const link of nav.querySelectorAll("a")) {
-      if (footerOnlyLabels.has(link.textContent.trim().toLocaleLowerCase("pt-BR"))) {
-        link.remove();
+    // As mesmas categorias, destinos e ordem das páginas internas.
+    const entries = [
+      ["/", "ProcurandoDanfe"],
+      ["/#como-funciona", "Como funciona"],
+      ["/ferramentas/", "Ferramentas"],
+      ["/guias/", "Guias"],
+      ["/perguntas-frequentes/", "Dúvidas"],
+      ["/contato/", "Contato"],
+      ["/procurandodashboard/", "ProcurandoDashboard"],
+    ];
+    const links = [...nav.querySelectorAll("a")];
+    const used = new Set();
+    const normalize = (href) => {
+      if (href === "#como-funciona") return "/#como-funciona";
+      if (href === "#duvidas") return "/perguntas-frequentes/";
+      return href;
+    };
+    entries.forEach(([href, label], order) => {
+      const link = links.find((candidate) => !used.has(candidate)
+        && normalize(candidate.getAttribute("href") || "") === href)
+        || links.find((candidate) => !used.has(candidate)
+          && candidate.textContent.trim() === label)
+        || document.createElement("a");
+      used.add(link);
+      if (link.getAttribute("href") !== href) link.setAttribute("href", href);
+      if (link.textContent.trim() !== label) link.textContent = label;
+      if (link.style.order !== String(order)) link.style.order = String(order);
+      link.classList.toggle("dashboard-nav-link", href === "/procurandodashboard/");
+      if (href === "/") {
+        if (window.location.pathname === "/") link.setAttribute("aria-current", "page");
+      } else if (link.hasAttribute("aria-current")) {
+        link.removeAttribute("aria-current");
       }
+      if (!link.isConnected) nav.append(link);
+    });
+    for (const link of links) {
+      if (!used.has(link)) link.remove();
     }
   }
-
-  if (nav && !nav.querySelector('[href="/procurandodashboard/"]')) {
-    const dashboard = document.createElement("a");
-    dashboard.href = "/procurandodashboard/";
-    dashboard.textContent = "ProcurandoDashboardBI";
-    dashboard.className = "dashboard-nav-link";
-    nav.append(dashboard);
-  }
-
-  const dashboardLink = nav?.querySelector('[href="/procurandodashboard/"]');
-  const insertBeforeDashboard = (href, label) => {
-    if (!nav || nav.querySelector(`[href="${href}"]`)) return;
-    const link = document.createElement("a");
-    link.href = href;
-    link.textContent = label;
-    dashboardLink ? nav.insertBefore(link, dashboardLink) : nav.append(link);
-  };
-  insertBeforeDashboard("/guias/", "Guias");
-  insertBeforeDashboard("/ferramentas/", "Ferramentas");
-  insertBeforeDashboard("/contato/", "Contato");
 
   for (const footerLinks of document.querySelectorAll("footer > div")) {
     if (![...footerLinks.querySelectorAll("a")].some((link) => link.textContent.trim() === "Segurança")) {
@@ -1864,7 +1876,8 @@ function setupMainMobileMenu() {
     header.append(panel);
   }
 
-  const links = [...nav.querySelectorAll("a")];
+  const links = [...nav.querySelectorAll("a")]
+    .sort((a, b) => Number(a.style.order) - Number(b.style.order));
   const signature = links.map((link) => `${link.textContent.trim()}|${link.getAttribute("href") || ""}`).join(";");
   if (panel.dataset.signature !== signature) {
     panel.innerHTML = "";
@@ -1903,7 +1916,7 @@ function setupMainMobileMenu() {
       if (!header.contains(event.target)) closeMenu();
     });
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 720) closeMenu();
+      if (window.innerWidth > 900) closeMenu();
     });
   }
 }
