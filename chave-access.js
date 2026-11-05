@@ -728,21 +728,6 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
       ? "browser-chrome"
       : "browser-other";
 
-  // Somente Chrome 109 no Windows 8/8.1: desloca a DANFE sem
-  // redimensionar a folha nem alterar lotes mistos ou CT-e.
-  const legacyDanfeAlignment = /Windows NT 6\\.[23]/i.test(userAgent)
-    && /(?:Chrome|Chromium)\\/109(?:\\.|$)/i.test(userAgent)
-    && nodes.every((node) => node.classList.contains("danfe-print"));
-  const legacyDanfeAlignmentCss = legacyDanfeAlignment
-    ? `@media print {
-        body.fiscal-isolated-print .danfe-sheet {
-          position: relative !important;
-          left: -2mm !important;
-          top: 3mm !important;
-        }
-      }`
-    : "";
-
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
@@ -752,7 +737,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}\n${legacyDanfeAlignmentCss}</style>
+        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}</style>
       </head>
       <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
     </html>`);
@@ -1169,11 +1154,7 @@ function enhanceBatchUpload(toolBody) {
   if (!input || !dropzone) return;
 
   ensureUploadWordStyles();
-  // O campo é controlado pela interface React, que pode recriá-lo ou
-  // sobrescrever o atributo multiple durante atualizações do formulário.
-  // A seleção em lote é suportada em TODOS os navegadores, não só Windows 8.
-  if (!input.multiple) input.multiple = true;
-  if (!input.hasAttribute("multiple")) input.setAttribute("multiple", "");
+  input.multiple = true;
   input.accept = ".xml,.txt,.doc,.docx,text/xml,application/xml,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   const dropzoneTitle = dropzone.querySelector("b");
   const dropzoneMeta = dropzone.querySelector("small");
@@ -2053,16 +2034,6 @@ function enhance() {
 
 enhance();
 
-// Antes de abrir o seletor nativo, garante a seleção múltipla mesmo se o
-// framework recriou o input entre duas passagens do MutationObserver.
-document.addEventListener("click", (event) => {
-  const target = event.target;
-  if (!(target instanceof Element)) return;
-  if (!target.closest(".tool-panel .dropzone, .tool-panel .file-input")) return;
-  const input = document.querySelector(".tool-panel .file-input");
-  if (input && !input.multiple) input.multiple = true;
-}, true);
-
 const observer = new MutationObserver(() => {
   window.clearTimeout(observer.timer);
   observer.timer = window.setTimeout(enhance, 30);
@@ -2072,7 +2043,7 @@ observer.observe(document.documentElement, {
   subtree: true,
   childList: true,
   attributes: true,
-  attributeFilter: ["disabled", "aria-disabled", "multiple"],
+  attributeFilter: ["disabled", "aria-disabled"],
 });
 
 window.addEventListener("pagehide", () => {
