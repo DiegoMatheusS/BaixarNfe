@@ -728,6 +728,21 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
       ? "browser-chrome"
       : "browser-other";
 
+  // Somente Chrome 109 no Windows 8/8.1: desloca a DANFE sem
+  // redimensionar a folha nem alterar lotes mistos ou CT-e.
+  const legacyDanfeAlignment = /Windows NT 6\\.[23]/i.test(userAgent)
+    && /(?:Chrome|Chromium)\\/109(?:\\.|$)/i.test(userAgent)
+    && nodes.every((node) => node.classList.contains("danfe-print"));
+  const legacyDanfeAlignmentCss = legacyDanfeAlignment
+    ? `@media print {
+        body.fiscal-isolated-print .danfe-sheet {
+          position: relative !important;
+          left: -2mm !important;
+          top: 3mm !important;
+        }
+      }`
+    : "";
+
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
@@ -737,7 +752,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}</style>
+        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}\n${legacyDanfeAlignmentCss}</style>
       </head>
       <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
     </html>`);
