@@ -7,6 +7,48 @@
   padding-right: max(24px, calc(50vw - 550px));
 }
 
+/* Navegação global: mesmas posições e tipografia da página inicial. */
+.content-page .site-header {
+  gap: 16px;
+  height: 76px;
+  padding-left: max(24px, calc(50vw - 600px));
+  padding-right: max(24px, calc(50vw - 600px));
+}
+.content-page .site-header nav {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  margin-left: auto;
+}
+.content-page .site-header nav a {
+  align-items: center;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.content-page .site-header nav a.dashboard-nav-link {
+  background: #f2c811;
+  border: 1px solid #d7ad00;
+  border-radius: 8px;
+  color: #28230d !important;
+  font-weight: 800;
+  padding: 9px 12px;
+}
+.content-page .site-header nav a.dashboard-nav-link:hover {
+  background: #ddb600;
+  color: #151100 !important;
+}
+.content-page .content-cta {
+  display: none !important;
+}
+.content-page .content-mobile-menu a.dashboard-nav-link {
+  background: #f2c811;
+  border: 1px solid #d7ad00;
+  border-radius: 8px;
+  color: #28230d !important;
+}
+
 .content-cta {
   background: var(--green);
   border-radius: 8px;
@@ -615,7 +657,7 @@
 .content-menu-toggle,
 .content-mobile-menu{display:none}
 
-@media(max-width:720px){
+@media(max-width:900px){
   .content-page .site-header{overflow:visible;position:relative}
   .content-page .site-header nav{display:none}
   .content-page .content-cta{display:none}
