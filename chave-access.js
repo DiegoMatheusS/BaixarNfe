@@ -1169,7 +1169,11 @@ function enhanceBatchUpload(toolBody) {
   if (!input || !dropzone) return;
 
   ensureUploadWordStyles();
-  input.multiple = true;
+  // O campo é controlado pela interface React, que pode recriá-lo ou
+  // sobrescrever o atributo multiple durante atualizações do formulário.
+  // A seleção em lote é suportada em TODOS os navegadores, não só Windows 8.
+  if (!input.multiple) input.multiple = true;
+  if (!input.hasAttribute("multiple")) input.setAttribute("multiple", "");
   input.accept = ".xml,.txt,.doc,.docx,text/xml,application/xml,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   const dropzoneTitle = dropzone.querySelector("b");
   const dropzoneMeta = dropzone.querySelector("small");
@@ -2049,6 +2053,16 @@ function enhance() {
 
 enhance();
 
+// Antes de abrir o seletor nativo, garante a seleção múltipla mesmo se o
+// framework recriou o input entre duas passagens do MutationObserver.
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  if (!target.closest(".tool-panel .dropzone, .tool-panel .file-input")) return;
+  const input = document.querySelector(".tool-panel .file-input");
+  if (input && !input.multiple) input.multiple = true;
+}, true);
+
 const observer = new MutationObserver(() => {
   window.clearTimeout(observer.timer);
   observer.timer = window.setTimeout(enhance, 30);
@@ -2058,7 +2072,7 @@ observer.observe(document.documentElement, {
   subtree: true,
   childList: true,
   attributes: true,
-  attributeFilter: ["disabled", "aria-disabled"],
+  attributeFilter: ["disabled", "aria-disabled", "multiple", "accept"],
 });
 
 window.addEventListener("pagehide", () => {
