@@ -728,6 +728,19 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
       ? "browser-chrome"
       : "browser-other";
 
+  // Somente Chrome 109 no Windows 8/8.1: ajuste da DANFE no papel.
+  // Não altera a escala, o tamanho A4, os CT-e ou os navegadores modernos.
+  const legacyDanfeAlignmentCss = /Windows NT 6\\.[23]/i.test(userAgent)
+    && /(?:Chrome|Chromium)\\/109(?:\\.|$)/i.test(userAgent)
+    ? `@media print {
+        body.fiscal-isolated-print .danfe-sheet {
+          position: relative !important;
+          left: -2mm !important;
+          top: 3mm !important;
+        }
+      }`
+    : "";
+
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
@@ -737,7 +750,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}</style>
+        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}\n${legacyDanfeAlignmentCss}</style>
       </head>
       <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
     </html>`);
@@ -1154,7 +1167,9 @@ function enhanceBatchUpload(toolBody) {
   if (!input || !dropzone) return;
 
   ensureUploadWordStyles();
-  input.multiple = true;
+  // A seleção múltipla permanece disponível em todos os navegadores.
+  // O input pode ser recriado ou perder o atributo após renderizações.
+  if (!input.multiple) input.multiple = true;
   input.accept = ".xml,.txt,.doc,.docx,text/xml,application/xml,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   const dropzoneTitle = dropzone.querySelector("b");
   const dropzoneMeta = dropzone.querySelector("small");
@@ -2034,6 +2049,15 @@ function enhance() {
 
 enhance();
 
+// Garante a seleção de vários arquivos antes de abrir o seletor nativo.
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  if (!target.closest(".tool-panel .dropzone, .tool-panel .file-input")) return;
+  const input = document.querySelector(".tool-panel .file-input");
+  if (input && !input.multiple) input.multiple = true;
+}, true);
+
 const observer = new MutationObserver(() => {
   window.clearTimeout(observer.timer);
   observer.timer = window.setTimeout(enhance, 30);
@@ -2043,7 +2067,7 @@ observer.observe(document.documentElement, {
   subtree: true,
   childList: true,
   attributes: true,
-  attributeFilter: ["disabled", "aria-disabled"],
+  attributeFilter: ["disabled", "aria-disabled", "multiple"],
 });
 
 window.addEventListener("pagehide", () => {
