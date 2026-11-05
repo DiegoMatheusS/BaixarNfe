@@ -2066,11 +2066,11 @@ body.batch-print-mode > :not(#batch-print-container){
 .site-header .header-badge {
   display: none;
 }
-.site-header nav {
+.site-header.site-header nav {
   gap: 14px;
   margin-left: auto;
 }
-.site-header nav a {
+.site-header.site-header nav a {
   align-items: center;
   display: inline-flex;
   font-size: 11px;
