@@ -2057,6 +2057,38 @@ body.batch-print-mode > :not(#batch-print-container){
   text-align: center;
 }
 
+/* Cabeçalho padronizado entre home, páginas internas e Dashboard. */
+.site-header {
+  gap: 16px;
+  padding-left: max(24px, calc(50vw - 600px));
+  padding-right: max(24px, calc(50vw - 600px));
+}
+.site-header .header-badge {
+  display: none;
+}
+.site-header nav {
+  gap: 14px;
+  margin-left: auto;
+}
+.site-header nav a {
+  align-items: center;
+  display: inline-flex;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.site-header nav a.dashboard-nav-link {
+  background: #f2c811;
+  border: 1px solid #d7ad00;
+  border-radius: 8px;
+  color: #28230d !important;
+  font-weight: 800;
+  padding: 9px 12px;
+}
+.site-header nav a.dashboard-nav-link:hover {
+  background: #ddb600;
+  color: #151100 !important;
+}
+
 /* v109: acesso à área ProcurandoDashboard, sem interferir na impressão fiscal */
 .dashboard-nav-link{
   align-items: center;
@@ -2355,9 +2387,12 @@ body.batch-print-mode > :not(#batch-print-container){
   display: none;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   .site-header {
     overflow: visible;
+  }
+  .site-header nav {
+    display: none !important;
   }
 
   .site-header .main-mobile-menu-toggle {
