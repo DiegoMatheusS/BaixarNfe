@@ -252,9 +252,15 @@
   grid-column: span 5;
 }
 
-.danfe-row-5 > .danfe-total,
-.official-tax-grid > .official-total{
+.danfe-row-5 > .danfe-total{
   grid-column: 26 / 31 !important;
+  grid-row: 2 !important;
+}
+
+/* DANFE: o quadro Valor Total da Nota tem a mesma largura
+   e borda direita alinhada ao Valor Total dos Produtos. */
+.official-tax-grid > .official-total{
+  grid-column: 49 / 61 !important;
   grid-row: 2 !important;
 }
 
@@ -727,7 +733,9 @@
   border-left: 0.22mm solid #000;
   border-top: 0.22mm solid #000;
   display: grid;
-  grid-template-columns: repeat(30, 1fr);
+  /* 60 frações permitem 20% de largura para os dois totais,
+     mantendo as seis células da segunda linha sem quebra. */
+  grid-template-columns: repeat(60, minmax(0, 1fr));
 }
 
 .official-tax-grid .fiscal-field{
@@ -735,17 +743,22 @@
 }
 
 .official-tax-grid .tax-first-row{
-  grid-column: span 6;
+  grid-column: span 12;
 }
 
 .official-tax-grid .tax-second-row{
-  grid-column: span 5;
+  grid-column: span 10;
 }
 
-.official-tax-grid .official-total > b{
-  font-size: 8.4pt;
-  font-weight: 800;
+/* Seguro e desconto cedem somente 1/60 cada para a nota total.
+   Larguras na 2ª linha: 10 + 9 + 9 + 10 + 10 + 12 = 60. */
+.official-tax-grid .tax-second-row:nth-child(7),
+.official-tax-grid .tax-second-row:nth-child(8){
+  grid-column: span 9;
 }
+
+/* Valores da nota e dos produtos usam a mesma regra de fonte,
+   espaçamento e posicionamento padrão de .fiscal-field > b. */
 
 .official-service-tax-grid,
 .official-reform-tax-grid{
