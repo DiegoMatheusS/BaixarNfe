@@ -1339,6 +1339,25 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // Exibe o ads.txt como texto puro, independente do fallback SPA do Pages.
+    // A rota /ads.txt também está incluída em _routes.json.
+    if (url.pathname === "/ads.txt") {
+      const headers = applySecurityHeaders(new Headers({
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "public, max-age=300",
+        "X-Robots-Tag": "all"
+      }));
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        headers.set("Allow", "GET, HEAD");
+        return new Response(null, { status: 405, headers });
+      }
+      const adsText = "google.com, pub-5674140399014280, DIRECT, f08c47fec0942fa0\n";
+      return new Response(request.method === "HEAD" ? null : adsText, {
+        status: 200,
+        headers
+      });
+    }
+
     if (url.pathname === "/api/contact") {
       return handleContactForm(request, env);
     }
