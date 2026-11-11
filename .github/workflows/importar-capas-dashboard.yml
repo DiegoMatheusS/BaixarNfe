@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - dashboard-capas.zip
+      - Capas_ProcurandoDashboard_WEBP.zip
+      - 01WEBP_dashboards.zip
   workflow_dispatch:
 
 permissions:
@@ -28,8 +30,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
-          archive = Path("dashboard-capas.zip")
-          if not archive.is_file():
+          archive = next((Path(name) for name in ("Capas_ProcurandoDashboard_WEBP.zip", "01WEBP_dashboards.zip", "dashboard-capas.zip") if Path(name).is_file()), None)
+          if archive is None:
               print("ZIP ausente; sem alterações.")
               raise SystemExit(0)
           dest = Path("procurandodashboard/capas")
@@ -60,13 +62,12 @@ jobs:
           PY
       - name: Commit e publicação das imagens
         run: |
-          if [ ! -f dashboard-capas.zip ]; then
-            exit 0
-          fi
-          rm dashboard-capas.zip
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- dashboard-capas.zip procurandodashboard/capas
+          git add -A -- procurandodashboard/capas
+          for archive in Capas_ProcurandoDashboard_WEBP.zip 01WEBP_dashboards.zip dashboard-capas.zip; do
+            if [ -f "$archive" ]; then git rm -f -- "$archive"; fi
+          done
           if git diff --cached --quiet; then
             echo "Sem novas imagens."
             exit 0
