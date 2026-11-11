@@ -57,7 +57,7 @@ const catalogTemplates = [
     destaque: "Resultado mensal",
     cor: "navy",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -69,7 +69,7 @@ const catalogTemplates = [
     destaque: "Próximos vencimentos",
     cor: "red",
     tipo: "profissional",
-    preco: 29.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -81,7 +81,7 @@ const catalogTemplates = [
     destaque: "Vendas por período",
     cor: "green",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -93,7 +93,7 @@ const catalogTemplates = [
     destaque: "Desempenho das turmas",
     cor: "blue",
     tipo: "profissional",
-    preco: 29.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -105,7 +105,7 @@ const catalogTemplates = [
     destaque: "Custo e progresso",
     cor: "orange",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -117,7 +117,7 @@ const catalogTemplates = [
     destaque: "Metas e orçamento",
     cor: "green",
     tipo: "pessoal_pro",
-    preco: 19.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -129,7 +129,7 @@ const catalogTemplates = [
     destaque: "Saldo projetado",
     cor: "blue",
     tipo: "profissional",
-    preco: 24.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -141,7 +141,7 @@ const catalogTemplates = [
     destaque: "Giro de estoque",
     cor: "orange",
     tipo: "profissional",
-    preco: 34.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -153,7 +153,7 @@ const catalogTemplates = [
     destaque: "Pessoas e desempenho",
     cor: "red",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -165,7 +165,7 @@ const catalogTemplates = [
     destaque: "Prazo e orçamento",
     cor: "navy",
     tipo: "profissional",
-    preco: 34.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -177,7 +177,7 @@ const catalogTemplates = [
     destaque: "Contas e saldos",
     cor: "yellow",
     tipo: "pessoal_pro",
-    preco: 19.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -189,7 +189,7 @@ const catalogTemplates = [
     destaque: "Evolução patrimonial",
     cor: "navy",
     tipo: "pessoal_pro",
-    preco: 24.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -201,7 +201,7 @@ const catalogTemplates = [
     destaque: "Renda passiva",
     cor: "green",
     tipo: "pessoal_pro",
-    preco: 19.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -213,7 +213,7 @@ const catalogTemplates = [
     destaque: "Ações e fundos",
     cor: "blue",
     tipo: "pessoal_pro",
-    preco: 24.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -225,7 +225,7 @@ const catalogTemplates = [
     destaque: "Carteira cripto",
     cor: "orange",
     tipo: "pessoal_pro",
-    preco: 19.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -249,7 +249,7 @@ const catalogTemplates = [
     destaque: "Recebimentos",
     cor: "green",
     tipo: "profissional",
-    preco: 29.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -261,7 +261,7 @@ const catalogTemplates = [
     destaque: "Resultado gerencial",
     cor: "navy",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -273,7 +273,7 @@ const catalogTemplates = [
     destaque: "Planejado x realizado",
     cor: "yellow",
     tipo: "profissional",
-    preco: 34.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -285,7 +285,7 @@ const catalogTemplates = [
     destaque: "Desempenho da loja",
     cor: "blue",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -297,7 +297,7 @@ const catalogTemplates = [
     destaque: "Aquisição e growth",
     cor: "red",
     tipo: "profissional",
-    preco: 34.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -309,7 +309,7 @@ const catalogTemplates = [
     destaque: "Alcance e engajamento",
     cor: "orange",
     tipo: "profissional",
-    preco: 29.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -321,7 +321,7 @@ const catalogTemplates = [
     destaque: "Cadeia de suprimentos",
     cor: "green",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -333,7 +333,7 @@ const catalogTemplates = [
     destaque: "Saving e fornecedores",
     cor: "navy",
     tipo: "profissional",
-    preco: 29.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -345,7 +345,7 @@ const catalogTemplates = [
     destaque: "Ocupação e receita",
     cor: "blue",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -357,7 +357,7 @@ const catalogTemplates = [
     destaque: "Pedidos e faturamento",
     cor: "red",
     tipo: "profissional",
-    preco: 34.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -369,7 +369,7 @@ const catalogTemplates = [
     destaque: "Alunos ativos",
     cor: "green",
     tipo: "profissional",
-    preco: 29.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -381,7 +381,7 @@ const catalogTemplates = [
     destaque: "Custos de manutenção",
     cor: "orange",
     tipo: "pessoal_pro",
-    preco: 14.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -393,7 +393,7 @@ const catalogTemplates = [
     destaque: "Produção e custos",
     cor: "yellow",
     tipo: "profissional",
-    preco: 44.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -417,7 +417,7 @@ const catalogTemplates = [
     destaque: "Dívidas e parcelas",
     cor: "red",
     tipo: "pessoal_pro",
-    preco: 14.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -429,7 +429,7 @@ const catalogTemplates = [
     destaque: "Projeção patrimonial",
     cor: "navy",
     tipo: "pessoal_pro",
-    preco: 19.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -441,7 +441,7 @@ const catalogTemplates = [
     destaque: "Comparação de ativos",
     cor: "blue",
     tipo: "pessoal_pro",
-    preco: 24.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -453,7 +453,7 @@ const catalogTemplates = [
     destaque: "Gastos recorrentes",
     cor: "yellow",
     tipo: "pessoal_pro",
-    preco: 14.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -465,7 +465,7 @@ const catalogTemplates = [
     destaque: "Serviços e clientes",
     cor: "green",
     tipo: "profissional",
-    preco: 29.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -477,7 +477,7 @@ const catalogTemplates = [
     destaque: "Atendimentos",
     cor: "blue",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -489,7 +489,7 @@ const catalogTemplates = [
     destaque: "Processos e prazos",
     cor: "navy",
     tipo: "profissional",
-    preco: 34.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -501,7 +501,7 @@ const catalogTemplates = [
     destaque: "Ocupação e reservas",
     cor: "orange",
     tipo: "profissional",
-    preco: 39.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -513,7 +513,7 @@ const catalogTemplates = [
     destaque: "Obras e medições",
     cor: "yellow",
     tipo: "profissional",
-    preco: 44.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -525,7 +525,7 @@ const catalogTemplates = [
     destaque: "Eficiência produtiva",
     cor: "red",
     tipo: "profissional",
-    preco: 49.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -537,7 +537,7 @@ const catalogTemplates = [
     destaque: "NPS, churn e SLA",
     cor: "green",
     tipo: "profissional",
-    preco: 34.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -549,7 +549,7 @@ const catalogTemplates = [
     destaque: "Fraudes e anomalias",
     cor: "red",
     tipo: "profissional",
-    preco: 59.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -561,7 +561,7 @@ const catalogTemplates = [
     destaque: "Ocupação e atendimento",
     cor: "blue",
     tipo: "profissional",
-    preco: 59.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   },
@@ -602,11 +602,145 @@ const catalogTemplates = [
     destaque: "Visão contábil",
     cor: "navy",
     tipo: "profissional",
-    preco: 49.9,
+    preco: 19.99,
     status: "em_breve",
     checkoutUrl: ""
   }
 ];
+
+
+// Capas WebP originais do catálogo. Modelos sem capa mantêm o preview ilustrativo.
+const dashboardCoverSets = Object.freeze({
+  "financas-pessoais-1": [
+    "Orcamento_Pessoal_Basico",
+    6
+  ],
+  "financeiro-empresarial": [
+    "Financeiro_Empresarial",
+    8
+  ],
+  "contas-a-pagar": [
+    "Contas_a_Pagar",
+    6
+  ],
+  "vendas-e-faturamento": [
+    "Vendas_e_Faturamento",
+    8
+  ],
+  "controle-escolar": [
+    "Controle_Escolar",
+    5
+  ],
+  "financas-pessoais-2": [
+    "Financas_Pessoais_Pro",
+    8
+  ],
+  "fluxo-de-caixa": [
+    "Fluxo_de_Caixa",
+    6
+  ],
+  "financeiro-bancario": [
+    "Financeiro_Bancario",
+    8
+  ],
+  "carteira-de-investimentos": [
+    "Carteira_de_Investimentos",
+    8
+  ],
+  "dividendos-renda-passiva": [
+    "Dividendos_e_Renda_Passiva",
+    6
+  ],
+  "acoes-e-fiis": [
+    "Acoes_e_FIIs",
+    8
+  ],
+  "criptomoedas": [
+    "Criptomoedas",
+    6
+  ],
+  "metas-de-investimento": [
+    "Metas_de_Investimento",
+    4
+  ],
+  "contas-a-receber": [
+    "Contas_a_Receber",
+    6
+  ],
+  "dre-gerencial": [
+    "DRE_Gerencial",
+    6
+  ],
+  "orcamento-empresarial": [
+    "Orcamento_Empresarial",
+    5
+  ],
+  "ecommerce": [
+    "E-commerce",
+    8
+  ],
+  "marketing-digital": [
+    "Marketing_Digital_e_Growth",
+    8
+  ],
+  "compras-e-fornecedores": [
+    "Compras_e_Gestao_de_Fornecedores",
+    8
+  ],
+  "gestao-imobiliaria": [
+    "Gestao_Imobiliaria",
+    8
+  ],
+  "restaurante-e-delivery": [
+    "Restaurante_e_Delivery",
+    8
+  ],
+  "manutencao-de-veiculos": [
+    "Manutencao_de_Veiculos",
+    8
+  ],
+  "agronegocio": [
+    "Gestao_do_Agronegocio",
+    8
+  ],
+  "orcamento-familiar-basico": [
+    "Orcamento_Familiar_Basico",
+    8
+  ],
+  "controle-de-dividas": [
+    "Controle_de_Dividas",
+    5
+  ],
+  "planejamento-de-aposentadoria": [
+    "Planejamento_de_Aposentadoria",
+    6
+  ],
+  "comparador-de-investimentos": [
+    "Comparador_de_Investimentos",
+    6
+  ],
+  "controle-de-assinaturas": [
+    "Controle_de_Assinaturas",
+    5
+  ],
+  "producao-industrial": [
+    "Producao_Industrial",
+    8
+  ],
+  "dashboard-contabil": [
+    "Dashboard_Contabil",
+    8
+  ]
+});
+for (const template of catalogTemplates) {
+  const cover = dashboardCoverSets[template.id];
+  if (!cover) continue;
+  template.previewImages = Array.from(
+    { length: cover[1] },
+    (_, index) => `/procurandodashboard/capas/${cover[0]}_Exemplo${index + 1}.webp`
+  );
+  template.previewUrl = template.previewImages[0];
+}
 
 const catalogState = {
   templates: [],
@@ -696,6 +830,7 @@ function templateCard(template, index) {
   article.className = `template-card template-${template.cor || "yellow"} template-${plan.className}`;
   article.innerHTML = `
     <div class="template-preview" aria-hidden="true">
+      ${template.previewUrl ? `<img class="template-preview-cover" src="${escapeHtml(safeUrl(template.previewUrl))}" alt="" loading="lazy" decoding="async" />` : ""}
       <div class="template-preview-top"><span></span><b>${escapeHtml(template.destaque || "Visão geral")}</b></div>
       <div class="template-preview-kpis"><i></i><i></i><i></i></div>
       <div class="template-preview-body">
@@ -714,6 +849,9 @@ function templateCard(template, index) {
       </div>
     </div>
   `;
+  article.querySelector(".template-preview-cover")?.addEventListener("error", (event) => {
+    event.currentTarget.remove();
+  });
   return article;
 }
 
@@ -817,7 +955,14 @@ function modalDashboardPreview(template) {
   const plan = planInfo(template.tipo);
   const imageUrl = safeUrl(template.previewUrl);
   if (imageUrl) {
-    return `<img src="${escapeHtml(imageUrl)}" alt="Exemplo visual do dashboard ${escapeHtml(template.nome)}" loading="lazy" />`;
+    const alternatives = (template.previewImages || []).slice(0, 8);
+    return `
+      <div class="detail-dashboard-gallery">
+        <img class="detail-dashboard-gallery-main" src="${escapeHtml(imageUrl)}" alt="Exemplo visual do dashboard ${escapeHtml(template.nome)}" loading="lazy" decoding="async" />
+        <div class="detail-dashboard-gallery-thumbs" aria-label="Outras telas do dashboard">
+          ${alternatives.map((src, index) => `<button type="button" class="detail-dashboard-gallery-thumb${index === 0 ? " is-active" : ""}" data-preview-src="${escapeHtml(safeUrl(src))}" aria-label="Visualizar tela ${index + 1} de ${alternatives.length}"><img src="${escapeHtml(safeUrl(src))}" alt="" loading="lazy" /></button>`).join("")}
+        </div>
+      </div>`;
   }
 
   return `
@@ -842,6 +987,19 @@ function openModelsModal(template, trigger) {
   if (modelsModalDescription) modelsModalDescription.textContent = template.descricao;
   if (modelsModalEyebrow) modelsModalEyebrow.textContent = `${template.categoria} • ${plan.label}`;
   modelsModalPreview.innerHTML = modalDashboardPreview(template);
+  // Mantém o preview ilustrativo quando a imagem ainda não estiver publicada.
+  const galleryMain = modelsModalPreview.querySelector(".detail-dashboard-gallery-main");
+  galleryMain?.addEventListener("error", () => {
+    modelsModalPreview.innerHTML = `<div class="detail-dashboard-fallback">Prévia ilustrativa indisponível. Confira a descrição e os recursos deste modelo.</div>`;
+  });
+  modelsModalPreview.querySelectorAll(".detail-dashboard-gallery-thumb").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextUrl = safeUrl(button.dataset.previewSrc);
+      if (!nextUrl || !galleryMain) return;
+      galleryMain.src = nextUrl;
+      modelsModalPreview.querySelectorAll(".detail-dashboard-gallery-thumb").forEach((thumb) => thumb.classList.toggle("is-active", thumb === button));
+    });
+  });
   if (modelsModalMeta) {
     modelsModalMeta.innerHTML = `<span>Power BI</span><span>Excel</span><span>JSON</span><span>${escapeHtml(template.categoria)}</span>`;
   }
