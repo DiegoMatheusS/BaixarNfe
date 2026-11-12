@@ -609,7 +609,7 @@ const catalogTemplates = [
 ];
 
 
-// Capas WebP originais do catálogo. Modelos sem capa mantêm o preview ilustrativo.
+// Telas originais dos 33 dashboards enviados. Cada modelo usa somente seu próprio conjunto.
 const dashboardCoverSets = Object.freeze({
   "financas-pessoais-1": [
     "Orcamento_Pessoal_Basico",
@@ -638,6 +638,10 @@ const dashboardCoverSets = Object.freeze({
   "fluxo-de-caixa": [
     "Fluxo_de_Caixa",
     6
+  ],
+  "gestao-de-estoque": [
+    "Gestao_de_Estoque",
+    4
   ],
   "financeiro-bancario": [
     "Financeiro_Bancario",
@@ -682,6 +686,14 @@ const dashboardCoverSets = Object.freeze({
   "marketing-digital": [
     "Marketing_Digital_e_Growth",
     8
+  ],
+  "redes-sociais": [
+    "Redes_Sociais",
+    8
+  ],
+  "logistica-e-entregas": [
+    "Logistica_e_Supply_Chain",
+    6
   ],
   "compras-e-fornecedores": [
     "Compras_e_Gestao_de_Fornecedores",
