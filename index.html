@@ -19,7 +19,7 @@
     <script type="module" crossorigin src="/assets/index-BDVXIsV2.js?v=244"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-Rj_DCHNM.css?v=236">
     <link rel="stylesheet" href="/chave-access.css?v=154">
-    <link rel="stylesheet" href="/cte.css?v=20">
+    <link rel="stylesheet" href="/cte.css?v=21">
     <script type="module" src="/chave-access.js?v=167"></script>
   </head>
   <body>
@@ -46,7 +46,7 @@
 
             <section class="cte-center-column">
               <div class="cte-center-title-row">
-                <div class="cte-title"><strong>DACTE</strong><span>Documento Auxiliar do Conhecimento<br>de Transporte Eletrônico</span></div>
+                <div class="cte-title"><strong>DACTE</strong><span>Documento Auxiliar do Conhecimento de Transporte Eletrônico</span></div>
                 <div class="cte-modal"><span>MODAL:</span><b data-cte="modal"></b></div>
               </div>
               <div class="cte-meta-row">
@@ -146,9 +146,14 @@
 
           <div class="cte-section-title">DOCUMENTOS ORIGINÁRIOS</div>
           <section class="cte-documents">
-            <!-- Linha completa: permite mostrar as 44 posições da chave com letra legível. -->
-            <div class="cte-doc-head"><span>TP DOC.</span><span>CNPJ / CPF EMITENTE</span><span>CHAVE DE ACESSO / NÚMERO DA NF-e</span><span>VALOR NOTA</span></div>
-            <div class="cte-doc-body" data-cte-slot="documents-left"></div>
+            <div class="cte-doc-half">
+              <div class="cte-doc-head"><span>TP DOC.</span><span>CNPJ / CPF EMITENTE</span><span>VALOR NOTA</span></div>
+              <div class="cte-doc-body" data-cte-slot="documents-left"></div>
+            </div>
+            <div class="cte-doc-half">
+              <div class="cte-doc-head"><span>TP DOC.</span><span>CNPJ / CPF EMITENTE</span><span>VALOR NOTA</span></div>
+              <div class="cte-doc-body" data-cte-slot="documents-right"></div>
+            </div>
           </section>
 
           <div class="cte-section-title">OBSERVAÇÕES</div>
