@@ -1091,7 +1091,7 @@
   align-items:start;
   margin-bottom:0.32mm;
   padding:0.1mm 0.15mm 0.35mm;
-  border-bottom:0.12mm solid #bbb;
+  border-bottom:0;
 }
 .cte-print .cte-doc-item > span {
   font-size:5.8pt;
