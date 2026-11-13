@@ -722,7 +722,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
   }
 
   const stylesheetUrl = new URL("/chave-access.css?v=154", window.location.href).href;
-  const cteStylesheetUrl = new URL("/cte.css?v=20", window.location.href).href;
+  const cteStylesheetUrl = new URL("/cte.css?v=21", window.location.href).href;
   const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
     ? "browser-firefox"
@@ -825,7 +825,7 @@ function ensurePdfCaptureFrame() {
   }
 
   const stylesheetUrl = new URL("/chave-access.css?v=154", window.location.href).href;
-  const cteStylesheetUrl = new URL("/cte.css?v=20", window.location.href).href;
+  const cteStylesheetUrl = new URL("/cte.css?v=21", window.location.href).href;
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
