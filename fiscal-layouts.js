@@ -1064,8 +1064,11 @@ function fillCteTemplate(wrapper, data, rendered) {
 
   const documentsLeft = wrapper.querySelector('[data-cte-slot="documents-left"]');
   const documentsRight = wrapper.querySelector('[data-cte-slot="documents-right"]');
-  // Documento em linha inteira: chave completa com 44 dígitos e número da NF-e.
+  // Distribuição alternada entre as duas metades, sem modificar a largura.
+  // A chave e a NF-e ficam em linhas próprias dentro de cada metade.
   const allDocuments = data.sourceDocuments || [];
+  const leftDocs = allDocuments.filter((_, index) => index % 2 === 0);
+  const rightDocs = allDocuments.filter((_, index) => index % 2 === 1);
   const appendDocItem = (slot, item) => {
     if (!slot) return;
     const row = document.createElement('div');
@@ -1112,11 +1115,16 @@ function fillCteTemplate(wrapper, data, rendered) {
     row.append(typeCell, issuerCell, documentCell, valueCell);
     slot.append(row);
   };
-  if (documentsLeft) {
+  if (documentsLeft || documentsRight) {
     if (allDocuments.length) {
-      allDocuments.forEach((item) => appendDocItem(documentsLeft, item));
+      const count = Math.max(leftDocs.length, rightDocs.length);
+      for (let index = 0; index < count; index += 1) {
+        if (documentsLeft) appendDocItem(documentsLeft, leftDocs[index]);
+        if (documentsRight) appendDocItem(documentsRight, rightDocs[index]);
+      }
     } else {
-      appendDocItem(documentsLeft, { type: "NENHUM DOCUMENTO ORIGINÁRIO LOCALIZADO NO XML.", value: "" });
+      if (documentsLeft) appendDocItem(documentsLeft, { type: "NENHUM DOCUMENTO ORIGINÁRIO LOCALIZADO NO XML.", value: "" });
+      if (documentsRight) appendDocItem(documentsRight, null);
     }
   }
 

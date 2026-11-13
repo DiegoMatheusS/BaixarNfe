@@ -1001,3 +1001,165 @@
 .cte-print .cte-party-title strong,
 .cte-print .cte-party-address b,
 .cte-print .cte-taker-line b { min-width:0; }
+
+/* v2.43 — DACTE: mantém Documentos Originários dividido ao meio.
+   Aumenta texto das informações de identificação e não muda a largura
+   das seções nem a escala de impressão. */
+.cte-print .cte-title {
+  min-width:0;
+  overflow:hidden;
+}
+.cte-print .cte-title strong { font-size:9.6pt; line-height:1; }
+.cte-print .cte-title span {
+  display:block;
+  max-width:100%;
+  font-size:4.7pt;
+  line-height:1;
+  margin-top:0.15mm;
+  white-space:nowrap;
+  overflow:visible;
+  overflow-wrap:normal;
+  word-break:normal;
+}
+
+/* Estes cinco campos ainda recebiam fontes pequenas de regras
+   específicas antigas, apesar dos aumentos globais do CT-e. */
+.cte-print .cte-ident-first .cte-box > span,
+.cte-print .cte-ident-second .cte-box > span,
+.cte-print .cte-ident-third .cte-box > span {
+  font-size:5.2pt;
+  line-height:1.08;
+  white-space:nowrap;
+  overflow-wrap:normal;
+}
+.cte-print .cte-ident-first .cte-box > b,
+.cte-print .cte-ident-second .cte-box > b,
+.cte-print .cte-ident-third .cte-box > b {
+  font-size:6.7pt;
+  line-height:1.09;
+  min-width:0;
+  white-space:nowrap;
+}
+
+/* Divide os 186 mm em duas áreas idênticas de 93 mm, mantendo
+   o traço central. Não reduzir a largura de nenhum lado. */
+.cte-print .cte-documents {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  grid-template-rows:auto;
+  height:auto;
+  min-height:27mm;
+  width:186mm;
+}
+.cte-print .cte-doc-half {
+  display:grid;
+  grid-template-rows:4.5mm minmax(0,1fr);
+  min-width:0;
+}
+.cte-print .cte-doc-half + .cte-doc-half {
+  border-left:0.14mm solid #555;
+}
+.cte-print .cte-doc-head,
+.cte-print .cte-doc-item {
+  display:grid;
+  grid-template-columns:11mm minmax(0,1fr) 23mm;
+  min-width:0;
+  align-items:start;
+}
+.cte-print .cte-doc-head {
+  border-bottom:0.14mm solid #555;
+  padding:0.2mm 0.3mm;
+  align-items:center;
+}
+.cte-print .cte-doc-head span {
+  font-size:4.65pt;
+  line-height:1.06;
+  white-space:nowrap;
+  overflow:visible;
+}
+.cte-print .cte-doc-head span:last-child {
+  text-align:right;
+}
+.cte-print .cte-doc-body {
+  min-width:0;
+  overflow:visible;
+  padding:0.3mm 0.35mm;
+}
+.cte-print .cte-doc-item {
+  grid-template-rows:auto auto;
+  row-gap:0.08mm;
+  align-items:start;
+  margin-bottom:0.32mm;
+  padding:0.1mm 0.15mm 0.35mm;
+  border-bottom:0.12mm solid #bbb;
+}
+.cte-print .cte-doc-item > span {
+  font-size:5.8pt;
+  line-height:1.08;
+  min-width:0;
+  white-space:nowrap;
+  text-overflow:clip;
+  overflow:hidden;
+}
+.cte-print .cte-doc-item > span:nth-child(1) {
+  grid-column:1;
+  grid-row:1;
+}
+.cte-print .cte-doc-item > span:nth-child(2) {
+  grid-column:2;
+  grid-row:1;
+}
+.cte-print .cte-doc-item > span:nth-child(4) {
+  grid-column:3;
+  grid-row:1;
+  text-align:right;
+}
+.cte-print .cte-doc-item > .cte-doc-reference {
+  grid-column:1 / -1;
+  grid-row:2;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0;
+  min-width:0;
+  width:100%;
+  padding:0.1mm 0;
+  white-space:normal;
+  overflow:visible;
+}
+.cte-print .cte-doc-reference small {
+  display:block;
+  font-size:4.65pt;
+  line-height:1.06;
+  font-weight:700;
+  margin-bottom:0.1mm;
+}
+.cte-print .cte-doc-access-key {
+  display:block;
+  width:max-content;
+  max-width:100%;
+  font-family:monospace;
+  font-size:8.2pt !important;
+  font-weight:700;
+  letter-spacing:0;
+  line-height:1.12 !important;
+  white-space:nowrap !important;
+  overflow:visible;
+  overflow-wrap:normal;
+  word-break:normal;
+}
+.cte-print .cte-doc-nfe-number {
+  display:block;
+  font-size:7pt;
+  font-weight:900;
+  line-height:1.08;
+  margin-top:0.18mm;
+  white-space:nowrap;
+}
+.cte-print .cte-doc-empty > span:first-child {
+  grid-column:1 / -1;
+  grid-row:1;
+  font-size:5.7pt;
+  white-space:normal;
+  overflow:visible;
+}
