@@ -845,6 +845,7 @@
 
 /* v2.42 - Exclusivo CT-e/DACTE: fontes maiores e melhor uso das áreas úteis.
    NF-e/DANFE, margens A4, orientação e escala de impressão permanecem intactos. */
+.cte-print .cte-homolog { font-size:6.4pt; }
 .cte-print .cte-emitter strong { font-size:11.2pt; }
 .cte-print .cte-emitter b { font-size:7.6pt; }
 .cte-print .cte-emitter p { font-size:6.3pt; }
@@ -966,7 +967,7 @@
 }
 .cte-print .cte-doc-nfe-number {
   display:block;
-  font-size:6.5pt;
+  font-size:7pt;
   font-weight:900;
   line-height:1.1;
   margin-top:0;
