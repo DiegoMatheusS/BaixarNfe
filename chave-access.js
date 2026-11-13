@@ -1,4 +1,4 @@
-import { buildOfficialDocument, parseFiscalXml } from "./fiscal-layouts.js?v=70";
+import { buildOfficialDocument, fitCteTextToBounds, parseFiscalXml } from "./fiscal-layouts.js?v=71";
 
 const API_URL = "/api/consultar-chave";
 const ACCEPTED_UPLOAD_EXTENSIONS = [".xml", ".txt", ".doc", ".docx"];
@@ -277,6 +277,7 @@ async function prepareSingleOfficialDocument(file) {
     const officialDocument = buildOfficialDocument(descriptor.fiscalDocument, rendered);
     syncPrintStartOrientation(container, officialDocument);
     container.replaceChildren(officialDocument);
+    fitCteTextToBounds(officialDocument);
     document.body.classList.add("official-print-ready");
     updateLocalStatistics([descriptor.fiscalDocument]);
   } catch {
@@ -422,6 +423,7 @@ async function processBatchFiles(files) {
       const officialDocument = buildOfficialDocument(descriptor.fiscalDocument, rendered);
       officialDocument.classList.add("batch-print-copy");
       printContainer.append(officialDocument);
+      fitCteTextToBounds(officialDocument);
       batchDocuments.push({ ...descriptor, node: officialDocument });
       setBatchRowStatus(row, "ready", descriptor.type === "CT-e" ? "DACTE pronto" : "DANFE pronto");
     } catch (error) {
@@ -720,7 +722,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
   }
 
   const stylesheetUrl = new URL("/chave-access.css?v=154", window.location.href).href;
-  const cteStylesheetUrl = new URL("/cte.css?v=19", window.location.href).href;
+  const cteStylesheetUrl = new URL("/cte.css?v=20", window.location.href).href;
   const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
     ? "browser-firefox"
@@ -823,7 +825,7 @@ function ensurePdfCaptureFrame() {
   }
 
   const stylesheetUrl = new URL("/chave-access.css?v=154", window.location.href).href;
-  const cteStylesheetUrl = new URL("/cte.css?v=19", window.location.href).href;
+  const cteStylesheetUrl = new URL("/cte.css?v=20", window.location.href).href;
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
