@@ -1070,6 +1070,9 @@ function fillCteTemplate(wrapper, data, rendered) {
     if (!slot) return;
     const row = document.createElement('div');
     row.className = 'cte-doc-item';
+    if (String(item?.type || "").startsWith("NENHUM DOCUMENTO ORIGINÁRIO")) {
+      row.classList.add("cte-doc-empty");
+    }
 
     if (!item) {
       [' ', ' ', ' ', ' '].forEach((value) => {
@@ -1141,6 +1144,62 @@ function fillCteTemplate(wrapper, data, rendered) {
 
   wrapper.dataset.accessKey = data.accessKey;
   sheet.dataset.accessKey = data.accessKey;
+}
+
+// Reduz fonte SOMENTE quando um campo do DACTE excede a largura física.
+// A fonte definida no CSS continua maior nos campos que cabem normalmente.
+// Executar após anexar o DACTE ao DOM, antes de imprimir ou gerar o PDF.
+export function fitCteTextToBounds(wrapper) {
+  if (!wrapper?.classList?.contains("cte-print")) return;
+  const fields = wrapper.querySelectorAll([
+    ".cte-inline b",
+    ".cte-meta-row b",
+    ".cte-key-line strong",
+    ".cte-box > span",
+    ".cte-box > b",
+    ".cte-party-title strong",
+    ".cte-party-address b",
+    ".cte-party-meta > span b",
+    ".cte-taker-line strong",
+    ".cte-taker-line b",
+    ".cte-component-row > span",
+    ".cte-component-row > b",
+    ".cte-doc-item > span:not(.cte-doc-reference)",
+    ".cte-modal-details .cte-field > span",
+    ".cte-modal-details .cte-field > b"
+  ].join(", "));
+  for (const node of fields) {
+    if (node.children.length || !node.clientWidth || node.scrollWidth <= node.clientWidth + 1) continue;
+    const originalSize = Number.parseFloat(getComputedStyle(node).fontSize);
+    if (!Number.isFinite(originalSize)) continue;
+    const minSize = 6.4; // ~4.8 pt para XMLs com dados excepcionalmente longos
+    let fontSize = originalSize;
+    for (let i = 0; i < 8 && node.scrollWidth > node.clientWidth + 1; i += 1) {
+      const nextSize = Math.max(minSize, fontSize * ((node.clientWidth - 2) / node.scrollWidth) * 0.985);
+      if (nextSize >= fontSize - 0.1) break;
+      node.style.fontSize = `${nextSize.toFixed(2)}px`;
+      fontSize = nextSize;
+      if (fontSize <= minSize + 0.1) break;
+    }
+  }
+
+  // As 44 posições ficam em uma única linha, com fonte maior, dentro da
+  // coluna dedicada. Redimensiona em XMLs atípicos sem ocultar o número NF-e.
+  for (const reference of wrapper.querySelectorAll(".cte-doc-reference")) {
+    const key = reference.querySelector(".cte-doc-access-key");
+    const number = reference.querySelector(".cte-doc-nfe-number");
+    if (!key || !number || !reference.clientWidth) continue;
+    let currentKeySize = Number.parseFloat(getComputedStyle(key).fontSize);
+    let currentNumberSize = Number.parseFloat(getComputedStyle(number).fontSize);
+    for (let i = 0; i < 8 && reference.scrollWidth > reference.clientWidth + 1; i += 1) {
+      const factor = Math.max(0.92, (reference.clientWidth - 2) / reference.scrollWidth);
+      currentKeySize = Math.max(8.0, currentKeySize * factor);
+      currentNumberSize = Math.max(7.4, currentNumberSize * factor);
+      key.style.fontSize = `${currentKeySize.toFixed(2)}px`;
+      number.style.fontSize = `${currentNumberSize.toFixed(2)}px`;
+      if (currentKeySize <= 8.1 && currentNumberSize <= 7.5) break;
+    }
+  }
 }
 
 function buildCteDocument(data, rendered) {
