@@ -1064,9 +1064,8 @@ function fillCteTemplate(wrapper, data, rendered) {
 
   const documentsLeft = wrapper.querySelector('[data-cte-slot="documents-left"]');
   const documentsRight = wrapper.querySelector('[data-cte-slot="documents-right"]');
+  // Documento em linha inteira: chave completa com 44 dígitos e número da NF-e.
   const allDocuments = data.sourceDocuments || [];
-  const leftDocs = allDocuments.filter((_, index) => index % 2 === 0);
-  const rightDocs = allDocuments.filter((_, index) => index % 2 === 1);
   const appendDocItem = (slot, item) => {
     if (!slot) return;
     const row = document.createElement('div');
@@ -1092,7 +1091,7 @@ function fillCteTemplate(wrapper, data, rendered) {
     documentCell.className = 'cte-doc-reference';
     if (item.accessKey && /^\d{44}$/.test(item.accessKey)) {
       const keyLabel = document.createElement('small');
-      keyLabel.textContent = 'Chave de acesso';
+      keyLabel.textContent = 'Chave de acesso:';
       const keyValue = document.createElement('span');
       keyValue.className = 'cte-doc-access-key';
       keyValue.textContent = item.accessKey;
@@ -1110,16 +1109,11 @@ function fillCteTemplate(wrapper, data, rendered) {
     row.append(typeCell, issuerCell, documentCell, valueCell);
     slot.append(row);
   };
-  if (documentsLeft || documentsRight) {
-    if (leftDocs.length || rightDocs.length) {
-      const count = Math.max(leftDocs.length, rightDocs.length, 1);
-      for (let index = 0; index < count; index += 1) {
-        if (documentsLeft) appendDocItem(documentsLeft, leftDocs[index]);
-        if (documentsRight) appendDocItem(documentsRight, rightDocs[index]);
-      }
+  if (documentsLeft) {
+    if (allDocuments.length) {
+      allDocuments.forEach((item) => appendDocItem(documentsLeft, item));
     } else {
-      if (documentsLeft) appendDocItem(documentsLeft, { type: 'NENHUM DOCUMENTO ORIGINÁRIO LOCALIZADO NO XML.', value: '', });
-      if (documentsRight) appendDocItem(documentsRight, null);
+      appendDocItem(documentsLeft, { type: "NENHUM DOCUMENTO ORIGINÁRIO LOCALIZADO NO XML.", value: "" });
     }
   }
 
@@ -1136,7 +1130,8 @@ function fillCteTemplate(wrapper, data, rendered) {
       field.className = "cte-field";
       if (!String(item.label || "").trim()) field.classList.add("cte-field-empty");
       const label = document.createElement("span");
-      label.textContent = String(item.label || "").trim() || " ";
+      const title = String(item.label || "").trim();
+      label.textContent = title ? (title.endsWith(":") ? title : `${title}:`) : " ";
       const value = document.createElement("b");
       value.textContent = String(item.value ?? "").trim() || "-";
       field.append(label, value);
