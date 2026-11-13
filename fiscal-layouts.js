@@ -1195,7 +1195,7 @@ export function fitCteTextToBounds(wrapper) {
       const factor = Math.max(0.92, (reference.clientWidth - 2) / reference.scrollWidth);
       currentKeySize = Math.max(8.0, currentKeySize * factor);
       currentNumberSize = Math.max(7.4, currentNumberSize * factor);
-      key.style.fontSize = `${currentKeySize.toFixed(2)}px`;
+      key.style.setProperty("font-size", `${currentKeySize.toFixed(2)}px`, "important");
       number.style.fontSize = `${currentNumberSize.toFixed(2)}px`;
       if (currentKeySize <= 8.1 && currentNumberSize <= 7.5) break;
     }
