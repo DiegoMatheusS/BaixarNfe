@@ -946,11 +946,15 @@
   overflow:visible;
   white-space:nowrap;
 }
+.cte-print .cte-doc-item > .cte-doc-reference {
+  overflow:visible;
+  padding-right:0;
+}
 .cte-print .cte-doc-reference small { display:none; }
 .cte-print .cte-doc-access-key {
   display:block;
   font-family:monospace;
-  font-size:7.1pt !important;
+  font-size:8.2pt !important;
   font-weight:700;
   letter-spacing:0;
   line-height:1.15 !important;
