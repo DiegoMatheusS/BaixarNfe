@@ -842,3 +842,157 @@
   flex-shrink: 0;
   margin: 10mm 0 1mm;
 }
+
+/* v2.42 - Exclusivo CT-e/DACTE: fontes maiores e melhor uso das áreas úteis.
+   NF-e/DANFE, margens A4, orientação e escala de impressão permanecem intactos. */
+.cte-print .cte-emitter strong { font-size:11.2pt; }
+.cte-print .cte-emitter b { font-size:7.6pt; }
+.cte-print .cte-emitter p { font-size:6.3pt; }
+.cte-print .cte-emitter small { font-size:6pt; }
+.cte-print .cte-inline span { font-size:5.1pt; }
+.cte-print .cte-inline b { font-size:6.6pt; min-width:0; text-overflow:clip; }
+.cte-print .cte-title strong { font-size:10pt; }
+.cte-print .cte-title span { font-size:5.1pt; }
+.cte-print .cte-modal span { font-size:5.25pt; }
+.cte-print .cte-modal b { font-size:7pt; }
+.cte-print .cte-meta-row span { font-size:4.9pt; }
+.cte-print .cte-meta-row b { font-size:7pt; }
+.cte-print .cte-meta-issued b { font-size:6pt; }
+.cte-print .cte-key-line span { font-size:4.7pt; }
+.cte-print .cte-key-line strong { font-size:6.8pt; letter-spacing:-0.01mm; }
+.cte-print .cte-box > span { font-size:5.05pt; }
+.cte-print .cte-box > b { font-size:6.7pt; }
+.cte-print .cte-choice-row span { font-size:5.2pt; }
+.cte-print .cte-choice-row i { font-size:6pt; }
+.cte-print .cte-party-title span { font-size:5.2pt; }
+.cte-print .cte-party-title strong { font-size:6.8pt; }
+.cte-print .cte-party-address span { font-size:4.85pt; }
+.cte-print .cte-party-address b { font-size:5.9pt; }
+.cte-print .cte-party-meta > span { font-size:4.55pt; }
+.cte-print .cte-party-meta > span b { font-size:5.6pt; }
+.cte-print .cte-taker-line span { font-size:4.85pt; }
+.cte-print .cte-taker-line strong { font-size:6.8pt; }
+.cte-print .cte-taker-line b { font-size:5.8pt; }
+.cte-print .cte-section-title { font-size:5.7pt; }
+.cte-print .cte-component-head span { font-size:5.05pt; }
+.cte-print .cte-component-row span,
+.cte-print .cte-component-row b { font-size:5.9pt; }
+.cte-print .cte-component-totals .cte-box > span { font-size:5pt; }
+.cte-print .cte-component-totals .cte-box > b { font-size:6.8pt; }
+.cte-print .cte-taxes .cte-box > span { font-size:4.8pt; }
+.cte-print .cte-taxes .cte-box > b { font-size:6.1pt; }
+.cte-print .cte-modal-details .cte-field > span { font-size:4.95pt; }
+.cte-print .cte-modal-details .cte-field > b { font-size:5.95pt; }
+.cte-print .cte-use .cte-box > span { font-size:4.95pt; }
+.cte-print .cte-use .cte-box > b { font-size:5.85pt; }
+.cte-print .cte-receipt > div { font-size:5.35pt; }
+.cte-print .cte-receipt > div span { font-size:4.85pt; }
+.cte-print .cte-receipt > div b { font-size:5.9pt; }
+.cte-print .cte-footer { font-size:4.9pt; }
+.cte-print .cte-observations { font-size:5.85pt; line-height:1.18; min-height:10mm; }
+
+/* Uma linha completa por documento originário permite ampliar a chave
+   de 44 dígitos sem quebrar ou invadir a coluna seguinte. */
+.cte-print .cte-documents {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:4.8mm minmax(24mm, auto);
+  height:auto;
+  min-height:33mm;
+  width:186mm;
+}
+.cte-print .cte-doc-head,
+.cte-print .cte-doc-item {
+  display:grid;
+  grid-template-columns:13mm 33mm minmax(0,1fr) 26mm;
+  align-items:center;
+  min-width:0;
+}
+.cte-print .cte-doc-head { padding:0 0.35mm; }
+.cte-print .cte-doc-head span {
+  font-size:5.1pt;
+  font-weight:700;
+  line-height:1.05;
+  white-space:nowrap;
+}
+.cte-print .cte-doc-head span:nth-child(3) { text-align:left; }
+.cte-print .cte-doc-body {
+  overflow:visible;
+  padding:0.25mm 0.35mm;
+  position:static;
+}
+.cte-print .cte-doc-item {
+  border-bottom:0.12mm solid #bbb;
+  min-height:4.8mm;
+  margin-bottom:0.12mm;
+}
+.cte-print .cte-doc-item > span {
+  font-size:6.1pt;
+  line-height:1.12;
+  min-width:0;
+  overflow:hidden;
+  overflow-wrap:normal;
+  padding:0 0.4mm 0 0;
+  text-overflow:clip;
+  white-space:nowrap;
+}
+.cte-print .cte-doc-item > span:last-child { text-align:right; }
+.cte-print .cte-doc-reference {
+  display:flex;
+  flex-direction:row;
+  align-items:baseline;
+  gap:1.2mm;
+  min-width:0;
+  overflow:visible;
+  white-space:nowrap;
+}
+.cte-print .cte-doc-reference small { display:none; }
+.cte-print .cte-doc-access-key {
+  display:block;
+  font-family:monospace;
+  font-size:7.1pt !important;
+  font-weight:700;
+  letter-spacing:0;
+  line-height:1.15 !important;
+  white-space:nowrap !important;
+  overflow:visible;
+  overflow-wrap:normal;
+  word-break:normal;
+  flex:0 0 auto;
+}
+.cte-print .cte-doc-nfe-number {
+  display:block;
+  font-size:6.5pt;
+  font-weight:900;
+  line-height:1.1;
+  margin-top:0;
+  white-space:nowrap;
+  flex:0 1 auto;
+}
+.cte-print .cte-doc-empty > span:first-child {
+  grid-column:1 / -1;
+  white-space:normal;
+  font-size:6pt;
+}
+.cte-print .cte-doc-empty > span:not(:first-child) { display:none; }
+
+/* Quadros curtos: uma linha; os dados extensos de endereço, observação
+   e detalhes do modal mantêm quebra controlada para não perder informação. */
+.cte-print .cte-inline b,
+.cte-print .cte-meta-row b,
+.cte-print .cte-box > span,
+.cte-print .cte-party-title strong,
+.cte-print .cte-component-row b,
+.cte-print .cte-doc-item > span {
+  min-width:0;
+  text-overflow:clip;
+}
+.cte-print .cte-inline b,
+.cte-print .cte-meta-row b,
+.cte-print .cte-box > span,
+.cte-print .cte-component-row b {
+  white-space:nowrap;
+}
+.cte-print .cte-party-title strong,
+.cte-print .cte-party-address b,
+.cte-print .cte-taker-line b { min-width:0; }
