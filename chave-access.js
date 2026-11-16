@@ -506,7 +506,7 @@ function waitForIsolatedPrintFrame(frame) {
   });
 }
 
-function isolatedPrintCss({ single = false, orientation = "portrait", lockOrientation = false } = {}) {
+function isolatedPrintCss({ single = false, orientation = "portrait", lockOrientation = false, legacyNfeTopMargin = false } = {}) {
   const landscape = orientation === "landscape";
   const forcePageSize = single || lockOrientation;
   const pageSize = forcePageSize ? `size: A4 ${landscape ? "landscape" : "portrait"};` : "size: auto;";
@@ -514,7 +514,7 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
   const sheetHeight = landscape ? "210mm" : "297mm";
 
   const pageRules = forcePageSize
-    ? `@page { margin: 0; ${pageSize} }`
+    ? `@page { margin: ${legacyNfeTopMargin ? "12mm 0 0" : "0"}; ${pageSize} }`
     : `
       /* Folha padrão neutra: cada folha escolhe sua página nomeada. */
       @page { margin: 8mm; size: auto; }
@@ -730,15 +730,24 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
       ? "browser-chrome"
       : "browser-other";
 
-  // Somente Chrome 109 no Windows 8/8.1: ajuste da DANFE no papel.
-  // Não altera a escala, o tamanho A4, os CT-e ou os navegadores modernos.
-  const legacyDanfeAlignmentCss = /Windows NT 6\.[23]/i.test(userAgent)
+  // Chrome 109 no Windows 8/8.1 pode cortar o canhoto superior do DANFE
+  // quando a area de pagina começa em 0. Reservamos margem fisica superior,
+  // sem mudar escala, CT-e, orientacao paisagem ou outros navegadores.
+  const legacyDanfeChrome109 = single
+    && !landscape
+    && /Windows NT 6\.[23]/i.test(userAgent)
     && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent)
+    && nodes.every((node) =>
+      (node.matches(".danfe-sheet") || Boolean(node.querySelector(".danfe-sheet")))
+      && !node.matches(".cte-sheet")
+      && !node.querySelector(".cte-sheet"),
+    );
+  const legacyDanfeAlignmentCss = legacyDanfeChrome109
     ? `@media print {
         body.fiscal-isolated-print .danfe-sheet {
           position: relative !important;
           left: -2mm !important;
-          top: 3mm !important;
+          top: 0 !important;
         }
       }`
     : "";
@@ -752,7 +761,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation) })}
+        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation), legacyNfeTopMargin: legacyDanfeChrome109 })}
 ${legacyDanfeAlignmentCss}</style>
       </head>
       <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
