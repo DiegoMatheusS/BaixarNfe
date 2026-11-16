@@ -735,8 +735,8 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
   // sem mudar escala, CT-e, orientacao paisagem ou outros navegadores.
   const legacyDanfeChrome109 = single
     && !landscape
-    && /Windows NT 6\\.[23]/i.test(userAgent)
-    && /(?:Chrome|Chromium)\\/109(?:\\.|$)/i.test(userAgent)
+    && /Windows NT 6\.[23]/i.test(userAgent)
+    && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent)
     && nodes.every((node) =>
       (node.matches(".danfe-sheet") || Boolean(node.querySelector(".danfe-sheet")))
       && !node.matches(".cte-sheet")
