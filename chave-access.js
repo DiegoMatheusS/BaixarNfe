@@ -506,7 +506,7 @@ function waitForIsolatedPrintFrame(frame) {
   });
 }
 
-function isolatedPrintCss({ single = false, orientation = "portrait", lockOrientation = false, legacyNfeTopMargin = false } = {}) {
+function isolatedPrintCss({ single = false, orientation = "portrait", lockOrientation = false } = {}) {
   const landscape = orientation === "landscape";
   const forcePageSize = single || lockOrientation;
   const pageSize = forcePageSize ? `size: A4 ${landscape ? "landscape" : "portrait"};` : "size: auto;";
@@ -514,7 +514,7 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
   const sheetHeight = landscape ? "210mm" : "297mm";
 
   const pageRules = forcePageSize
-    ? `@page { margin: ${legacyNfeTopMargin ? "12mm 0 0" : "0"}; ${pageSize} }`
+    ? `@page { margin: 0; ${pageSize} }`
     : `
       /* Folha padrão neutra: cada folha escolhe sua página nomeada. */
       @page { margin: 8mm; size: auto; }
@@ -702,7 +702,21 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
   if (!nodes.length) throw new Error("Documento fiscal ainda não está pronto para impressão.");
 
   const firstSheet = nodes[0].querySelector(".danfe-sheet, .cte-sheet") || nodes[0];
-  const orientation = forcedOrientation || sheetOrientation(firstSheet);
+  const userAgent = navigator.userAgent || "";
+  // DANFE vertical: Chrome 109 no Windows 8/8.1 usa exatamente o mesmo
+  // CSS de impressao do Chrome atual, em vez do A4 sem margens.
+  // Continua mantendo o modo compativel para DACTE e DANFE horizontal.
+  const modernDanfePrintLayout = /Windows NT 6\.[23]/i.test(userAgent)
+    && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent)
+    && sheetOrientation(firstSheet) === "portrait"
+    && nodes.every((node) =>
+      Boolean(node.querySelector(".danfe-sheet"))
+      && !node.matches(".cte-print, .cte-sheet")
+      && !node.querySelector(".cte-print, .cte-sheet"),
+    );
+  const printSingle = modernDanfePrintLayout ? false : single;
+  const printForcedOrientation = modernDanfePrintLayout ? null : forcedOrientation;
+  const orientation = printForcedOrientation || sheetOrientation(firstSheet);
   const landscape = orientation === "landscape";
   // A largura do iframe não pode depender só da primeira folha: em lote
   // misto, uma folha paisagem precisa manter toda sua largura natural.
@@ -723,34 +737,12 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
 
   const stylesheetUrl = new URL("/chave-access.css?v=154", window.location.href).href;
   const cteStylesheetUrl = new URL("/cte.css?v=22", window.location.href).href;
-  const userAgent = navigator.userAgent || "";
   const browserClass = /Firefox\//i.test(userAgent)
     ? "browser-firefox"
     : /(?:Chrome|Chromium|Edg)\//i.test(userAgent)
       ? "browser-chrome"
       : "browser-other";
 
-  // Chrome 109 no Windows 8/8.1 pode cortar o canhoto superior do DANFE
-  // quando a area de pagina começa em 0. Reservamos margem fisica superior,
-  // sem mudar escala, CT-e, orientacao paisagem ou outros navegadores.
-  const legacyDanfeChrome109 = single
-    && !landscape
-    && /Windows NT 6\.[23]/i.test(userAgent)
-    && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent)
-    && nodes.every((node) =>
-      (node.matches(".danfe-sheet") || Boolean(node.querySelector(".danfe-sheet")))
-      && !node.matches(".cte-sheet")
-      && !node.querySelector(".cte-sheet"),
-    );
-  const legacyDanfeAlignmentCss = legacyDanfeChrome109
-    ? `@media print {
-        body.fiscal-isolated-print .danfe-sheet {
-          position: relative !important;
-          left: -2mm !important;
-          top: 0 !important;
-        }
-      }`
-    : "";
 
   frameDocument.open();
   frameDocument.write(`<!doctype html>
@@ -761,8 +753,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single, orientation, lockOrientation: Boolean(forcedOrientation), legacyNfeTopMargin: legacyDanfeChrome109 })}
-${legacyDanfeAlignmentCss}</style>
+        <style>${isolatedPrintCss({ single: printSingle, orientation, lockOrientation: Boolean(printForcedOrientation) })}</style>
       </head>
       <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
     </html>`);
