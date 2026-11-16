@@ -706,8 +706,8 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
   // DANFE vertical: Chrome 109 no Windows 8/8.1 usa exatamente o mesmo
   // CSS de impressao do Chrome atual, em vez do A4 sem margens.
   // Continua mantendo o modo compativel para DACTE e DANFE horizontal.
-  const modernDanfePrintLayout = /Windows NT 6\\.[23]/i.test(userAgent)
-    && /(?:Chrome|Chromium)\\/109(?:\\.|$)/i.test(userAgent)
+  const modernDanfePrintLayout = /Windows NT 6\.[23]/i.test(userAgent)
+    && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent)
     && sheetOrientation(firstSheet) === "portrait"
     && nodes.every((node) =>
       Boolean(node.querySelector(".danfe-sheet"))
