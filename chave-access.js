@@ -703,19 +703,21 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
 
   const firstSheet = nodes[0].querySelector(".danfe-sheet, .cte-sheet") || nodes[0];
   const userAgent = navigator.userAgent || "";
-  // DANFE vertical: Chrome 109 no Windows 8/8.1 usa exatamente o mesmo
-  // CSS de impressao do Chrome atual, em vez do A4 sem margens.
-  // Continua mantendo o modo compativel para DACTE e DANFE horizontal.
-  const modernDanfePrintLayout = /Windows NT 6\.[23]/i.test(userAgent)
+  // Chrome 109 no Windows 8.1: posicionar as folhas com margens fisicas
+  // em A4 fixo. Nao interfere no DACTE, paisagem ou Windows 10/11.
+  const win81Chrome109Danfe = /Windows NT 6\.3/i.test(userAgent)
     && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent)
-    && sheetOrientation(firstSheet) === "portrait"
-    && nodes.every((node) =>
-      Boolean(node.querySelector(".danfe-sheet"))
-      && !node.matches(".cte-print, .cte-sheet")
-      && !node.querySelector(".cte-print, .cte-sheet"),
-    );
-  const printSingle = modernDanfePrintLayout ? false : single;
-  const printForcedOrientation = modernDanfePrintLayout ? null : forcedOrientation;
+    && nodes.every((node) => {
+      const sheets = node.matches(".danfe-sheet")
+        ? [node]
+        : [...node.querySelectorAll(".danfe-sheet")];
+      return sheets.length > 0
+        && sheets.every((sheet) => sheetOrientation(sheet) === "portrait")
+        && !node.matches(".cte-print, .cte-sheet")
+        && !node.querySelector(".cte-print, .cte-sheet");
+    });
+  const printSingle = win81Chrome109Danfe || single;
+  const printForcedOrientation = win81Chrome109Danfe ? "portrait" : forcedOrientation;
   const orientation = printForcedOrientation || sheetOrientation(firstSheet);
   const landscape = orientation === "landscape";
   // A largura do iframe não pode depender só da primeira folha: em lote
@@ -744,6 +746,32 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
       : "browser-other";
 
 
+  // Forca uma folga superior por folha: 14 + 276 = 290 mm no A4.
+  // Nao depende de paginas nomeadas nem da margem do dialogo legado.
+  const win81DanfePrintCss = win81Chrome109Danfe ? `
+    @media print {
+      body.fiscal-isolated-print.browser-win81-chrome109 .fiscal-standard-print.fiscal-portrait-print {
+        display: flow-root !important;
+        box-sizing: border-box !important;
+        width: 210mm !important;
+        min-width: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body.fiscal-isolated-print.browser-win81-chrome109 .fiscal-sheet.fiscal-portrait {
+        box-sizing: border-box !important;
+        width: 190mm !important;
+        min-width: 190mm !important;
+        height: 276mm !important;
+        min-height: 276mm !important;
+        margin: 14mm 0 0 10mm !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+      }
+    }
+  ` : "";
+
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
@@ -753,9 +781,10 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single: printSingle, orientation, lockOrientation: Boolean(printForcedOrientation) })}</style>
+        <style>${isolatedPrintCss({ single: printSingle, orientation, lockOrientation: Boolean(printForcedOrientation) })}
+${win81DanfePrintCss}</style>
       </head>
-      <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
+      <body class="fiscal-isolated-print ${browserClass}${win81Chrome109Danfe ? " browser-win81-chrome109" : ""}">${nodes.map((node) => node.outerHTML).join("")}</body>
     </html>`);
   frameDocument.close();
 
