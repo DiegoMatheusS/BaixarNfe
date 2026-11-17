@@ -764,6 +764,7 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         min-width: 190mm !important;
         height: 276mm !important;
         min-height: 276mm !important;
+        page: auto !important;
         margin: 14mm 0 0 10mm !important;
         top: 0 !important;
         left: 0 !important;
