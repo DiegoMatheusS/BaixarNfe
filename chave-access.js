@@ -506,18 +506,10 @@ function waitForIsolatedPrintFrame(frame) {
   });
 }
 
-function isolatedPrintCss({ single = false, orientation = "portrait", lockOrientation = false } = {}) {
-  const landscape = orientation === "landscape";
-  const forcePageSize = single || lockOrientation;
-  const pageSize = forcePageSize ? `size: A4 ${landscape ? "landscape" : "portrait"};` : "size: auto;";
-  const sheetWidth = landscape ? "297mm" : "210mm";
-  const sheetHeight = landscape ? "210mm" : "297mm";
-
-  const pageRules = forcePageSize
-    ? `@page { margin: 0; ${pageSize} }`
-    : `
-      /* Folha padrão neutra: cada folha escolhe sua página nomeada. */
-      @page { margin: 8mm; size: auto; }
+function isolatedPrintCss({ legacyCte = false } = {}) {
+  const pageRules = `
+      /* O CT-e em navegador antigo usa a página padrão com A4 fixo. */
+      ${legacyCte ? "@page { margin: 0; size: A4 portrait; }" : "@page { margin: 8mm; size: auto; }"}
       @page fiscal-portrait { margin: 8mm; size: A4 portrait; }
       @page fiscal-landscape { margin: 8mm; size: A4 landscape; }
     `;
@@ -545,16 +537,6 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
       position: static !important;
       top: auto !important;
     }
-    ${forcePageSize ? `
-    body.fiscal-isolated-print .fiscal-standard-print {
-      page: auto !important;
-      width: ${sheetWidth} !important;
-    }
-    body.fiscal-isolated-print .fiscal-sheet {
-      height: ${sheetHeight} !important;
-      min-height: ${sheetHeight} !important;
-      width: ${sheetWidth} !important;
-    }` : `
     body.fiscal-isolated-print .fiscal-portrait-print,
     body.fiscal-isolated-print .fiscal-sheet.fiscal-portrait,
     body.fiscal-isolated-print .fiscal-sheet.fiscal-portrait {
@@ -579,7 +561,7 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
     }
     body.fiscal-isolated-print .fiscal-standard-print.fiscal-landscape-print {
       width: 280mm !important;
-    }`}
+    }
     body.fiscal-isolated-print .fiscal-sheet {
       box-sizing: border-box !important;
       margin: 0 !important;
@@ -596,15 +578,12 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
       break-after: auto !important;
       page-break-after: auto !important;
     }
-    /* Páginas nomeadas só são necessárias nos navegadores modernos.
-       Na impressão compatível (A4 fixo), não sobrescrever @page. */
-    ${forcePageSize ? "" : `
     body.fiscal-isolated-print > .fiscal-standard-print.fiscal-portrait-print {
       page: fiscal-portrait !important;
     }
     body.fiscal-isolated-print > .fiscal-standard-print.fiscal-landscape-print {
       page: fiscal-landscape !important;
-    }`}
+    }
     body.fiscal-isolated-print > .fiscal-standard-print + .fiscal-standard-print {
       break-before: page !important;
       page-break-before: always !important;
@@ -612,7 +591,7 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
     body.fiscal-isolated-print .cte-print {
       display: block !important;
       margin: 0 !important;
-      page: ${forcePageSize ? "auto" : "fiscal-portrait"} !important;
+      page: ${legacyCte ? "auto" : "fiscal-portrait"} !important;
       width: 190mm !important;
     }
     body.fiscal-isolated-print .cte-sheet {
@@ -631,8 +610,8 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
        em conteúdo paginado, então usamos margens físicas iguais dos dois lados. */
     body.fiscal-isolated-print.browser-chrome .fiscal-standard-print {
       width: 190mm !important;
-      margin-left: ${forcePageSize ? "10mm" : "2mm"} !important;
-      margin-right: ${forcePageSize ? "10mm" : "2mm"} !important;
+      margin-left: 2mm !important;
+      margin-right: 2mm !important;
     }
     body.fiscal-isolated-print.browser-chrome .fiscal-sheet.fiscal-portrait,
     body.fiscal-isolated-print.browser-chrome .cte-sheet {
@@ -697,29 +676,15 @@ function isolatedPrintCss({ single = false, orientation = "portrait", lockOrient
   `;
 }
 
-async function printFiscalDocumentsIsolated(documentNodes, { single = false, forcedOrientation = null, waitForAfterPrint = false } = {}) {
+async function printFiscalDocumentsIsolated(documentNodes, { waitForAfterPrint = false } = {}) {
   const nodes = documentNodes.filter(Boolean);
   if (!nodes.length) throw new Error("Documento fiscal ainda não está pronto para impressão.");
 
   const firstSheet = nodes[0].querySelector(".danfe-sheet, .cte-sheet") || nodes[0];
   const userAgent = navigator.userAgent || "";
-  // Chrome 109 no Windows 8.1: posicionar as folhas com margens fisicas
-  // em A4 fixo. Nao interfere no DACTE, paisagem ou Windows 10/11.
-  const win81Chrome109Danfe = /Windows NT 6\.3/i.test(userAgent)
-    && /(?:Chrome|Chromium)\/109(?:\.|$)/i.test(userAgent)
-    && nodes.every((node) => {
-      const sheets = node.matches(".danfe-sheet")
-        ? [node]
-        : [...node.querySelectorAll(".danfe-sheet")];
-      return sheets.length > 0
-        && sheets.every((sheet) => sheetOrientation(sheet) === "portrait")
-        && !node.matches(".cte-print, .cte-sheet")
-        && !node.querySelector(".cte-print, .cte-sheet");
-    });
-  const printSingle = win81Chrome109Danfe || single;
-  const printForcedOrientation = win81Chrome109Danfe ? "portrait" : forcedOrientation;
-  const orientation = printForcedOrientation || sheetOrientation(firstSheet);
-  const landscape = orientation === "landscape";
+  const legacyCte = requiresPdfPrintFallback(userAgent)
+    && nodes.some((node) => node.matches(".cte-print, .cte-sheet"));
+  const landscape = sheetOrientation(firstSheet) === "landscape";
   // A largura do iframe não pode depender só da primeira folha: em lote
   // misto, uma folha paisagem precisa manter toda sua largura natural.
   const mixedOrientations = new Set(nodes.flatMap((node) =>
@@ -745,34 +710,6 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
       ? "browser-chrome"
       : "browser-other";
 
-
-  // Forca uma folga superior por folha: 14 + 276 = 290 mm no A4.
-  // Nao depende de paginas nomeadas nem da margem do dialogo legado.
-  const win81DanfePrintCss = win81Chrome109Danfe ? `
-    @media print {
-      body.fiscal-isolated-print.browser-win81-chrome109 .fiscal-standard-print.fiscal-portrait-print {
-        display: flow-root !important;
-        box-sizing: border-box !important;
-        width: 210mm !important;
-        min-width: 210mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      body.fiscal-isolated-print.browser-win81-chrome109 .fiscal-sheet.fiscal-portrait {
-        box-sizing: border-box !important;
-        width: 190mm !important;
-        min-width: 190mm !important;
-        height: 276mm !important;
-        min-height: 276mm !important;
-        page: auto !important;
-        margin: 14mm 0 0 10mm !important;
-        top: 0 !important;
-        left: 0 !important;
-        transform: none !important;
-      }
-    }
-  ` : "";
-
   frameDocument.open();
   frameDocument.write(`<!doctype html>
     <html lang="pt-BR">
@@ -782,10 +719,9 @@ async function printFiscalDocumentsIsolated(documentNodes, { single = false, for
         <title>Documento fiscal</title>
         <link rel="stylesheet" href="${stylesheetUrl}">
         <link rel="stylesheet" href="${cteStylesheetUrl}">
-        <style>${isolatedPrintCss({ single: printSingle, orientation, lockOrientation: Boolean(printForcedOrientation) })}
-${win81DanfePrintCss}</style>
+        <style>${isolatedPrintCss({ legacyCte })}</style>
       </head>
-      <body class="fiscal-isolated-print ${browserClass}${win81Chrome109Danfe ? " browser-win81-chrome109" : ""}">${nodes.map((node) => node.outerHTML).join("")}</body>
+      <body class="fiscal-isolated-print ${browserClass}">${nodes.map((node) => node.outerHTML).join("")}</body>
     </html>`);
   frameDocument.close();
 
@@ -1174,14 +1110,7 @@ async function printBatchDocuments(panel) {
       pdf.save("documentos-fiscais-compatibilidade.pdf");
       message.textContent = "PDF baixado. Abra o arquivo para imprimir as folhas com orientações diferentes.";
     } else {
-      /* Uma única orientação: mesmo diálogo de impressão do site normal.
-         No navegador antigo, fixa A4 para não depender de páginas nomeadas. */
-      const legacyOrientation = legacyBrowser ? [...orientations][0] : null;
-      await printFiscalDocumentsIsolated(documents, {
-        single: legacyBrowser,
-        forcedOrientation: legacyOrientation,
-        waitForAfterPrint: true,
-      });
+      await printFiscalDocumentsIsolated(documents, { waitForAfterPrint: true });
       message.textContent = "Impressão preparada. Todos os documentos foram enviados juntos.";
     }
   } catch (error) {
@@ -1366,16 +1295,7 @@ function bindSinglePrint() {
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    /* Todos os navegadores abrem a impressão normal sem aba "Aguarde".
-       No Windows 8/Chrome 109 força A4 na orientação da nota para não
-       depender das regras @page nomeadas, pouco confiáveis nessa versão. */
-    const legacyBrowser = requiresPdfPrintFallback();
-    const firstSheet = officialDocument.querySelector(".danfe-sheet, .cte-sheet") || officialDocument;
-    void printFiscalDocumentsIsolated([officialDocument], {
-      single: legacyBrowser,
-      forcedOrientation: legacyBrowser ? sheetOrientation(firstSheet) : null,
-      waitForAfterPrint: true,
-    }).catch(() => {
+    void printFiscalDocumentsIsolated([officialDocument], { waitForAfterPrint: true }).catch(() => {
       /* Só gerar PDF local como último recurso se a impressão falhar. */
       void downloadSinglePdfForLegacy(button);
     });
